@@ -1,11 +1,26 @@
 import React from 'react'
-
+import Image from "next/image";
 const FooterComponent = () => {
   return (
     <div className='flex-row'>
-      <div className=''>
-
+        {/* primera seccion */}
+      <div className='flex flex-row'>
+        <Image
+        className="dark:invert"
+        src="/next.svg"
+        alt="Next.js logo"
+        width={180}
+        height={38}
+        priority
+        />
+        <div>
+          <p className="text-gray-600">
+            <span className="text-gray-900">Next.js</span> is a minimalistic
+            framework for building fast web applications.
+          </p>
+        </div>
       </div>
+      {/* segunda sección */}
       <div className='grid grid-cols-4'>
         <div className='col-span-1'>
           <h1>About</h1>
