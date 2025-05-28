@@ -60,7 +60,7 @@ const FooterComponent = () => {
                 </div>
             </div>
         </div>
-        <div className='flex flex-row gap-8 items-center justify-end'>
+        <div className='flex flex-row gap-8 items-center lg:justify-end justify-between '>
             <Facebook/>
             <Instagram/>
             <Youtube/>
