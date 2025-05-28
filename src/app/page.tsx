@@ -1,4 +1,5 @@
 "use client";
+import FooterComponent from "@/components/footer";
 import NavbarComponent from "@/components/navbar";
 import AuthService from "@/services/AuthService";
 import Image from "next/image";
@@ -114,6 +115,7 @@ export default function Home() {
           </a>
         </footer>
       </div>
+      <FooterComponent/>
     </>
   );
 }
