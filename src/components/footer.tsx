@@ -1,69 +1,74 @@
 import React from 'react'
 import Image from "next/image";
+import Button from '@mui/material/Button';
+import { Facebook, Instagram, Youtube } from 'lucide-react';
 const FooterComponent = () => {
   return (
-    <div className='flex-row p-4'>
-        {/* primera seccion */}
-      <div className='flex flex-row mb-4'>
-        <div className='w-[50%]'>
-            <Image
-            className="dark:invert"
-            src="/next.svg"
-            alt="Next.js logo"
-            width={180}
-            height={38}
-            priority
-            />
-        </div>
-        <div>
-            <p className="text-gray-600 mb-4">
-                ¡Te esperan muchos beneficios y sorpresas!
-                Regístrate, acumula puntos y úsalos en todas tus compras.
-            </p>
-            <div className='w-full bg-white flex items-center justify-center py-3 rounded-lg'>
-                <button className="text-sm text-gray-600 hover:text-gray-900">
-                    Descubre más
-                </button>
+    <>
+        <div className='flex lg:flex-row flex-col p-4 gap-4'>
+            {/* primera seccion */}
+            <div className='flex flex-col mb-4 lg:w-[35%] gap-8'>
+                <div className='mx-auto'>
+                    <Image
+                    className="dark:invert"
+                    src="/next.svg"
+                    alt="Next.js logo"
+                    width={180}
+                    height={38}
+                    priority
+                    />
+                </div>
+                <div>
+                    <p className="text-gray-600 mb-6">
+                        ¡Te esperan muchos beneficios y sorpresas!
+                        Regístrate, acumula puntos y úsalos en todas tus compras.
+                    </p>
+                    <div className='w-full flex items-center justify-center py-3 rounded-lg'>
+                        <Button style={{width:'100%', backgroundColor:'white', color:'black'}} variant='contained'>Descubre más</Button>
+                    </div>
+                </div>
+            </div>
+            {/* segunda sección */}
+            <div className='grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 flex-1 gap-8 px-4'>
+                <div className='col-span-1'>
+                    <h1 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>ACERCA DE</h1>
+                    <ul className='space-y-3'>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>About Us</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Contact Us</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Careers</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Blog</li>
+                    </ul>
+                </div>
+                <div className='col-span-1'>
+                    <h1 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>TÉRMINOS Y CONDICIONES</h1>
+                    <ul className='space-y-3'>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Help Center</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Terms of Service</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Privacy Policy</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Legal</li>
+                    </ul>
+                </div>
+                
+                <div className='col-span-1'>
+                    <h1 className='text-lg font-bold mb-4 text-gray-800 border-b pb-2'>LEGAL</h1>
+                    <ul className='space-y-3'>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Help Center</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Terms of Service</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Privacy Policy</li>
+                        <li className='text-gray-600 hover:text-blue-600 transition-colors duration-200 cursor-pointer'>Legal</li>
+                    </ul>
+                </div>
             </div>
         </div>
-      </div>
-      {/* segunda sección */}
-      <div className='grid grid-cols-4'>
-        <div className='col-span-1'>
-          <h1>About</h1>
-          <ul>
-            <li>About Us</li>
-            <li>Contact Us</li>
-            <li>Careers</li>
-            <li>Blog</li>
-          </ul>
+        <div className='flex flex-row gap-8 items-center justify-end'>
+            <Facebook/>
+            <Instagram/>
+            <Youtube/>
         </div>
-        <div className='col-span-1'>
-          <h1>Support</h1>
-          <ul>
-            <li>Help Center</li>
-            <li>Terms of Service</li>
-            <li>Privacy Policy</li>
-            <li>Legal</li>
-          </ul>
+        <div>
+            <p className='text-center text-gray-600'>© 2023 Tricks. All rights reserved.</p>
         </div>
-        <div className='col-span-1'>
-          <h1>Community</h1>
-          <ul>
-            <li>Twitter</li>    
-            <li>Facebook</li>
-            <li>Instagram</li>
-            <li>LinkedIn</li>
-          </ul>
-        </div>
-        <div className='col-span-1'>
-          <h1>Newsletter</h1>
-          <ul>
-            <li>Subscribe to our newsletter</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }
 
