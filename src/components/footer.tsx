@@ -2,22 +2,29 @@ import React from 'react'
 import Image from "next/image";
 const FooterComponent = () => {
   return (
-    <div className='flex-row'>
+    <div className='flex-row p-4'>
         {/* primera seccion */}
-      <div className='flex flex-row'>
-        <Image
-        className="dark:invert"
-        src="/next.svg"
-        alt="Next.js logo"
-        width={180}
-        height={38}
-        priority
-        />
+      <div className='flex flex-row mb-4'>
+        <div className='w-[50%]'>
+            <Image
+            className="dark:invert"
+            src="/next.svg"
+            alt="Next.js logo"
+            width={180}
+            height={38}
+            priority
+            />
+        </div>
         <div>
-          <p className="text-gray-600">
-            <span className="text-gray-900">Next.js</span> is a minimalistic
-            framework for building fast web applications.
-          </p>
+            <p className="text-gray-600 mb-4">
+                ¡Te esperan muchos beneficios y sorpresas!
+                Regístrate, acumula puntos y úsalos en todas tus compras.
+            </p>
+            <div className='w-full bg-white flex items-center justify-center py-3 rounded-lg'>
+                <button className="text-sm text-gray-600 hover:text-gray-900">
+                    Descubre más
+                </button>
+            </div>
         </div>
       </div>
       {/* segunda sección */}
