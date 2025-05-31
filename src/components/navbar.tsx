@@ -15,7 +15,7 @@ const NavbarComponent = () => {
 
           {/* Enlaces de navegación para desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium no-underline">
               Inicio
             </Link>
             <Link href="/productos" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
@@ -41,16 +41,16 @@ const NavbarComponent = () => {
           </div>
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <Search/>
+              <Search color='gray'/>
             </Link>
             <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <User/>
+              <User color='gray'/>
             </Link>
             <Link href="/productos" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <Heart/>
+              <Heart color='gray'/>
             </Link>
             <Link href="/servicios" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <ShoppingBag/>
+              <ShoppingBag color='gray'/>
             </Link>
           </div>
           {/* Botón de menú móvil */}
