@@ -36,12 +36,16 @@ const MainComponent = () => {
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
 
-          <Link 
-            href='/' 
-            className='absolute inset-0 flex items-center justify-center text-white text-xl font-bold bg-opacity-40 hover:bg-opacity-60 transition'
+          <div 
+            className='absolute inset-0 flex items-center justify-center text-white text-xl font-bold bg-opacity-40 hover:bg-opacity-60 transition '
           >
-            Descubre nuestros productos
-          </Link>
+            <Link 
+              href='/' 
+              className='text-white text-xl font-bold bg-opacity-40 hover:bg-opacity-60 transition bg-red-200 '
+            >
+              Descubre nuestros productos
+            </Link>
+          </div>
         </div>
         <div className='col-span-1 relative'>
           <Image
