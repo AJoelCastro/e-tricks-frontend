@@ -4,18 +4,17 @@ import Button from '@mui/material/Button';
 import { Facebook, Instagram, Youtube } from 'lucide-react';
 const FooterComponent = () => {
   return (
-    <>
+    <div className='bg-white'>
         <div className='flex lg:flex-row flex-col p-4 gap-4'>
             {/* primera seccion */}
             <div className='flex flex-col mb-4 lg:w-[35%] gap-8'>
                 <div className='mx-auto'>
                     <Image
-                    className="dark:invert"
-                    src="/next.svg"
-                    alt="Next.js logo"
-                    width={180}
-                    height={38}
-                    priority
+                        src="/next.svg"
+                        alt="Next.js logo"
+                        width={180}
+                        height={38}
+                        priority
                     />
                 </div>
                 <div>
@@ -61,14 +60,14 @@ const FooterComponent = () => {
             </div>
         </div>
         <div className='flex flex-row gap-8 items-center lg:justify-end justify-between '>
-            <Facebook/>
-            <Instagram/>
-            <Youtube/>
+            <Facebook color='black'/>
+            <Instagram color='black'/>
+            <Youtube color='black'/>
         </div>
         <div>
             <p className='text-center text-gray-600'>© 2023 Tricks. All rights reserved.</p>
         </div>
-    </>
+    </div>
   )
 }
 
