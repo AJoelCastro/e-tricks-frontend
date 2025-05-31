@@ -1,6 +1,6 @@
 "use client";
-import FooterComponent from "@/components/footer";
-import NavbarComponent from "@/components/navbar";
+import NavbarComponent from "@/components/Navbar";
+import FooterComponent from "@/components/Footer";
 import AuthService from "@/services/AuthService";
 import Image from "next/image";
 import { useEffect } from "react";

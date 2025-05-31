@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { User, Heart, ShoppingBag, Search } from "lucide-react";
 
-const Navbar = () => {
+const NavbarComponent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -106,4 +106,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarComponent;
