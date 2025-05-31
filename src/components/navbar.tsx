@@ -41,16 +41,16 @@ const NavbarComponent = () => {
           </div>
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <Search color='gray'/>
+              <Search/>
             </Link>
             <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <User color='gray'/>
+              <User/>
             </Link>
             <Link href="/productos" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <Heart color='gray'/>
+              <Heart/>
             </Link>
             <Link href="/servicios" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-              <ShoppingBag color='gray'/>
+              <ShoppingBag/>
             </Link>
           </div>
           {/* Botón de menú móvil */}
