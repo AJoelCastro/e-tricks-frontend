@@ -3,6 +3,8 @@ import MainCarouselComponent from './carousel/MainCarousel'
 import Image from 'next/image'
 import Link from 'next/link'
 import { imagesPrueba } from '@/data/ImagesPrueba'
+import ProductCard from './cards/Products'
+import { productCardPrueba } from '@/data/ProductCardPrueba'
 
 
 const MainComponent = () => {
@@ -39,6 +41,15 @@ const MainComponent = () => {
                   </div>
                 </Link>
               </div>
+          ))
+        }
+      </div>
+      <div className='grid grid-cols-4'>
+        {
+          productCardPrueba.map((product, index) => (
+            <div key={index} className='col-span-1'>
+              <ProductCard products={product}/>
+            </div>
           ))
         }
       </div>
