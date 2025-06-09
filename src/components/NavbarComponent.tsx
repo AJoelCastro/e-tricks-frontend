@@ -5,6 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { User, Heart, ShoppingBag, Search } from "lucide-react";
 import SearchSidebar from './modal/SearchSidebar';
+import {
+  SignIn,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 
 const NavbarComponent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,6 +45,7 @@ const NavbarComponent = () => {
   const shouldShowWhiteBackground = isScrolled || isHovered;
   const showWhiteBackground = shouldShowWhiteBackground || isMobile;
 
+
   return (
     <>
       <nav 
@@ -52,19 +61,10 @@ const NavbarComponent = () => {
           <div className="flex justify-between h-16">
             
             {/* Links de navegación izquierda */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4 ">
+              
               <Link 
-                href="/" 
-                className={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
-                }`}
-              >
-                Inicio
-              </Link>
-              <Link 
-                href="/productos" 
+                href="/products" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
@@ -121,19 +121,8 @@ const NavbarComponent = () => {
               >
                 <Search/>
               </button>
-              
               <Link 
-                href="/" 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
-                }`}
-              >
-                <User/>
-              </Link>
-              <Link 
-                href="/productos" 
+                href="/products" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
@@ -152,6 +141,22 @@ const NavbarComponent = () => {
               >
                 <ShoppingBag/>
               </Link>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode='modal'>
+                  <button 
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                      showWhiteBackground 
+                        ? 'text-gray-900 hover:text-blue-600' 
+                        : 'text-white hover:text-gray-300'
+                    }`}
+                  >
+                    <User/>
+                  </button>
+                </SignInButton>
+              </SignedOut>
             </div>
 
             {/* Botón de menú móvil */}
@@ -193,16 +198,6 @@ const NavbarComponent = () => {
           showWhiteBackground ? 'bg-white' : 'bg-gray-900'
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link 
-              href="/" 
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              Inicio
-            </Link>
             <Link 
               href="/productos" 
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
