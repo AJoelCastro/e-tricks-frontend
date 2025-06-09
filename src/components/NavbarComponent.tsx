@@ -6,9 +6,7 @@ import Link from 'next/link';
 import { User, Heart, ShoppingBag, Search } from "lucide-react";
 import SearchSidebar from './modal/SearchSidebar';
 import {
-  SignIn,
   SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
