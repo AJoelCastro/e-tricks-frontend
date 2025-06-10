@@ -1,8 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { User, Heart, ShoppingBag, Search, X } from "lucide-react";
+import {  Search, X } from "lucide-react";
 
 
 const SearchSidebar = ({ isOpen, onClose }) => {

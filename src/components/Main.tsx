@@ -8,7 +8,7 @@ import ThreeImages from './sections/ThreeImages'
 
 const MainComponent = () => {
   return (
-    <div className='bg-white'>
+    <div>
       <MainCarouselComponent/>
       <div className='mt-4 grid grid-cols-3'>
         {

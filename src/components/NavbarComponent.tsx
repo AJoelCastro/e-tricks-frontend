@@ -18,6 +18,7 @@ const NavbarComponent = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,14 +30,25 @@ const NavbarComponent = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
+    // Detectar modo oscuro
+    const checkDarkMode = () => {
+      setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    };
+
     handleResize();
+    checkDarkMode();
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
     
+    // Escuchar cambios en el modo de color
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', checkDarkMode);
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
+      darkModeMediaQuery.removeEventListener('change', checkDarkMode);
     };
   }, []);
 
@@ -49,7 +61,7 @@ const NavbarComponent = () => {
       <nav 
         className={`fixed w-full z-50 transition-all duration-300 ease-in-out ${
           showWhiteBackground 
-            ? 'bg-white shadow-lg' 
+            ? isDarkMode ? 'bg-[#0a0a0a] shadow-lg shadow-gray-800' : 'bg-white shadow-lg' 
             : 'bg-transparent'
         }`}
         onMouseEnter={() => setIsHovered(true)}
@@ -65,28 +77,18 @@ const NavbarComponent = () => {
                 href="/women" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                 }`}
               >
                 Mujer
               </Link>
-              {/* <Link 
-                href="/men" 
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
-                }`}
-              >
-                Hombres
-              </Link> */}
               <Link 
                 href="/marcas" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                 }`}
               >
                 Marcas
@@ -101,7 +103,7 @@ const NavbarComponent = () => {
                   alt="Logo"
                   width={32}
                   height={32}
-                  className="h-8 w-auto"
+                  className={`h-8 w-auto ${isDarkMode ? 'filter invert' : ''}`}
                 />
               </Link>
             </div>
@@ -113,8 +115,8 @@ const NavbarComponent = () => {
                 onClick={() => setIsSearchOpen(true)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                 }`}
               >
                 <Search/>
@@ -123,8 +125,8 @@ const NavbarComponent = () => {
                 href="/favorites" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                 }`}
               >
                 <Heart/>
@@ -133,8 +135,8 @@ const NavbarComponent = () => {
                 href="/cart" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
-                    : 'text-white hover:text-gray-300'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                 }`}
               >
                 <ShoppingBag/>
@@ -147,8 +149,8 @@ const NavbarComponent = () => {
                   <button 
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                       showWhiteBackground 
-                        ? 'text-gray-900 hover:text-blue-600' 
-                        : 'text-white hover:text-gray-300'
+                        ? isDarkMode ? 'text-[#ededed] hover:text-blue-400' : 'text-gray-900 hover:text-blue-600' 
+                        : isDarkMode ? 'text-[#ededed] hover:text-gray-300' : 'text-white hover:text-gray-300'
                     }`}
                   >
                     <User/>
@@ -163,8 +165,8 @@ const NavbarComponent = () => {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-300 ${
                   showWhiteBackground
-                    ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-100'
-                    : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                    ? isDarkMode ? 'text-[#ededed] hover:text-blue-400 hover:bg-gray-800' : 'text-gray-900 hover:text-blue-600 hover:bg-gray-100'
+                    : isDarkMode ? 'text-[#ededed] hover:text-gray-300 hover:bg-gray-800' : 'text-white hover:text-gray-300 hover:bg-gray-800'
                 }`}
               >
                 <span className="sr-only">Abrir menú principal</span>
@@ -193,15 +195,15 @@ const NavbarComponent = () => {
 
         {/* Menú móvil */}
         <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden transition-all duration-300 ${
-          showWhiteBackground ? 'bg-white' : 'bg-gray-900'
+          showWhiteBackground ? isDarkMode ? 'bg-[#0a0a0a]' : 'bg-white' : isDarkMode ? 'bg-gray-900' : 'bg-gray-900'
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link 
               href="/productos" 
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                  ? isDarkMode ? 'text-[#ededed] hover:text-blue-400 hover:bg-gray-800' : 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  : isDarkMode ? 'text-[#ededed] hover:text-gray-300 hover:bg-gray-800' : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
               Productos
@@ -210,8 +212,8 @@ const NavbarComponent = () => {
               href="/servicios" 
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                  ? isDarkMode ? 'text-[#ededed] hover:text-blue-400 hover:bg-gray-800' : 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  : isDarkMode ? 'text-[#ededed] hover:text-gray-300 hover:bg-gray-800' : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
               Servicios
@@ -220,8 +222,8 @@ const NavbarComponent = () => {
               href="/contacto" 
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                  ? isDarkMode ? 'text-[#ededed] hover:text-blue-400 hover:bg-gray-800' : 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  : isDarkMode ? 'text-[#ededed] hover:text-gray-300 hover:bg-gray-800' : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
               Contacto
@@ -232,8 +234,8 @@ const NavbarComponent = () => {
               onClick={() => setIsSearchOpen(true)}
               className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                  ? isDarkMode ? 'text-[#ededed] hover:text-blue-400 hover:bg-gray-800' : 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  : isDarkMode ? 'text-[#ededed] hover:text-gray-300 hover:bg-gray-800' : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
               <Search className="inline mr-2"/>

@@ -1,10 +1,16 @@
+'use client';
+import NavbarComponent from '@/components/NavbarComponent'
 import React from 'react'
-
+import '../globals.css'
+import FooterComponent from '@/components/FooterComponent';
+import MainFavorites from '@/components/favorites/Main';
 const FavoritesPage = () => {
   return (
-    <div>
-      
-    </div>
+    <>
+      <NavbarComponent/>
+      <MainFavorites/>
+      <FooterComponent/>
+    </>
   )
 }
 
