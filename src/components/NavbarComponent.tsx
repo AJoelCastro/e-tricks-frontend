@@ -62,34 +62,34 @@ const NavbarComponent = () => {
             <div className="hidden md:flex items-center space-x-4 ">
               
               <Link 
-                href="/products" 
+                href="/women" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
-                Productos
+                Mujer
               </Link>
-              <Link 
-                href="/servicios" 
+              {/* <Link 
+                href="/men" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
-                Servicios
-              </Link>
+                Hombres
+              </Link> */}
               <Link 
-                href="/contacto" 
+                href="/marcas" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
-                Contacto
+                Marcas
               </Link>
             </div>
 
@@ -120,7 +120,7 @@ const NavbarComponent = () => {
                 <Search/>
               </button>
               <Link 
-                href="/products" 
+                href="/favorites" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
@@ -130,7 +130,7 @@ const NavbarComponent = () => {
                 <Heart/>
               </Link>
               <Link 
-                href="/servicios" 
+                href="/cart" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-blue-600' 
