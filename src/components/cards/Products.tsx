@@ -28,7 +28,7 @@ const ProductCard: React.FC<Props> =({products})=> {
       />
       <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
         <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
+          <FavoriteIcon/>
         </IconButton>
       </Box>
       <CardHeader title={products.title}/>
