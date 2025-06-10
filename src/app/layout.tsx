@@ -1,6 +1,7 @@
 import { type Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { esES } from '@clerk/localizations'
+import { dark } from '@clerk/themes'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -24,8 +25,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  
   return (
-    <ClerkProvider localization={esES}>
+    <ClerkProvider localization={esES} appearance={{
+      baseTheme:  dark,
+    }}>
       <html lang="es">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
