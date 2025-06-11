@@ -91,11 +91,11 @@ const NavbarComponent = () => {
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center">
                 <Image
-                  src="/next.svg"
+                  src="/tricks_logo_black.svg"
                   alt="Logo"
                   width={32}
                   height={32}
-                  className="h-8 w-auto"
+                  className="h-24 w-auto"
                 />
               </Link>
             </div>

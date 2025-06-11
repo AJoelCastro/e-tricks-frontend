@@ -10,13 +10,13 @@ const FooterComponent = () => {
     <div className='bg-white text-gray-800'>
         <div className='flex lg:flex-row flex-col p-4 gap-4'>
             {/* primera seccion */}
-            <div className='flex flex-col mb-4 lg:w-[35%] gap-8'>
+            <div className='flex flex-col mb-4 lg:w-[35%]'>
                 <div className='mx-auto'>
                     <Image
-                        src="/next.svg"
+                        src="/tricks_logo_black.svg"
                         alt="Next.js logo"
-                        width={180}
-                        height={38}
+                        width={150}
+                        height={30}
                         priority
                     />
                 </div>
