@@ -9,7 +9,7 @@ export default function Home() {
 
   const getHealth = async() => {
     const dataHealth = await AuthService.HealthCheck();
-    console.log(dataHealth);
+    console.log("health",dataHealth);
   }
   useEffect(() => {
     getHealth();

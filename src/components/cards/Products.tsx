@@ -17,13 +17,12 @@ type Props = {
   products: Product;
 }
 const ProductCard: React.FC<Props> =({products})=> {
-  console.log(products);
   return (
     <Card style={{position: "relative"}}>
       <CardMedia
         component="img"
         height="194"
-        image={products.image}
+        image={products.images[0]}
         alt="Paella dish"
       />
       <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
@@ -31,7 +30,7 @@ const ProductCard: React.FC<Props> =({products})=> {
           <FavoriteIcon/>
         </IconButton>
       </Box>
-      <CardHeader title={products.title}/>
+      <CardHeader title={products.name}/>
       <CardContent>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {products.description}
