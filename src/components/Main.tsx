@@ -14,8 +14,7 @@ const MainComponent = () => {
 
   useEffect(() => {
     const getProducts = async() =>{
-      const token = await getToken();
-      const data = await ProductService.GetProducts( token!);
+      const data = await ProductService.GetProducts();
       setDataProducts(data);
     }
     getProducts();

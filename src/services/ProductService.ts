@@ -4,16 +4,9 @@ import axios from 'axios';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const ProductService = {
 
-    GetProducts : async (token: string) => {
+    GetProducts : async () => {
         try {
-            if (!token) {
-                throw new Error('Token is required');
-            }
-            const response = await axios.get(`${API_URL}/products/get`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await axios.get(`${API_URL}/products/get`, {});
             return response.data;
         }catch (error) {
             console.error(error);
