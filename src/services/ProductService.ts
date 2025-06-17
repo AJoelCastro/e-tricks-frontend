@@ -6,7 +6,7 @@ const ProductService = {
 
     GetProducts : async () => {
         try {
-            const response = await axios.get(`${API_URL}/products/get`, {});
+            const response = await axios.get(`${API_URL}/product/get`, {});
             return response.data;
         }catch (error) {
             console.error(error);
@@ -15,7 +15,7 @@ const ProductService = {
     },
     GetProduct : async (id : number) => {
         try {
-            const response = await axios.get(`${API_URL}/products/${id}/get`);
+            const response = await axios.get(`${API_URL}/product/${id}/get`);
             return response.data;
         }catch (error) {
             console.error(error);
@@ -24,7 +24,7 @@ const ProductService = {
     },
     GetProductsByCategory : async (category : string) => {
         try {
-            const response = await axios.get(`${API_URL}/products/category/${category}`);
+            const response = await axios.get(`${API_URL}/product/category/${category}`);
             return response.data;
         }catch (error) {
             console.error(error);
