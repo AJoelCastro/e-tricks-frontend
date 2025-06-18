@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import NavbarComponent from "@/page-sections/navbar/NavbarComponent";
 import FooterComponent from "@/page-sections/footer/FooterComponent";
 import AuthService from "@/services/AuthService";
