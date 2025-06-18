@@ -39,7 +39,7 @@ const ProductCard: React.FC<Props> =({products})=> {
         </IconButton>
       </Box>
       <CardHeader title={products.name}/>
-      <CardContent>
+      <CardContent sx={{backgroundColor: "white"}}>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {products.description}
         </Typography>

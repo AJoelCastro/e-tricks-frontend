@@ -7,7 +7,6 @@ import SettingsProvider from '@/contexts/settingsContext';
 import RTL from '@/components/rtl';
 import { esES } from '@clerk/localizations'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

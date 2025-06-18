@@ -1,194 +1,133 @@
 'use client';
 import { useState, useEffect } from 'react';
-import {  Search, X } from "lucide-react";
-
+import {
+  Drawer,
+  Box,
+  IconButton,
+  InputBase,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 
 const SearchSidebar = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (isOpen) {
-    
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-   
+    document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
-  const quickLinks = [
-    'Outlet',
-    'Nuevo',
-    'Sigue tu pedido',
-    'Tiendas'
-  ];
 
-  const suggestedProducts = [
-    {
-      id: 1,
-      name: 'Zapatillas Urbanas Mujer North Star',
-      brand: 'NORTH STAR',
-      price: 169.90,
-      currency: 'S/',
-    },
-    {
-      id: 2,
-      name: 'Zapatillas Deportivas Running Hombre',
-      brand: 'POWER',
-      originalPrice: 149.90,
-      price: 119.92,
-      discount: '-20%',
-      currency: 'S/',
-    },
-    {
-      id: 3,
-      name: 'Zapatillas Urbanas Mujer North Star Azul',
-      brand: 'NORTH STAR',
-      originalPrice: 139.90,
-      price: 111.92,
-      discount: '-20%',
-      currency: 'S/',
-    },
-    {
-      id: 4,
-      name: 'Zapatillas De Fútbol Hombre Power',
-      brand: 'POWER',
-      originalPrice: 139.90,
-      price: 79.90,
-      discount: '-43%',
-      currency: 'S/',
-    }
-  ];
+  const quickLinks = ['Outlet', 'Nuevo', 'Sigue tu pedido', 'Tiendas'];
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  const suggestedProducts = [/* tu array de productos igual */];
 
   const handleClose = () => {
     setSearchQuery('');
     onClose();
   };
 
-  if (!isOpen) return null;
-  
-
   return (
-    <div
-      className="fixed inset-0  backdrop-blur-md bg-opacity-50 z-[60] flex justify-end"
-      onClick={handleBackdropClick}
+    <Drawer
+      anchor="right"
+      open={isOpen}
+      onClose={handleClose}
+      ModalProps={{ keepMounted: true }}
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', md: 600 },
+          maxWidth: '100%',
+          p: 2,
+        },
+      }}
     >
-      <div
-        className={`bg-white w-full max-w-5xl h-full shadow-xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Box display="flex" alignItems="center" mb={2}>
+        <Box flex={1} display="flex" alignItems="center" px={1} py={0.5} sx={{ backgroundColor: '#f3f4f6', borderRadius: 1 }}>
+          <SearchIcon color="action" sx={{ mr: 1 }} />
+          <InputBase
+            placeholder="Buscar"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            fullWidth
+            autoFocus
+          />
+        </Box>
+        <IconButton onClick={handleClose} sx={{ ml: 1 }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-        {/* Header del Sidebar */}
-        <div className="flex items-center border-b border-gray-200 p-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-600" />
-            <input
-              type="text"
-              placeholder="Buscar"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white border border-transparent focus:border-blue-500 transition-all"
-              autoFocus
-            />
-          </div>
-          <button
-            onClick={handleClose}
-            className="ml-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="h-6 w-6 text-gray-500" />
-          </button>
-        </div>
+      <Divider />
 
-        {/* Contenido del Sidebar */}
-        <div className="flex h-full">
-          {/* Enlaces Rápidos */}
-          <div className="w-1/3 border-r border-gray-200 p-6">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Enlaces Rápidos
-            </h3>
-            <div className="space-y-1">
-              {quickLinks.map((link, index) => (
-                <button
-                  key={index}
-                  className="block w-full text-left px-3 py-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors text-sm"
-                  onClick={() => {
-                    console.log('Navegando a:', link);
-                    handleClose();
-                  }}
-                >
-                  {link}
-                </button>
-              ))}
-            </div>
-          </div>
+      <Box display="flex" mt={2}>
+        <Box flex="1 1 30%" pr={2}>
+          <Typography variant="overline" color="text.secondary" display="block" gutterBottom>
+            Enlaces Rápidos
+          </Typography>
+          <List dense>
+            {quickLinks.map((link) => (
+              <ListItemButton key={link} onClick={() => { console.log('Navegando a:', link); handleClose(); }}>
+                <ListItemText primary={link} />
+              </ListItemButton>
+            ))}
+          </List>
+        </Box>
 
-          {/* Productos Sugeridos */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-6">
-              Productos Sugeridos
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              {suggestedProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group"
-                  onClick={() => {
-                    console.log('Producto seleccionado:', product.name);
-                    handleClose();
-                  }}
-                >
-                  {/* Imagen del Producto */}
-                  <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                    <div className="w-20 h-20 bg-gray-300 rounded-lg"></div>
-                  </div>
+        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
 
-                  {/* Info del Producto */}
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
-                      {product.brand}
-                    </p>
-                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
-                      {product.name}
-                    </h4>
-
-                    {/* Precios */}
-                    <div className="space-y-1">
-                      {product.originalPrice && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-400 line-through">
-                            {product.currency} {product.originalPrice}
-                          </span>
-                          {product.discount && (
-                            <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full font-semibold">
-                              {product.discount}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      <div className="flex items-center">
-                        <span className="text-lg font-bold text-red-600">
-                          {product.currency} {product.price}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <Box flex="1 1 70%" pl={2} overflow="auto">
+          <Typography variant="overline" color="text.secondary" display="block" gutterBottom>
+            Productos Sugeridos
+          </Typography>
+          <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(160px, 1fr))" gap={2}>
+            {suggestedProducts.map((product) => (
+              <Box
+                key={product.id}
+                onClick={() => { console.log('Producto seleccionado:', product.name); handleClose(); }}
+                sx={{
+                  border: 1,
+                  borderColor: 'grey.300',
+                  borderRadius: 1,
+                  p: 2,
+                  cursor: 'pointer',
+                  '&:hover': { boxShadow: 2 },
+                }}
+              >
+                <Box sx={{ width: '100%', pt: '100%', bgcolor: 'grey.100', borderRadius: 1, mb: 1 }} />
+                <Typography variant="caption" color="text.secondary" display="block">
+                  {product.brand}
+                </Typography>
+                <Typography variant="body2" noWrap title={product.name}>
+                  {product.name}
+                </Typography>
+                {product.originalPrice && (
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="caption" color="text.disabled" sx={{ textDecoration: 'line-through', mr: 1 }}>
+                      {product.currency} {product.originalPrice}
+                    </Typography>
+                    {product.discount && (
+                      <Typography variant="caption" color="error" sx={{ bgcolor: 'error.main', color: '#fff', px: 0.5, borderRadius: 1 }}>
+                        {product.discount}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+                <Typography variant="subtitle1" color="error">
+                  {product.currency} {product.price}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+    </Drawer>
   );
 };
+
 export default SearchSidebar;

@@ -1,9 +1,9 @@
 "use client";
-import NavbarComponent from "@/components/NavbarComponent";
-import FooterComponent from "@/components/FooterComponent";
+import NavbarComponent from "@/components/navbar/NavbarComponent";
+import FooterComponent from "@/components/footer/FooterComponent";
 import AuthService from "@/services/AuthService";
 import { useEffect } from "react";
-import MainComponent from "@/components/Main";
+import MainComponent from "@/components/main/Main";
 
 export default function Home() {
 
