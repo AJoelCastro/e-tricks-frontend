@@ -33,7 +33,9 @@ const ProductCard: React.FC<Props> =({products})=> {
               color: 'red',
               cursor: 'pointer'
             }
-          }}/>
+          }}
+            fontSize='small'
+          />
         </IconButton>
       </Box>
       <CardHeader title={products.name}/>

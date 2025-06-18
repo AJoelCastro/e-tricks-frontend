@@ -1,5 +1,10 @@
 import { type Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
+// THEME PROVIDER
+import CustomThemeProvider from '@/theme/theme-provider';
+import { LoadingProgress } from '@/components/loader';
+import SettingsProvider from '@/contexts/settingsContext';
+import RTL from '@/components/rtl';
 import { esES } from '@clerk/localizations'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
@@ -29,7 +34,12 @@ export default function RootLayout({
     <ClerkProvider localization={esES}>
       <html lang="es">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          {children}
+          <SettingsProvider>
+            <CustomThemeProvider>
+              <LoadingProgress />
+              <RTL>{children}</RTL>
+            </CustomThemeProvider>
+          </SettingsProvider>
         </body>
       </html>
     </ClerkProvider>
