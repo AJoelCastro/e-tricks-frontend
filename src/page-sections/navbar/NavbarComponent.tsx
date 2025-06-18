@@ -26,7 +26,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs';
-import SearchSidebar from '../modal/SearchSidebar';
+import SearchSidebar from '../../components/modal/SearchSidebar';
 
 const NavbarComponent = () => {
   const [isScrolled, setIsScrolled] = useState(false);

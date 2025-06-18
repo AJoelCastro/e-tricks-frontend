@@ -1,6 +1,6 @@
-import FooterComponent from '@/components/footer/FooterComponent'
-import NavbarComponent from '@/components/navbar/NavbarComponent'
-import MainWomen from '@/components/women/Main'
+import FooterComponent from '@/page-sections/footer/FooterComponent'
+import NavbarComponent from '@/page-sections/navbar/NavbarComponent'
+import MainWomen from '@/page-sections/women/Main'
 import React from 'react'
 
 const WomenPage = () => {

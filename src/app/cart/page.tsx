@@ -1,6 +1,6 @@
-import MainCart from '@/components/cart/Main'
-import FooterComponent from '@/components/footer/FooterComponent'
-import NavbarComponent from '@/components/navbar/NavbarComponent'
+import MainCart from '@/page-sections/cart/Main'
+import FooterComponent from '@/page-sections/footer/FooterComponent'
+import NavbarComponent from '@/page-sections/navbar/NavbarComponent'
 import React from 'react'
 
 const CartPage = () => {

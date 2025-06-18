@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import ProductCard from '../cards/Products'
+import ProductCard from '../../components/cards/Products'
 import ProductService from '@/services/ProductService'
 
 const MainFavorites = () => {
