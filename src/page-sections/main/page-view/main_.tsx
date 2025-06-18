@@ -1,11 +1,12 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from "@clerk/nextjs";
 import { Container, Grid, Box } from '@mui/material';
 
-import MainCarouselComponent from '../../components/carousel/MainCarousel';
+import MainCarouselComponent from '@/components/carousel/MainCarousel';
 import { imagesPrueba } from '@/data/ThreeImagesPrueba';
-import ProductCard from '../../components/cards/Products';
-import ThreeImages from '../../components/sections/ThreeImages';
+import ProductCard from '@/components/cards/Products';
+import ThreeImages from '@/components/sections/ThreeImages';
 import ProductService from '@/services/ProductService';
 
 const MainComponent = () => {

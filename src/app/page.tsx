@@ -3,7 +3,7 @@ import NavbarComponent from "@/page-sections/navbar/NavbarComponent";
 import FooterComponent from "@/page-sections/footer/FooterComponent";
 import AuthService from "@/services/AuthService";
 import { useEffect } from "react";
-import MainComponent from "@/page-sections/main/Main";
+import { MainPageView } from "@/page-sections/main/page-view";
 
 export default function Home() {
 
@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <>
       <NavbarComponent/>
-      <MainComponent/>
+      <MainPageView/>
       <FooterComponent/>
     </>
   );
