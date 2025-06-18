@@ -1,1 +1,1 @@
-export { default as MainCartPageView } from './Main'
+export { default as MainCartPageView } from './main_'
