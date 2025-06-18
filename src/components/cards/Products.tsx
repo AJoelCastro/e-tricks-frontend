@@ -4,7 +4,7 @@ import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Box, CardHeader } from '@mui/material';
 
 type Product = {
@@ -27,7 +27,13 @@ const ProductCard: React.FC<Props> =({products})=> {
       />
       <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
         <IconButton aria-label="add to favorites">
-          <FavoriteIcon/>
+          <FavoriteBorderIcon sx={{ 
+            color: 'inherit',
+            '&:hover': { 
+              color: 'red',
+              cursor: 'pointer'
+            }
+          }}/>
         </IconButton>
       </Box>
       <CardHeader title={products.name}/>
