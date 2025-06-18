@@ -56,18 +56,18 @@ const MainCart = () => {
   }
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8 bg-white'> {/* Añadido bg-white */}
       <h1 className='text-3xl font-bold mb-6'>Mi Carrito</h1>
       
-      {/* {loading ? (
+      {loading ? (
         <div className='flex justify-center items-center h-40'>
           <p className='text-gray-500'>Cargando tu carrito...</p>
         </div>
       ) : cartItems.length > 0 ? (
         <div className='flex flex-col lg:flex-row gap-8'>
-          <div className='lg:w-2/3'>
+          <div className='lg:w-2/3 bg-white'> {/* Añadido bg-white */}
             {cartItems.map((item) => (
-              <div key={item.id} className='flex flex-col sm:flex-row items-center border-b border-gray-200 py-4 gap-4'>
+              <div key={item.id} className='flex flex-col sm:flex-row items-center border-b border-gray-200 py-4 gap-4 bg-white'> {/* Añadido bg-white */}
                 <div className='sm:w-24 h-24 relative'>
                   <Image 
                     src={item.images[0]} 
@@ -78,7 +78,7 @@ const MainCart = () => {
                   />
                 </div>
                 <div className='flex-1 sm:ml-4'>
-                  <h3 className='font-medium text-lg'>{item.name}</h3>
+                  <h3 className='font-medium text-lg text-gray-900'>{ /* Añadido text-gray-900 */ }{item.name}</h3>
                   <p className='text-gray-600 mt-1'>S/ {item.price.toFixed(2)}</p>
                 </div>
                 <div className='flex items-center gap-2'>
@@ -109,7 +109,7 @@ const MainCart = () => {
             ))}
           </div>
           
-          <div className='lg:w-1/3 bg-gray-50 p-6 rounded-lg h-fit'>
+          <div className='lg:w-1/3 bg-gray-50 p-6 rounded-lg h-fit'> {/* Ya tiene bg-gray-50 que es claro */}
             <h2 className='text-xl font-bold mb-4'>Resumen de compra</h2>
             <div className='space-y-3 mb-4'>
               <div className='flex justify-between'>
@@ -133,14 +133,14 @@ const MainCart = () => {
           </div>
         </div>
       ) : (
-        <div className='text-center py-10'>
+        <div className='text-center py-10 bg-white'> {/* Añadido bg-white */}
           <p className='text-xl text-gray-600 mb-4'>Tu carrito está vacío</p>
           <p className='text-gray-500 mb-6'>Añade productos a tu carrito para verlos aquí</p>
           <button className='bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors'>
             Continuar comprando
           </button>
         </div>
-      )} */}
+      )}
     </div>
   )
 }

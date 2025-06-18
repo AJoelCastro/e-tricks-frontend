@@ -18,7 +18,7 @@ type Props = {
 }
 const ProductCard: React.FC<Props> =({products})=> {
   return (
-    <Card style={{position: "relative"}}>
+    <Card style={{position: "relative", backgroundColor: "white"}}> {/* Añadido backgroundColor: "white" */}
       <CardMedia
         component="img"
         height="194"
@@ -47,7 +47,6 @@ const ProductCard: React.FC<Props> =({products})=> {
           S/ {products.price}
         </Typography>
       </CardContent>
-      
     </Card>
   );
 }

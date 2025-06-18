@@ -28,7 +28,7 @@ const MainFavorites = () => {
   }, [])
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8 bg-white'> {/* Añadido bg-white */}
       <h1 className='text-3xl font-bold mb-6'>Mis Favoritos</h1>
       
       {loading ? (
@@ -44,7 +44,7 @@ const MainFavorites = () => {
           ))}
         </div>
       ) : (
-        <div className='text-center py-10'>
+        <div className='text-center py-10 bg-white'> {/* Añadido bg-white */}
           <p className='text-xl text-gray-600 mb-4'>No tienes productos favoritos</p>
           <p className='text-gray-500'>Explora nuestra tienda y marca tus productos favoritos para verlos aquí</p>
         </div>

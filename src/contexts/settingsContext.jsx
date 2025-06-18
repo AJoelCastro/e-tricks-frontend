@@ -10,7 +10,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 
 const initialSettings = {
   direction: 'ltr',
-  theme: THEMES.LIGHT,
+  theme: THEMES.LIGHT, // Siempre tema claro
   activeLayout: 'layout1',
   responsiveFontSizes: true
 };
@@ -23,9 +23,29 @@ export default function SettingsProvider({
     data: settings,
     storeData: setStoreSettings
   } = storage;
-  const saveSettings = updateSettings => setStoreSettings(updateSettings);
-  return <SettingsContext value={{
-    settings,
+  
+  // Forzar siempre el tema claro
+  if (settings.theme !== THEMES.LIGHT) {
+    setStoreSettings({
+      ...settings,
+      theme: THEMES.LIGHT
+    });
+  }
+  
+  const saveSettings = updateSettings => {
+    // Asegurar que el tema siempre sea claro
+    const newSettings = {
+      ...updateSettings,
+      theme: THEMES.LIGHT
+    };
+    setStoreSettings(newSettings);
+  };
+  
+  return <SettingsContext.Provider value={{
+    settings: {
+      ...settings,
+      theme: THEMES.LIGHT // Forzar tema claro en el contexto
+    },
     saveSettings
-  }}>{children}</SettingsContext>;
+  }}>{children}</SettingsContext.Provider>;
 }

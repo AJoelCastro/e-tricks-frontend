@@ -21,7 +21,7 @@ const MainComponent = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, backgroundColor: 'white', width: '100%' }} >
       {/* Carrusel principal */}
       <Box mb={4}>
         <MainCarouselComponent />

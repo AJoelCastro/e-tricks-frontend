@@ -65,23 +65,17 @@ const baseOptions = {
 // ==============================================================
 
 export const createCustomTheme = settings => {
-  /**
-   * settings.theme value is 'light' or 'dark'
-   * update settings in contexts/settingsContext.tsx
-   */
-  let themeOption = themesOptions[settings.theme];
-  if (!themeOption) {
-    themeOption = themesOptions[THEMES.LIGHT];
-  }
-  const mergedThemeOptions = merge({}, baseOptions, themeOption, {
+  // Siempre usar la paleta clara, independientemente de la configuración
+  const themeOptions = themesOptions[THEMES.LIGHT];
+  
+  let theme = createTheme(merge({}, baseOptions, themeOptions, {
     direction: settings.direction
+  }));
+  
+  theme = createTheme(theme, {
+    shadows: shadows(theme),
+    components: componentsOverride(theme)
   });
-  const theme = createTheme(mergedThemeOptions);
-
-  // OVERRIDE SHADOWS
-  theme.shadows = shadows(theme);
-
-  // OVERRIDE COMPONENTS
-  theme.components = componentsOverride(theme);
+  
   return theme;
 };
