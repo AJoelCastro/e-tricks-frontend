@@ -7,7 +7,7 @@ const FavoriteService = {
         try {
             const response = await axios.get(`${API_URL}/favorite/${id}/get`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             return response.data;
@@ -20,7 +20,7 @@ const FavoriteService = {
         try {
             const response = await axios.post(`${API_URL}/favorite/${id}/create`, {}, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             return response.data;
