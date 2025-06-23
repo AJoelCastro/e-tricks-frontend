@@ -94,13 +94,18 @@ const NavbarComponent = () => {
   return (
     <>
       <AppBar
-        position="fixed"
-        elevation={isScrolled ? 4 : 0}
-        sx={{
-          backgroundColor: isScrolled ? 'background.paper' : 'transparent',
-          transition: 'background-color 0.3s',
-        }}
-      >
+  position="fixed"
+  elevation={0} // Siempre sin sombra inicial
+  sx={{
+    backgroundColor: isScrolled ? '#fff' : 'transparent',
+    backdropFilter: isScrolled ? 'none' : 'blur(50px)',
+    boxShadow: 'none',
+    transition: 'all 0.3s ease',
+    color: isScrolled ? 'inherit' : 'white', // Color de texto blanco inicial
+  }}
+>
+
+
         <Toolbar sx={{ justifyContent: 'space-between' }}>
 
           {/* Menú Izquierdo */}
