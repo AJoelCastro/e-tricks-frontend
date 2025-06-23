@@ -22,7 +22,7 @@ const MainComponent = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ backgroundColor: 'white' }} >
+    <Box sx={{ backgroundColor: 'white', width: '100%' }}>
       {/* Carrusel principal */}
       <Box mb={4}>
         <MainCarouselComponent />
@@ -45,7 +45,7 @@ const MainComponent = () => {
           </Grid>
         ))}
       </Grid>
-    </Container>
+    </Box>
   );
 };
 
