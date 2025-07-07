@@ -1,4 +1,4 @@
-import MainCart from '@/components/cart/Main'
+import MainCart from '@/page-sections/cart/Main'
 import FooterComponent from '@/components/FooterComponent'
 import NavbarComponent from '@/components/NavbarComponent'
 import React from 'react'

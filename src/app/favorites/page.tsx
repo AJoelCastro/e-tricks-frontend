@@ -3,7 +3,7 @@ import NavbarComponent from '@/components/NavbarComponent'
 import React from 'react'
 import '../globals.css'
 import FooterComponent from '@/components/FooterComponent';
-import MainFavorites from '@/components/favorites/Main';
+import MainFavorites from '@/page-sections/favorites/Main';
 const FavoritesPage = () => {
   return (
     <>

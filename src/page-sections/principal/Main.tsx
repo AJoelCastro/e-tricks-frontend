@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from "@clerk/nextjs";
-import MainCarouselComponent from './carousel/MainCarousel'
+import MainCarouselComponent from '../../components/carousel/MainCarousel'
 import { imagesPrueba } from '@/data/ThreeImagesPrueba'
-import ProductCard from './cards/Products'
-import { productCardPrueba } from '@/data/ProductCardPrueba'
-import ThreeImages from './sections/ThreeImages'
+import ProductCard from '../../components/cards/Products'
+import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import ProductCard from '../cards/Products'
+import ProductCard from '../../components/cards/Products'
 import ProductService from '@/services/ProductService'
+import { CircularProgress } from '@mui/material'
 
 const MainFavorites = () => {
   const [favorites, setFavorites] = useState<Array<any>>([])
@@ -28,27 +29,8 @@ const MainFavorites = () => {
   }, [])
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-3xl font-bold mb-6'>Mis Favoritos</h1>
+    <div className=''>
       
-      {loading ? (
-        <div className='flex justify-center items-center h-40'>
-          <p className='text-gray-500'>Cargando tus favoritos...</p>
-        </div>
-      ) : favorites.length > 0 ? (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-          {favorites.map((product, index) => (
-            <div key={index} className='col-span-1'>
-              <ProductCard products={product} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className='text-center py-10'>
-          <p className='text-xl text-gray-600 mb-4'>No tienes productos favoritos</p>
-          <p className='text-gray-500'>Explora nuestra tienda y marca tus productos favoritos para verlos aquí</p>
-        </div>
-      )}
     </div>
   )
 }

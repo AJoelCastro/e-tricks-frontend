@@ -3,7 +3,7 @@ import NavbarComponent from "@/components/NavbarComponent";
 import FooterComponent from "@/components/FooterComponent";
 import AuthService from "@/services/AuthService";
 import { useEffect } from "react";
-import MainComponent from "@/components/Main";
+import MainComponent from "@/page-sections/principal/Main";
 
 export default function Home() {
 
