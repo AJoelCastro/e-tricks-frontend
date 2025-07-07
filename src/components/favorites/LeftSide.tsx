@@ -29,14 +29,16 @@ const LeftSide = () => {
 const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
   return (
-    <div className='h-[100vh] bg-[#fafefa] w-[25vw]'>
-        <div className='flex px-8 justify-center items-center'>
+    <div className='h-[100vh]  w-[25vw] flex flex-col gap-[4vh]'>
+        <div className='flex mx-8 justify-center items-center rounded-lg'>
             <Typography variant='h2' >
                 MIS FAVORITOS
             </Typography>
         </div>
-        <div>
-            
+        <div className='flex mx-8 justify-center items-center bg-white rounded-xl px-8 py-6'>
+            <Typography variant='hEspecial'>
+                HOLA, GREICY CHACON
+            </Typography>
         </div>
         <div className='px-8'>
             <List sx={style} aria-label="mailbox folders">

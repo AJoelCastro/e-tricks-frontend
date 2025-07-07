@@ -11,6 +11,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
+import theme from '@/theme/create-theme';
 
 const NavbarComponent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,20 +71,20 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-[#7950f2]' 
-                    : 'text-white hover:text-gray-300'
+                    : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
-                Mujer
+                MUJER
               </Link>
               <Link 
                 href="/marcas" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-[#7950f2]' 
-                    : 'text-white hover:text-gray-300'
+                    : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
-                Marcas
+                MARCAS
               </Link>
             </div>
 
@@ -108,7 +109,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-[#7950f2]' 
-                    : 'text-white hover:text-gray-300'
+                    : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Search/>
@@ -118,7 +119,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-[#7950f2]' 
-                    : 'text-white hover:text-gray-300'
+                    : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Heart/>
@@ -128,7 +129,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
                     ? 'text-gray-900 hover:text-[#7950f2]' 
-                    : 'text-white hover:text-gray-300'
+                    : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <ShoppingBag/>
