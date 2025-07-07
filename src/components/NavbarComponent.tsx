@@ -51,7 +51,7 @@ const NavbarComponent = () => {
   return (
     <>
       <nav 
-        className={`fixed w-full z-50 transition-all duration-300 ease-in-out ${
+        className={`w-full z-50 transition-all duration-300 ease-in-out fixed  ${
           showWhiteBackground 
             ? 'bg-white shadow-lg' 
             : 'bg-transparent'
@@ -69,7 +69,7 @@ const NavbarComponent = () => {
                 href="/women" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
+                    ? 'text-gray-900 hover:text-[#7950f2]' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
@@ -79,7 +79,7 @@ const NavbarComponent = () => {
                 href="/marcas" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
+                    ? 'text-gray-900 hover:text-[#7950f2]' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
@@ -107,7 +107,7 @@ const NavbarComponent = () => {
                 onClick={() => setIsSearchOpen(true)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
+                    ? 'text-gray-900 hover:text-[#7950f2]' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
@@ -117,7 +117,7 @@ const NavbarComponent = () => {
                 href="/favorites" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
+                    ? 'text-gray-900 hover:text-[#7950f2]' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
@@ -127,7 +127,7 @@ const NavbarComponent = () => {
                 href="/cart" 
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground 
-                    ? 'text-gray-900 hover:text-blue-600' 
+                    ? 'text-gray-900 hover:text-[#7950f2]' 
                     : 'text-white hover:text-gray-300'
                 }`}
               >
@@ -141,7 +141,7 @@ const NavbarComponent = () => {
                   <button 
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                       showWhiteBackground 
-                        ? 'text-gray-900 hover:text-blue-600' 
+                        ? 'text-gray-900 hover:text-[#7950f2]' 
                         : 'text-white hover:text-gray-300'
                     }`}
                   >

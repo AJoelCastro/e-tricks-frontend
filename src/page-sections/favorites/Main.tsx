@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import ProductCard from '../../components/cards/Products'
+import ProductCard from '@/components/cards/Products'
 import ProductService from '@/services/ProductService'
 import { CircularProgress } from '@mui/material'
+import LeftSide from '@/components/LeftSide'
 
 const MainFavorites = () => {
   const [favorites, setFavorites] = useState<Array<any>>([])
@@ -30,7 +31,8 @@ const MainFavorites = () => {
 
   return (
     <div className=''>
-      
+      <div className='h-16'></div>
+      <LeftSide/>
     </div>
   )
 }
