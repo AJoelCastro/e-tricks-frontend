@@ -1,5 +1,5 @@
 import theme from '@/theme/create-theme';
-import { Divider, List, ListItem, ListItemText, styled, Typography  } from '@mui/material'
+import { Divider, List, ListItem, styled, Typography  } from '@mui/material'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react'

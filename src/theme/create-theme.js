@@ -24,6 +24,7 @@ const theme = createTheme({
     h5: { fontSize: 28, fontWeight: 600, lineHeight: 1 },
     hEspecial: { fontSize: 24, fontWeight: 550, lineHeight: 1 },
     h6: { fontSize: 18, fontWeight: 500 },
+    h7: { fontSize: 14, fontWeight: 500 },
   },
   breakpoints: {
     values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
