@@ -1,3 +1,4 @@
+import theme from '@/theme/create-theme';
 import { Divider, List, ListItem, ListItemText, styled, Typography  } from '@mui/material'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -15,7 +16,7 @@ const StyledNavItem = styled(Link, {
 })(({
   isActive
 }) => ({
-  color: 'black',
+  color: theme.palette.text.secondary,
   transition: 'color 300ms',
   ':hover': {
     color: '#7950f2'
@@ -29,35 +30,57 @@ const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
   return (
     <div className='h-[100vh] bg-[#fafefa] w-[25vw]'>
-      <div className='flex px-8 justify-center items-center'>
-        <Typography variant='h4' sx={{mt: 4, fontFamily: 'Comic Sans MS'}} >
-            Favoritos
-        </Typography>
-      </div>
-      <div>
-        
-      </div>
-      <div className='px-8'>
-        <List sx={style} aria-label="mailbox folders">
-            <ListItem>
-                <StyledNavItem href="/favorites" isActive={isActive('/favorites')}>
-                    <ListItemText primary="Favorites" />
-                </StyledNavItem>
-            </ListItem>
-            <Divider component="li" />
-            <ListItem>
-                <ListItemText primary="Drafts" />
-            </ListItem>
-            <Divider component="li" />
-            <ListItem>
-                <ListItemText primary="Trash" />
-            </ListItem>
-            <Divider component="li" />
-            <ListItem>
-                <ListItemText primary="Spam" />
-            </ListItem>
+        <div className='flex px-8 justify-center items-center'>
+            <Typography variant='h2' >
+                MIS FAVORITOS
+            </Typography>
+        </div>
+        <div>
+            
+        </div>
+        <div className='px-8'>
+            <List sx={style} aria-label="mailbox folders">
+                <ListItem>
+                    <StyledNavItem href="/favorites" isActive={isActive('/favorites')}>
+                        <Typography>
+                            MIS FAVORITOS
+                        </Typography>
+                    </StyledNavItem>
+                </ListItem>
+                <Divider component="li" />
+                <ListItem>
+                    <StyledNavItem href="/drafts" isActive={isActive('/drafts')}>
+                        <Typography>
+                            MIS COMPRAS
+                        </Typography>
+                    </StyledNavItem>
+                </ListItem>
+                <Divider component="li" />
+                <ListItem>
+                    <StyledNavItem href="/trash" isActive={isActive('/trash')}>
+                        <Typography>
+                            DIRECCIONES
+                        </Typography>
+                    </StyledNavItem>
+                </ListItem>
+                <Divider component="li" />
+                <ListItem>
+                    <StyledNavItem href="/spam" isActive={isActive('/spam')}>
+                        <Typography>
+                            METODOS DE PAGO
+                        </Typography>
+                    </StyledNavItem>
+                </ListItem>
+                <Divider component="li" />
+                <ListItem>
+                    <StyledNavItem href="/spam" isActive={isActive('/spam')}>
+                        <Typography>
+                            MIS PUNTOS
+                        </Typography>
+                    </StyledNavItem>
+                </ListItem>
             </List>
-      </div>
+        </div>
     </div>
   )
 }
