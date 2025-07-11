@@ -44,9 +44,20 @@ const ProductCard: React.FC<Props> =({products})=> {
           <Typography variant="h4" sx={{ color: 'text.primary' }}>
             {products.name}
           </Typography>
-          <Rating
-            
-          />
+          <Grid container spacing={8} sx={{alignItems:'center'}}>
+            <Grid >
+              <Rating
+                precision={0.5}
+                value={products.resenias?.map((resenia) => resenia.valoracion).reduce((a, b) => a + b, 0) / products.resenias?.length}
+                readOnly
+              />
+            </Grid>
+            <Grid>
+              <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '14px' }}>
+                {products.resenias?.length ?? 0} reseñas
+              </Typography>
+            </Grid>
+          </Grid>
 
           {
             products.descuento!==null && products.descuento!==undefined && products.descuento!=='' && (
