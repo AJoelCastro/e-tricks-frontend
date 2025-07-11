@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Box, CardHeader } from '@mui/material';
+import { Box, CardHeader, Grid } from '@mui/material';
 
 type Product = {
   title: string;
@@ -44,12 +44,39 @@ const ProductCard: React.FC<Props> =({products})=> {
           <Typography variant="h4" sx={{ color: 'text.primary' }}>
             {products.name}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {products.description}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.primary' }}>
-            S/ {products.price}
-          </Typography>
+            {
+              products.descuento!==null && products.descuento!==undefined && products.descuento!=='' && (
+                <Grid>
+                  <Grid container spacing={8} sx={{alignItems:'center'}}>
+                    <Grid >
+                      <Typography variant="body1" sx={{ color: 'text.primary' }}>
+                        S/ {products.price}
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      sx={{backgroundColor: 'red', borderRadius: '6px', padding: '1px 10px'}}
+                    >
+                      <Typography variant="body2" sx={{ color: 'white' }}>
+                        {products.descuento}%
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', textDecoration: 'line-through', fontSize: '12px' }}>
+                      S/ {products.price + (products.price * products.descuento / 100)}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              ) || (
+                <>
+                  <Typography variant="body1" sx={{ color: 'text.primary' }}>
+                    S/ {products.price}
+                  </Typography>
+                </>
+              )
+            }
+            
+          
         </CardContent>
         
       </Card>
