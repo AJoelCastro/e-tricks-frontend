@@ -4,7 +4,7 @@ import React from 'react'
 const RightSide = () => {
 
     return (
-        <div className='w-[75vw]'>
+        <div >
             <div className='flex mx-8 justify-between items-center bg-white rounded-xl px-8 py-4'>
                 <Typography variant='h7'>
                     FILTRAR POR

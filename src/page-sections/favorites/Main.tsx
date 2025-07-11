@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ProductCard from '@/components/cards/Products'
 import ProductService from '@/services/ProductService'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, Grid } from '@mui/material'
 import LeftSide from '@/components/favorites/LeftSide'
 import RightSide from '@/components/favorites/RightSide'
 
@@ -31,13 +31,22 @@ const MainFavorites = () => {
   }, [])
 
   return (
-    <div className=''>
+    <>
       <div className='h-16'></div>
-      <div className='flex flex-row'>
-        <LeftSide/>
-        <RightSide/>
-      </div>
-    </div>
+      <Grid container spacing={3}>
+        <Grid size={{
+          xs:12, sm:5, md:3
+        }}>
+          <LeftSide/>
+        </Grid>
+        <Grid size={{
+          xs:12, sm:7, md:9
+        }}>
+          <RightSide/>
+        </Grid>
+      </Grid>
+    </>
+    
   )
 }
 

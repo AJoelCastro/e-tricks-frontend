@@ -1,6 +1,6 @@
 import theme from '@/theme/create-theme';
 import { useUser } from '@clerk/nextjs';
-import { Divider, List, ListItem, styled, Typography  } from '@mui/material'
+import { Box, Divider, List, ListItem, styled, Typography  } from '@mui/material'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react'
@@ -32,18 +32,19 @@ const LeftSide = () => {
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
     return (
-        <div className='h-[100vh]  w-[25vw] flex flex-col gap-[4vh]'>
-            <div className='flex mx-8 justify-center items-center rounded-lg'>
+        <Box sx={{width: '100%'}}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
                 <Typography variant='h2' >
                     MIS FAVORITOS
                 </Typography>
-            </div>
-            <div className='flex mx-8 justify-center items-center bg-white rounded-xl px-8 py-6'>
+            </Box>
+            <Box sx={{ paddingX: 6, paddingY: 3, backgroundColor:'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2 }} >
+
                 <Typography variant='hEspecial'>
                     HOLA, {user?.firstName?.toUpperCase()}
                 </Typography>
-            </div>
-            <div className='px-8'>
+            </Box>
+            <Box sx={{ paddingX: 4, marginBottom: 8 }}>
                 <List sx={style} aria-label="mailbox folders">
                     <ListItem>
                         <StyledNavItem href="/favorites" isActive={isActive('/favorites')}>
@@ -85,8 +86,8 @@ const LeftSide = () => {
                         </StyledNavItem>
                     </ListItem>
                 </List>
-            </div>
-        </div>
+            </Box>
+        </Box>
     )
 }
 
