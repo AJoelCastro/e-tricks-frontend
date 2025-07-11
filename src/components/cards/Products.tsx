@@ -38,7 +38,7 @@ const ProductCard: React.FC<Props> =({products})=> {
           </IconButton>
         </Box>
         <CardContent>
-          <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
+          <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
             {products.marca}
           </Typography>
           <Typography variant="h4" sx={{ color: 'text.primary' }}>
@@ -71,7 +71,7 @@ const ProductCard: React.FC<Props> =({products})=> {
                   <Grid
                     sx={{backgroundColor: 'red', borderRadius: '6px', padding: '1px 10px'}}
                   >
-                    <Typography variant="body2" sx={{ color: 'white' }}>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
                       {products.descuento}%
                     </Typography>
                   </Grid>
