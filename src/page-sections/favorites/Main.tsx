@@ -33,7 +33,7 @@ const MainFavorites = () => {
   return (
     <>
       <div className='h-16'></div>
-      <Grid container spacing={3}>
+      <Grid container spacing={1} sx={{minHeight:'100vh'}}>
         <Grid size={{
           xs:12, sm:5, md:3
         }}>
