@@ -4,6 +4,7 @@ import { esES } from '@clerk/localizations'
 import { Geist, Geist_Mono } from 'next/font/google'
 import  ThemeProvider1  from '@/theme/theme-provider';
 import './globals.css'
+import AuthTokenHandler from '@/hooks/AuthTokenHandler';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,13 +29,15 @@ export default function RootLayout({
   
   return (
     <ClerkProvider localization={esES}>
-      <html lang="es">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <ThemeProvider1>
-            {children}
-          </ThemeProvider1>
-        </body>
-      </html>
+      <AuthTokenHandler>
+        <html lang="es">
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <ThemeProvider1>
+              {children}
+            </ThemeProvider1>
+          </body>
+        </html>
+      </AuthTokenHandler>
     </ClerkProvider>
   )
 }

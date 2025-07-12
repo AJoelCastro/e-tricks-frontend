@@ -26,11 +26,15 @@ type Props = {
 };
 
 const ProductCard: React.FC<Props> = ({ products }) => {
+  console.log("pr",products)
   const promedio =
     products.resenias && products.resenias.length
       ? products.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / products.resenias.length
       : 0;
-
+  React.useEffect(() => {
+    
+  }, [])
+  
   return (
     <Box sx={{ height: '100%' }} className='h-80'> 
       <Card
@@ -52,7 +56,7 @@ const ProductCard: React.FC<Props> = ({ products }) => {
         />
 
         <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-          <IconButton aria-label="add to favorites">
+          <IconButton aria-label="add to favorites" onClick={()=>{}}>
             <FavoriteBorderIcon
               sx={{
                 color: 'inherit',
