@@ -32,9 +32,9 @@ const MainComponent = () => {
           ))
         }
       </div>
-      <div className='grid grid-cols-4'>
+      <div className='grid xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4'>
         {dataProducts.map((product, index) => (
-          <div key={index} className='grid grid-cols-1'>
+          <div key={index} className='col-span-1'>
             <ProductCard products={product} />
           </div>
         ))}
