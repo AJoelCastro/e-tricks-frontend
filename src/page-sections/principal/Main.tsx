@@ -12,34 +12,32 @@ const MainComponent = () => {
   const [dataProducts, setDataProducts] = useState<Array<any>>([]);
 
   useEffect(() => {
-    const getProducts = async() =>{
+    const getProducts = async () => {
       const data = await ProductService.GetProducts();
       setDataProducts(data);
     }
     getProducts();
   }, [])
-  
+
 
   return (
     <div>
-      <MainCarouselComponent/>
+      <MainCarouselComponent />
       <div className='mt-4 grid grid-cols-3'>
         {
           imagesPrueba.map((image, index) => (
-              <div className='col-span-1 relative' key={index}>
-                <ThreeImages image={image}/>
-              </div>
+            <div className='col-span-1 relative' key={index}>
+              <ThreeImages image={image} />
+            </div>
           ))
         }
       </div>
       <div className='grid grid-cols-4'>
-        {
-          dataProducts.map((product, index) => (
-            <div key={index} className='col-span-1'>
-              <ProductCard products={product}/>
-            </div>
-          ))
-        }
+        {dataProducts.map((product, index) => (
+          <div key={index} className='grid grid-cols-1'>
+            <ProductCard products={product} />
+          </div>
+        ))}
       </div>
     </div>
   )

@@ -1,11 +1,24 @@
 'use client';
 import { useState, useEffect } from 'react';
 import {  Search, X } from "lucide-react";
+import ProductService from '@/services/ProductService';
+type Product = {
+  name: string;
+  description: string;
+  images: string[];
+  price: number;
+  marca: string;
+  descuento?: number;
+};
+type Props = {
+  products: Product;
+}
 
 
-const SearchSidebar = ({ isOpen, onClose }) => {
+
+const SearchSidebar: React.FC<Props> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
-
+   const [suggestedProducts, setDataProducts] = useState<Array<any>>([]);
   useEffect(() => {
     if (isOpen) {
     
@@ -14,6 +27,11 @@ const SearchSidebar = ({ isOpen, onClose }) => {
       document.body.style.overflow = '';
     }
 
+     const getProducts = async() =>{
+      const data = await ProductService.GetProducts();
+      setDataProducts(data);
+    }
+    getProducts();
    
     return () => {
       document.body.style.overflow = '';
@@ -23,45 +41,11 @@ const SearchSidebar = ({ isOpen, onClose }) => {
     'Outlet',
     'Nuevo',
     'Sigue tu pedido',
-    'Tiendas'
+    'Alvaro marikong'
   ];
 
-  const suggestedProducts = [
-    {
-      id: 1,
-      name: 'Zapatillas Urbanas Mujer North Star',
-      brand: 'NORTH STAR',
-      price: 169.90,
-      currency: 'S/',
-    },
-    {
-      id: 2,
-      name: 'Zapatillas Deportivas Running Hombre',
-      brand: 'POWER',
-      originalPrice: 149.90,
-      price: 119.92,
-      discount: '-20%',
-      currency: 'S/',
-    },
-    {
-      id: 3,
-      name: 'Zapatillas Urbanas Mujer North Star Azul',
-      brand: 'NORTH STAR',
-      originalPrice: 139.90,
-      price: 111.92,
-      discount: '-20%',
-      currency: 'S/',
-    },
-    {
-      id: 4,
-      name: 'Zapatillas De Fútbol Hombre Power',
-      brand: 'POWER',
-      originalPrice: 139.90,
-      price: 79.90,
-      discount: '-43%',
-      currency: 'S/',
-    }
-  ];
+ 
+
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -149,13 +133,13 @@ const SearchSidebar = ({ isOpen, onClose }) => {
                 >
                   {/* Imagen del Producto */}
                   <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                    <div className="w-20 h-20 bg-gray-300 rounded-lg"></div>
+                    <img src={product.images[0]} className=" bg-gray-300 rounded-lg"/>
                   </div>
 
                   {/* Info del Producto */}
                   <div className="space-y-2">
                     <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
-                      {product.brand}
+                      {product.marca}
                     </p>
                     <h4 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
                       {product.name}
@@ -163,21 +147,21 @@ const SearchSidebar = ({ isOpen, onClose }) => {
 
                     {/* Precios */}
                     <div className="space-y-1">
-                      {product.originalPrice && (
+                      {product.price && (
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-400 line-through">
-                            {product.currency} {product.originalPrice}
+                           S/.  {product.price}
                           </span>
-                          {product.discount && (
+                          {product.descuento && (
                             <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full font-semibold">
-                              {product.discount}
+                              {product.descuento}
                             </span>
                           )}
                         </div>
                       )}
                       <div className="flex items-center">
                         <span className="text-lg font-bold text-red-600">
-                          {product.currency} {product.price}
+                          S/. {product.price}
                         </span>
                       </div>
                     </div>
