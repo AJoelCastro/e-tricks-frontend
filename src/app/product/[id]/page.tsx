@@ -2,7 +2,7 @@
 import NavbarComponent from '@/components/NavbarComponent';
 import React from 'react'
 
-const ProductIdPage = () => {
+const ProductDetailPage = () => {
   return (
     <>
         <NavbarComponent/>
@@ -10,4 +10,4 @@ const ProductIdPage = () => {
   )
 }
 
-export default ProductIdPage
+export default ProductDetailPage
