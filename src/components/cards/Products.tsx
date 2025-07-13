@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { SignInButton, useUser } from '@clerk/nextjs';
+import UserService from '@/services/UserService';
 
 type Resenia = {
   cliente: string;
@@ -25,9 +26,11 @@ type Product = {
 type Props = {
   products: Product;
   markedFavorite?: boolean;
+  handleRemoveFavorite?: (idProduct: string) => Promise<void>;
+  handleAddFavorite?: (idProduct: string) => Promise<void>;
 };
 
-const ProductCard: React.FC<Props> = ({ products, markedFavorite }) => {
+const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFavorite, handleAddFavorite }) => {
 
   const promedio =
     products.resenias && products.resenias.length
@@ -39,22 +42,21 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite }) => {
   React.useEffect(() => {
     
   }, [])
-  const handleAddFavorite = async()=>{
-    try {
-      console.log("Favorite added")
 
-    } catch (error) {
-      throw error
-    }
-  }
-  const handleDeleteFavorite = async()=>{
-    try {
-      console.log("Favorite deleted") 
+  const handleAddFav = React.useCallback(
+    async () => {
+      handleAddFavorite?.(products._id);
+    },
+    [handleAddFavorite, products._id],
+  )
 
-    } catch (error) {
-      throw error
-    }
-  }
+  const handleRemoveFav = React.useCallback(
+    async () => {
+      handleRemoveFavorite?.(products._id);
+    },
+    [handleRemoveFavorite, products._id],
+  )
+
   return (
     <Box sx={{ height: '100%' }} className='h-80'> 
       <Card
@@ -80,9 +82,9 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite }) => {
               isSignedIn ? (
                 <IconButton aria-label="add to favorites" onClick={()=>{
                   if (markedFavorite) {
-                    handleDeleteFavorite();
+                    handleRemoveFav();
                   } else {
-                    handleAddFavorite();
+                    handleAddFav();
                   }
                 }}>
                   <FavoriteBorderIcon

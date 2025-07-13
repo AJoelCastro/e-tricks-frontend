@@ -1,36 +1,37 @@
 import UserService from '@/services/UserService'
 import { Box, Button, Grid, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ProductCard from '../cards/Products';
 
 const RightSide = () => {
-    const [favorites, setFavorites] = useState([]);
-    const [favoriteIds, setFavoriteIds] = useState([]);
-    useEffect(() => {
-        const getFavoriteIds = async() =>{
-            try {
-                const dataFavoriteIds = await UserService.getFavoriteIds()
-                setFavoriteIds(dataFavoriteIds)
-            } catch (error) {
-                throw error
-            }
-        }
-        getFavoriteIds()
-    }, [])
-    useEffect(() => {
-        const getFavorites = async() =>{
-            try {
-                const dataFavorites = await UserService.getFavorites()
-                setFavorites(dataFavorites)
 
-            } catch (error) {
-                throw error
-            }
+    const [favorites, setFavorites] = useState([]);
+    const getFavorites = async() =>{
+        try {
+            const dataFavorites = await UserService.getFavorites()
+            setFavorites(dataFavorites)
+
+        } catch (error) {
+            throw error
         }
+    }
+    useEffect(() => {
         getFavorites()
     }, [])
    
-
+    const handleRemoveFavorite = useCallback(
+      async (id:string) => {
+        try {
+            const dataRemove = await UserService.removeFavorite(id)
+            console.log("data r", dataRemove)
+            getFavorites()
+        } catch (error) {
+            throw error
+        }
+      },
+      [],
+    )
+    
     return (
         <Box>
             <Grid container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2, paddingY: 1 }}>
@@ -77,22 +78,36 @@ const RightSide = () => {
                     </Button>
                 </Grid>
             </Grid>
-            <Grid container sx={{marginX: 4, marginBottom: 4,}} spacing={3}>
-                {
+            <Grid container sx={{ marginX: 4, marginBottom: 4 }} spacing={3}>
+                {favorites.length === 0 ? (
+                    <Grid size={{
+                                xs: 12, sm: 12, md: 12
+                        }} 
+                        sx={{ textAlign: 'center', mt: 4 }}
+                    >
+                        <Typography variant="h4" sx={{ color: 'text.secondary' }}>
+                            Tu lista de favoritos está vacía 💔
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
+                            Agrega productos a favoritos y aparecerán aquí.
+                        </Typography>
+                    </Grid>
+                ) : (
                     favorites.map((favorite) => (
-                        <Grid key={favorite._id} size={{
-                            sm: 6,
-                            md: 4
-                        }}>
-                            {favoriteIds.includes(favorite._id) ? (
-                                <ProductCard products={favorite} markedFavorite={true}></ProductCard>
-                            ):(
-                                <ProductCard products={favorite} markedFavorite={false}></ProductCard>
-                            )
-                            }
+                        <Grid
+                            key={favorite._id}
+                            size={{
+                                xs: 12, sm: 6, md: 4
+                            }}
+                        >
+                            <ProductCard
+                            products={favorite}
+                            markedFavorite={true}
+                            handleRemoveFavorite={handleRemoveFavorite}
+                            />
                         </Grid>
                     ))
-                }
+                )}
             </Grid>
         </Box>
         

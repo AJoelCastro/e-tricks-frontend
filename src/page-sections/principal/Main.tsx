@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useAuth } from "@clerk/nextjs";
 import MainCarouselComponent from '../../components/carousel/MainCarousel'
 import { imagesPrueba } from '@/data/ThreeImagesPrueba'
@@ -12,23 +12,46 @@ const MainComponent = () => {
   const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
-
+  const getProducts = async () => {
+    const data = await ProductService.GetProducts();
+    setDataProducts(data);
+  }
+  const getFavorites = async () => {
+    const data = await UserService.getFavoriteIds();
+    console.log("data main", data)
+    setFavoriteIds(data);
+  }
   useEffect(() => {
-    const getProducts = async () => {
-      const data = await ProductService.GetProducts();
-      setDataProducts(data);
-    }
     getProducts();
-  }, [])
-
-  useEffect(() => {
-      const getFavorites = async () => {
-        const data = await UserService.getFavoriteIds();
-        console.log("data main", data)
-        setFavoriteIds(data);
-      }
-      getFavorites();
+    getFavorites();
   }, []);
+
+  const handleRemoveFavorite = useCallback(
+    async (id:string) => {
+      try {
+          const dataRemove = await UserService.removeFavorite(id)
+          console.log("data r", dataRemove)
+          getFavorites()
+      } catch (error) {
+          throw error
+      }
+    },
+    [],
+  )
+
+  const handleAddFavorite = useCallback(
+    async(id:string) => {
+      try {
+        const dataAdd = await UserService.addFavorite(id)
+        console.log("data a", dataAdd)
+        getFavorites()
+      } catch (error) {
+        throw error
+      }
+    },
+    [],
+  )
+  
 
   return (
     <div>
@@ -45,7 +68,7 @@ const MainComponent = () => {
       <div className='grid xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4'>
         {dataProducts.map((product, index) => (
           <div key={index} className='col-span-1'>
-            <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} />
+            <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
           </div>
         ))}
       </div>
