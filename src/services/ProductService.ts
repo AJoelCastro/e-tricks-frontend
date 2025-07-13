@@ -13,7 +13,7 @@ const ProductService = {
             throw error;
         }
     },
-    GetProduct : async (id : number) => {
+    GetProductById : async (id : string) => {
         try {
             const response = await axios.get(`${API_URL}/product/${id}/get`);
             return response.data;
