@@ -29,7 +29,6 @@ const StyledNavItem = styled(Link, {
 const LeftSide = () => {
 
     const { user } = useUser();
-    console.log(user)
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
     return (

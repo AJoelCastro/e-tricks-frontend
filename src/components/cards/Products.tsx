@@ -4,6 +4,7 @@ import {
   Grid, Rating
 } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { SignInButton, useUser } from '@clerk/nextjs';
 
 type Resenia = {
   cliente: string;
@@ -23,18 +24,37 @@ type Product = {
 
 type Props = {
   products: Product;
+  markedFavorite?: boolean;
 };
 
-const ProductCard: React.FC<Props> = ({ products }) => {
-  console.log("pr",products)
+const ProductCard: React.FC<Props> = ({ products, markedFavorite }) => {
+
   const promedio =
     products.resenias && products.resenias.length
       ? products.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / products.resenias.length
       : 0;
+
+  const { isSignedIn } = useUser()
+  
   React.useEffect(() => {
     
   }, [])
-  
+  const handleAddFavorite = async()=>{
+    try {
+      console.log("Favorite added")
+
+    } catch (error) {
+      throw error
+    }
+  }
+  const handleDeleteFavorite = async()=>{
+    try {
+      console.log("Favorite deleted") 
+
+    } catch (error) {
+      throw error
+    }
+  }
   return (
     <Box sx={{ height: '100%' }} className='h-80'> 
       <Card
@@ -56,17 +76,41 @@ const ProductCard: React.FC<Props> = ({ products }) => {
         />
 
         <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-          <IconButton aria-label="add to favorites" onClick={()=>{}}>
-            <FavoriteBorderIcon
-              sx={{
-                color: 'inherit',
-                '&:hover': {
-                  color: 'red',
-                  cursor: 'pointer',
-                },
-              }}
-            />
-          </IconButton>
+            {
+              isSignedIn ? (
+                <IconButton aria-label="add to favorites" onClick={()=>{
+                  if (markedFavorite) {
+                    handleDeleteFavorite();
+                  } else {
+                    handleAddFavorite();
+                  }
+                }}>
+                  <FavoriteBorderIcon
+                    sx={{
+                      color: markedFavorite ? 'red' : 'inherit',
+                      '&:hover': {
+                        color: 'red',
+                        cursor: 'pointer',
+                      },
+                    }}
+                  />
+                </IconButton>
+              ) : (
+                <SignInButton mode='modal'>
+                  <button className='px-2'>
+                    <FavoriteBorderIcon
+                      sx={{
+                        color: markedFavorite ? 'red' : 'inherit',
+                        '&:hover': {
+                          color: 'red',
+                          cursor: 'pointer',
+                        },
+                      }}
+                    />
+                  </button>
+                </SignInButton>
+              )
+            }
         </Box>
 
         <CardContent sx={{ paddingBottom: '60px' }}> 
