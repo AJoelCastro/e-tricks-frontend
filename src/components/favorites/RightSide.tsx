@@ -101,9 +101,9 @@ const RightSide = () => {
                             }}
                         >
                             <ProductCard
-                            products={favorite}
-                            markedFavorite={true}
-                            handleRemoveFavorite={handleRemoveFavorite}
+                                products={favorite}
+                                markedFavorite={true}
+                                handleRemoveFavorite={handleRemoveFavorite}
                             />
                         </Grid>
                     ))

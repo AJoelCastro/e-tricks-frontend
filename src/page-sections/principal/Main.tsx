@@ -22,8 +22,8 @@ const MainComponent = () => {
     setFavoriteIds(data);
   }
   useEffect(() => {
-    getProducts();
     getFavorites();
+    getProducts();
   }, []);
 
   const handleRemoveFavorite = useCallback(
