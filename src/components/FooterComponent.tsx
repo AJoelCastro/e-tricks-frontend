@@ -18,7 +18,6 @@ const FooterComponent = () => {
     >
       <Grid container spacing={4}>
 
-        {/* Logo + CTA */}
         <Grid  size={{xs:12, sm:6, md:4}}>
           <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -51,8 +50,6 @@ const FooterComponent = () => {
             </Button>
           </Box>
         </Grid>
-
-        {/* Enlaces */}
         <Grid size={{xs:12, sm:6, md:8}}>
           <Grid container spacing={4}>
             {[
@@ -89,7 +86,6 @@ const FooterComponent = () => {
 
       <Divider sx={{ my: 4 }} />
 
-      {/* Social + Copy */}
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid size={{xs:12, sm:6, md:6}}>
           <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' }, color: 'text.secondary' }}>
