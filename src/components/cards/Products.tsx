@@ -6,6 +6,7 @@ import {
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { SignInButton, useUser } from '@clerk/nextjs';
 import UserService from '@/services/UserService';
+import Link from 'next/link';
 
 type Resenia = {
   cliente: string;
@@ -58,7 +59,7 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
   )
 
   return (
-    <Box sx={{ height: '100%' }} className='h-80'> 
+    <Box sx={{ height: '100%' }}> 
       <Card
         sx={{
           position: 'relative',
@@ -69,14 +70,6 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
           },
         }}
       >
-        <CardMedia
-          component="img"
-          height="194"
-          image={products.images[0]}
-          alt={products.name}
-          sx={{ objectFit: 'contain' }}
-        />
-
         <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
             {
               isSignedIn ? (
@@ -114,20 +107,30 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
               )
             }
         </Box>
-
+        <Link href={`/product/${products._id}`}>
+        <CardMedia
+          component="img"
+          height="194"
+          image={products.images[0]}
+          alt={products.name}
+          sx={{ objectFit: 'contain' }}
+        />
+        </Link>
         <CardContent sx={{ paddingBottom: '60px' }}> 
-          <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-            {products.marca}
-          </Typography>
-          
+          <Link href={`/marcas/${products.marca.toLowerCase()}`}>
+            <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+              {products.marca}
+            </Typography>
+          </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Grid item>
-              <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                {products.name}
-              </Typography>
+              <Link href={`/product/${products._id}`}>
+                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                  {products.name}
+                </Typography>
+              </Link>
             </Grid>
           </Grid>
-
           <Grid container spacing={1} sx={{ alignItems: 'center', mt: 1 }}>
             <Grid item>
               <Rating precision={0.5} value={promedio} readOnly />
@@ -170,7 +173,6 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
             </Typography>
           )}
         </CardContent>
-
         <Box
           className="add-to-cart-container"
           sx={{
