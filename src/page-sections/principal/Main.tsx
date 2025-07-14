@@ -59,15 +59,15 @@ const MainComponent = () => {
       <Box sx={{height:{xs:64, sm:64, md:0}}}></Box>
       <Box>
         <MainCarouselComponent />
-        <div className='grid grid-cols-3'>
+        <Grid container size={12}>
           {
             imagesPrueba.map((image, index) => (
-              <div className='col-span-1 relative' key={index}>
+              <Grid key={index} size={{xs:12, sm:6, md:4}} sx={{marginX:'auto'}}>
                 <ThreeImages image={image}/>
-              </div>
+              </Grid>
             ))
           }
-        </div>
+        </Grid>
         <Grid container size={12}>
             {dataProducts.map((product, index) => (
               <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
