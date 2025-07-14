@@ -16,16 +16,20 @@ export default function AuthTokenHandler({ children }: { children: React.ReactNo
                     localStorage.setItem('auth_token', token);
                     await UserService.verifyUser(token, user!.id)
                     localStorage.setItem('idClerk', user!.id)
+                    setReady(true);
+
                 }
             } else {
                 localStorage.removeItem('auth_token'); // limpia si se desloguea
                 localStorage.removeItem('idClerk')
+                setReady(true);
             }
-            setReady(true);
         };
 
         storeToken();
     }, [isSignedIn]);
-    if (!ready) return <SplashScreen/>;
+    if(!ready){
+        return (<SplashScreen/>)
+    }
     return <>{children}</>;
 }
