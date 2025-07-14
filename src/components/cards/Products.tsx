@@ -107,7 +107,7 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
             </Typography>
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-            <Grid item>
+            <Grid >
               <Link href={`/product/${products._id}`}>
                 <Typography variant="h4" sx={{ color: 'text.primary' }}>
                   {products.name}
@@ -116,10 +116,10 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
             </Grid>
           </Grid>
           <Grid container spacing={1} sx={{ alignItems: 'center', mt: 1 }}>
-            <Grid item>
+            <Grid >
               <Rating precision={0.5} value={promedio} readOnly />
             </Grid>
-            <Grid item>
+            <Grid >
               <Typography variant="body2" color="text.secondary" fontSize="14px">
                 {products.resenias?.length ?? 0} reseñas
               </Typography>
@@ -129,14 +129,14 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
           {products.descuento ? (
             <Box mt={2}>
               <Grid container spacing={1} alignItems="center">
-                <Grid item>
+                <Grid >
                   <Typography variant="body1" sx={{ color: 'text.primary' }}>
                     S/ {products.price}
                   </Typography>
                 </Grid>
-                <Grid item sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
                   <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
-                    {products.descuento}%
+                    -{products.descuento}%
                   </Typography>
                 </Grid>
               </Grid>

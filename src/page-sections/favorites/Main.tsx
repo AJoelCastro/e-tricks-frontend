@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircularProgress, Grid } from '@mui/material'
+import { Grid } from '@mui/material'
 import LeftSide from '@/components/favorites/LeftSide'
 import RightSide from '@/components/favorites/RightSide'
 

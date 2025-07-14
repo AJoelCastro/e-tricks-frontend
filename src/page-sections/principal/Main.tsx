@@ -6,6 +6,7 @@ import ProductCard from '../../components/cards/Products'
 import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
 import UserService from '@/services/UserService';
+import { Box, Grid } from '@mui/material';
 
 
 const MainComponent = () => {
@@ -54,9 +55,9 @@ const MainComponent = () => {
   
 
   return (
-    <div>
+    <Box>
       <MainCarouselComponent />
-      <div className='mt-4 grid grid-cols-3'>
+      <div className='grid grid-cols-3'>
         {
           imagesPrueba.map((image, index) => (
             <div className='col-span-1 relative' key={index}>
@@ -65,14 +66,14 @@ const MainComponent = () => {
           ))
         }
       </div>
-      <div className='grid xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4'>
-        {dataProducts.map((product, index) => (
-          <div key={index} className='col-span-1'>
-            <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
-          </div>
-        ))}
-      </div>
-    </div>
+      <Grid container size={12} >
+          {dataProducts.map((product, index) => (
+            <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
+              <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
+            </Grid>
+          ))}
+      </Grid>
+    </Box>
   )
 }
 
