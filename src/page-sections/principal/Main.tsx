@@ -66,7 +66,7 @@ const MainComponent = () => {
           ))
         }
       </div>
-      <Grid container size={12} >
+      <Grid container size={12}>
           {dataProducts.map((product, index) => (
             <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
               <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
