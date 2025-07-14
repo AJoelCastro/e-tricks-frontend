@@ -2,6 +2,7 @@
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 import Image from 'next/image';
+import { Box } from '@mui/material';
 
 export default function Carousel() {
   const [sliderRef] = useKeenSlider<HTMLDivElement>({
@@ -14,7 +15,7 @@ export default function Carousel() {
   });
 
   return (
-    <div ref={sliderRef} className="keen-slider">
+    <Box ref={sliderRef} className="keen-slider" >
         <div className="keen-slider__slide  flex items-center justify-center relative">
             <Image
                 src={'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80'}
@@ -39,6 +40,6 @@ export default function Carousel() {
             >
             </Image>
         </div>
-    </div>
+    </Box>
   );
 }

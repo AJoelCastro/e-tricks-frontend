@@ -55,25 +55,28 @@ const MainComponent = () => {
   
 
   return (
-    <Box>
-      <MainCarouselComponent />
-      <div className='grid grid-cols-3'>
-        {
-          imagesPrueba.map((image, index) => (
-            <div className='col-span-1 relative' key={index}>
-              <ThreeImages image={image}/>
-            </div>
-          ))
-        }
-      </div>
-      <Grid container size={12}>
-          {dataProducts.map((product, index) => (
-            <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
-              <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
-            </Grid>
-          ))}
-      </Grid>
-    </Box>
+    <>
+      <Box sx={{height:{xs:64, sm:64, md:0}}}></Box>
+      <Box>
+        <MainCarouselComponent />
+        <div className='grid grid-cols-3'>
+          {
+            imagesPrueba.map((image, index) => (
+              <div className='col-span-1 relative' key={index}>
+                <ThreeImages image={image}/>
+              </div>
+            ))
+          }
+        </div>
+        <Grid container size={12}>
+            {dataProducts.map((product, index) => (
+              <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
+                <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
+              </Grid>
+            ))}
+        </Grid>
+      </Box>
+    </>
   )
 }
 
