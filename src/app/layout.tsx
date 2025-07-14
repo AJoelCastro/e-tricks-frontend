@@ -2,7 +2,7 @@ import { type Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { esES } from '@clerk/localizations'
 import { Geist, Geist_Mono } from 'next/font/google'
-import  ThemeProvider1  from '@/theme/theme-provider';
+import ThemeProvider1 from '@/theme/theme-provider';
 import './globals.css'
 import AuthTokenHandler from '@/hooks/AuthTokenHandler';
 
@@ -26,18 +26,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  
   return (
-    <ClerkProvider localization={esES}>
-      <AuthTokenHandler>
-        <html lang="es">
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="es">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ClerkProvider localization={esES}>
+          <AuthTokenHandler>
             <ThemeProvider1>
               {children}
             </ThemeProvider1>
-          </body>
-        </html>
-      </AuthTokenHandler>
-    </ClerkProvider>
+          </AuthTokenHandler>
+        </ClerkProvider>
+      </body>
+    </html>
   )
 }

@@ -26,7 +26,12 @@ const StyledNavItem = styled(Link, {
     color: '#7950f2'
   })
 }));
-const LeftSide = () => {
+
+type Props={
+    title:string
+}
+
+const LeftSide:React.FC<Props> = ({title}) => {
 
     const { user } = useUser();
     const pathname = usePathname();
@@ -35,7 +40,7 @@ const LeftSide = () => {
         <Box sx={{width: '100%'}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
                 <Typography variant='h2' >
-                    MIS FAVORITOS
+                    {title.toUpperCase()}
                 </Typography>
             </Box>
             <Box sx={{ paddingX: 6, paddingY: 3, backgroundColor:'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2 }} >
@@ -56,6 +61,14 @@ const LeftSide = () => {
                     <Divider component="li" />
                     <ListItem>
                         <StyledNavItem href="/cart" isActive={isActive('/cart')}>
+                            <Typography>
+                                MI CARRITO
+                            </Typography>
+                        </StyledNavItem>
+                    </ListItem>
+                    <Divider component="li" />
+                    <ListItem>
+                        <StyledNavItem href="/compras" isActive={isActive('/compras')}>
                             <Typography>
                                 MIS COMPRAS
                             </Typography>

@@ -33,7 +33,23 @@ const UserService = {
             throw error
         }
     },
-
+    getCartItems: async ()=>{
+        const idClerk = localStorage.getItem('idClerk');
+        const token = localStorage.getItem('auth_token');
+        if (!idClerk || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+        try {
+            const response = await axios.get(`${API_URL}/user/getCartItems/${idClerk}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    },
     getFavoriteIds: async ()=>{
         const idClerk = localStorage.getItem('idClerk');
         const token = localStorage.getItem('auth_token');

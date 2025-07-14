@@ -50,7 +50,7 @@ const RightSide = () => {
                     sm:12,
                     md: 9
                 }}
-                sx={{ display:'flex', flexDirection:'row', justifyContent: 'space-between', paddingX:4 }}
+                sx={{ display:'flex', flexDirection:'row', justifyContent: 'space-between', paddingX:4,flexWrap: 'wrap', }}
                 >
                     <Button >
                         <Typography variant='h7'>

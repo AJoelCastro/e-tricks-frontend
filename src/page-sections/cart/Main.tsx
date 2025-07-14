@@ -11,7 +11,7 @@ const MainCart = () => {
         <Grid size={{
           xs:12, sm:5, md:3
         }}>
-          <LeftSide/>
+          <LeftSide title='mi carrito'/>
         </Grid>
         <Grid size={{
           xs:12, sm:7, md:9
