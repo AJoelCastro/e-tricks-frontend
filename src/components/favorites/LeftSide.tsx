@@ -55,7 +55,7 @@ const LeftSide = () => {
                     </ListItem>
                     <Divider component="li" />
                     <ListItem>
-                        <StyledNavItem href="/drafts" isActive={isActive('/drafts')}>
+                        <StyledNavItem href="/cart" isActive={isActive('/cart')}>
                             <Typography>
                                 MIS COMPRAS
                             </Typography>

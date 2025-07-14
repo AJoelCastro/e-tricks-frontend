@@ -1,3 +1,4 @@
+'use client';
 import MainCart from '@/page-sections/cart/Main'
 import FooterComponent from '@/components/FooterComponent'
 import NavbarComponent from '@/components/NavbarComponent'
