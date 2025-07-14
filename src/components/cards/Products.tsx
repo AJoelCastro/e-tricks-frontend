@@ -5,27 +5,11 @@ import {
 } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { SignInButton, useUser } from '@clerk/nextjs';
-import UserService from '@/services/UserService';
 import Link from 'next/link';
-
-type Resenia = {
-  cliente: string;
-  valoracion: number;
-  comentario: string;
-};
-
-type Product = {
-  name: string;
-  description: string;
-  images: string[];
-  price: number;
-  marca: string;
-  descuento?: number;
-  resenias?: Resenia[];
-};
+import { IProduct } from '@/interfaces/Product';
 
 type Props = {
-  products: Product;
+  products: IProduct;
   markedFavorite?: boolean;
   handleRemoveFavorite?: (idProduct: string) => Promise<void>;
   handleAddFavorite?: (idProduct: string) => Promise<void>;
