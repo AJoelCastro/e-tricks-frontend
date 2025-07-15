@@ -37,7 +37,7 @@ const NavbarComponent = () => {
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
@@ -51,10 +51,10 @@ const NavbarComponent = () => {
 
   return (
     <>
-      <nav 
+      <nav
         className={`w-full z-50 transition-all duration-300 ease-in-out fixed  ${
-          showWhiteBackground 
-            ? 'bg-white shadow-lg' 
+          showWhiteBackground
+            ? 'bg-white shadow-lg'
             : 'bg-transparent'
         }`}
         onMouseEnter={() => setIsHovered(true)}
@@ -62,25 +62,25 @@ const NavbarComponent = () => {
       >
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            
+
             {/* Links de navegación izquierda */}
             <div className="hidden md:flex items-center space-x-4 ">
-              
-              <Link 
-                href="/women" 
+
+              <Link
+                href="/women"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-[#7950f2]' 
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 MUJER
               </Link>
-              <Link 
-                href="/marcas" 
+              <Link
+                href="/marcas"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-[#7950f2]' 
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
@@ -104,31 +104,31 @@ const NavbarComponent = () => {
             {/* Iconos de la derecha */}
             <div className="hidden md:flex items-center space-x-4">
               {/* Botón de búsqueda */}
-              <button 
+              <button
                 onClick={() => setIsSearchOpen(true)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-[#7950f2]' 
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Search/>
               </button>
-              <Link 
-                href="/favorites" 
+              <Link
+                href="/favorites"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-[#7950f2]' 
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Heart/>
               </Link>
-              <Link 
-                href="/cart" 
+              <Link
+                href="/cart"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                  showWhiteBackground 
-                    ? 'text-gray-900 hover:text-[#7950f2]' 
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
@@ -139,10 +139,10 @@ const NavbarComponent = () => {
               </SignedIn>
               <SignedOut>
                 <SignInButton mode='modal'>
-                  <button 
+                  <button
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-                      showWhiteBackground 
-                        ? 'text-gray-900 hover:text-[#7950f2]' 
+                      showWhiteBackground
+                        ? 'text-gray-900 hover:text-[#7950f2]'
                         : 'text-white hover:text-gray-300'
                     }`}
                   >
@@ -191,8 +191,8 @@ const NavbarComponent = () => {
           showWhiteBackground ? 'bg-white' : 'bg-gray-900'
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link 
-              href="/productos" 
+            <Link
+              href="/productos"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
@@ -201,8 +201,8 @@ const NavbarComponent = () => {
             >
               Productos
             </Link>
-            <Link 
-              href="/servicios" 
+            <Link
+              href="/servicios"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
@@ -211,8 +211,8 @@ const NavbarComponent = () => {
             >
               Servicios
             </Link>
-            <Link 
-              href="/contacto" 
+            <Link
+              href="/contacto"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
@@ -223,7 +223,7 @@ const NavbarComponent = () => {
             </Link>
 
             {/* Botón de búsqueda en móvil */}
-            <button 
+            <button
               onClick={() => setIsSearchOpen(true)}
               className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
@@ -239,9 +239,9 @@ const NavbarComponent = () => {
       </nav>
 
       {/* Sidebar de Búsqueda */}
-      <SearchSidebar 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
+      <SearchSidebar
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
       />
     </>
   );

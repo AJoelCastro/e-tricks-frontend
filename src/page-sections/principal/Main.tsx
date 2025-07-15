@@ -7,6 +7,8 @@ import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
 import UserService from '@/services/UserService';
 import { Box, Grid } from '@mui/material';
+import NavbarComponent from '@/components/NavbarComponent';
+import FooterComponent from '@/components/FooterComponent';
 
 
 const MainComponent = () => {
@@ -61,6 +63,7 @@ const MainComponent = () => {
 
   return (
     <>
+      <NavbarComponent/>
       <Box sx={{height:{xs:64, sm:64, md:0}}}></Box>
       <Box>
         <MainCarouselComponent />
@@ -81,6 +84,7 @@ const MainComponent = () => {
             ))}
         </Grid>
       </Box>
+      <FooterComponent/>
     </>
   )
 }
