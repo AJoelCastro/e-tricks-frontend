@@ -1,3 +1,4 @@
+import { store } from '@/store';
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -17,13 +18,12 @@ const UserService = {
     },
 
     getFavorites: async ()=>{
-        const idClerk = localStorage.getItem('idClerk');
-        const token = localStorage.getItem('auth_token');
-        if (!idClerk || !token) {
+        const { userId, token} = store.getState().auth;
+        if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
         try {
-            const response = await axios.get(`${API_URL}/user/getFavorites/${idClerk}`,{
+            const response = await axios.get(`${API_URL}/user/getFavorites/${userId}`,{
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -34,13 +34,12 @@ const UserService = {
         }
     },
     getCartItems: async ()=>{
-        const idClerk = localStorage.getItem('idClerk');
-        const token = localStorage.getItem('auth_token');
-        if (!idClerk || !token) {
+        const { userId, token} = store.getState().auth;
+        if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
         try {
-            const response = await axios.get(`${API_URL}/user/getCartItems/${idClerk}`,{
+            const response = await axios.get(`${API_URL}/user/getCartItems/${userId}`,{
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -51,13 +50,12 @@ const UserService = {
         }
     },
     getFavoriteIds: async ()=>{
-        const idClerk = localStorage.getItem('idClerk');
-        const token = localStorage.getItem('auth_token');
-        if (!idClerk || !token) {
+        const { userId, token} = store.getState().auth;
+        if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
         try {
-            const response = await axios.get(`${API_URL}/user/getFavoriteIds/${idClerk}`,{
+            const response = await axios.get(`${API_URL}/user/getFavoriteIds/${userId}`,{
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -69,14 +67,13 @@ const UserService = {
     },
 
     addFavorite: async (idProduct: string)=>{
-        const idClerk = localStorage.getItem('idClerk');
-        const token = localStorage.getItem('auth_token');
+        const { userId, token} = store.getState().auth;
 
-        if (!idClerk || !token) {
+        if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
         try {
-            const response = await axios.post(`${API_URL}/user/addFavorite/${idClerk}`,{
+            const response = await axios.post(`${API_URL}/user/addFavorite/${userId}`,{
                 idProduct
             },{
                 headers: {
@@ -90,15 +87,14 @@ const UserService = {
     },
 
     removeFavorite: async (idProduct: string) => {
-        const idClerk = localStorage.getItem('idClerk');
-        const token = localStorage.getItem('auth_token');
+        const { userId, token} = store.getState().auth;
 
-        if (!idClerk || !token) {
+        if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
 
         try {
-            const response = await axios.delete(`${API_URL}/user/removeFavorite/${idClerk}`, {
+            const response = await axios.delete(`${API_URL}/user/removeFavorite/${userId}`, {
                 data: { idProduct },
                 headers: {
                     Authorization: `Bearer ${token}`

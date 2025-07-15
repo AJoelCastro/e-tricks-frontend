@@ -2,34 +2,35 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
+import { useDispatch } from 'react-redux';
+import { setAuth, clearAuth } from '@/store/slices/authSlice';
 import UserService from '@/services/UserService';
-import { SplashScreen } from '@/components/splash-screen'
+import { SplashScreen } from '@/components/splash-screen';
+
 export default function AuthTokenHandler({ children }: { children: React.ReactNode }) {
-    const { isSignedIn, getToken } = useAuth();
-    const { user } = useUser();
-    const [ready, setReady] = useState(false);
-    useEffect(() => {
-        const storeToken = async () => {
-            if (isSignedIn) {
-                const token = await getToken(); // default: 'clerk'
-                if (token) {
-                    localStorage.setItem('auth_token', token);
-                    await UserService.verifyUser(token, user!.id)
-                    localStorage.setItem('idClerk', user!.id)
-                    setReady(true);
+  const { isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
+  const dispatch = useDispatch();
+  const [ready, setReady] = useState(false);
 
-                }
-            } else {
-                localStorage.removeItem('auth_token'); // limpia si se desloguea
-                localStorage.removeItem('idClerk')
-                setReady(true);
-            }
-        };
+  useEffect(() => {
+    const storeToken = async () => {
+      if (isSignedIn && user) {
+        const token = await getToken();
+        if (token) {
+          dispatch(setAuth({ token, userId: user.id }));
+          await UserService.verifyUser(token, user.id);
+          setReady(true);
+        }
+      } else {
+        dispatch(clearAuth());
+        setReady(true);
+      }
+    };
 
-        storeToken();
-    }, [isSignedIn]);
-    if(!ready){
-        return (<SplashScreen/>)
-    }
-    return <>{children}</>;
+    storeToken();
+  }, [isSignedIn, user]);
+
+  if (!ready) return <SplashScreen />;
+  return <>{children}</>;
 }

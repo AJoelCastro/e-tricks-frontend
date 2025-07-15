@@ -2,13 +2,14 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const privateRoutes = [
   '/favorites(.*)',
+  '/cart(.*)',
 ]
 const isProtectedRoute  = createRouteMatcher(privateRoutes);
 
 export default clerkMiddleware(async (auth, req) => {
     if (isProtectedRoute(req)) await auth.protect()
   });
-
+console.log('midleware')
 
 
 export const config = {

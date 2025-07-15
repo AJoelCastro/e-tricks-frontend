@@ -32,6 +32,7 @@ const RightSide = () => {
       },
       [],
     )
+    console.log("right side")
     
     return (
         <Box>

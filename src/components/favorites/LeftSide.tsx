@@ -36,6 +36,7 @@ const LeftSide:React.FC<Props> = ({title}) => {
     const { user } = useUser();
     const pathname = usePathname();
     const isActive = (path: string) => pathname === path;
+    console.log("left side")
     return (
         <Box sx={{width: '100%'}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >

@@ -11,7 +11,7 @@ import theme from './create-theme';
 export default function ThemeProvider1({
   children
 }) {
-  
+  console.log("theme provider")
   return <LocalizationProvider dateAdapter={AdapterDateFns}>
       <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>

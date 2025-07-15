@@ -13,19 +13,24 @@ const MainComponent = () => {
   const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
+
   const getProducts = async () => {
-    const data = await ProductService.GetProducts();
-    setDataProducts(data);
+    try{
+      const data = await ProductService.GetProducts();
+      setDataProducts(data);
+    }catch(error){
+      throw error
+    }
   }
   const getFavorites = async () => {
+    if (!isSignedIn) return;
     const data = await UserService.getFavoriteIds();
-    console.log("data main", data)
     setFavoriteIds(data);
   }
   useEffect(() => {
     getFavorites();
     getProducts();
-  }, []);
+  }, [isSignedIn]);
 
   const handleRemoveFavorite = useCallback(
     async (id:string) => {

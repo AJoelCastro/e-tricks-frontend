@@ -5,6 +5,7 @@ import ProductCard from '../cards/Products';
 import CartProgress from './Stepper';
 
 const RightSideCart = () => {
+
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [etapa, setEtapa] = useState<number>(0);
     
