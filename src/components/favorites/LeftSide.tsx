@@ -40,13 +40,13 @@ const LeftSide:React.FC<Props> = ({title}) => {
     return (
         <Box sx={{width: '100%'}}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
-                <Typography variant='h2' >
+                <Typography variant='h4' sx={{fontFamily:'monospace'}}>
                     {title.toUpperCase()}
                 </Typography>
             </Box>
             <Box sx={{ paddingX: 6, paddingY: 3, backgroundColor:'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2 }} >
 
-                <Typography variant='hEspecial'>
+                <Typography variant='h6' sx={{fontFamily:'revert', fontWeight:'bold'}}>
                     HOLA, {user?.firstName?.toUpperCase()}
                 </Typography>
             </Box>

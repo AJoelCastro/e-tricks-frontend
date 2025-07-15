@@ -104,8 +104,26 @@ const UserService = {
         } catch (error) {
             throw error;
         }
-    }
+    },
+    addCartItem: async (idProduct: string, quantity: number, size: string)=>{
+        const { userId, token} = store.getState().auth;
 
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+        try {
+            const response = await axios.post(`${API_URL}/user/addCartItem/${userId}`,{
+                idProduct, quantity, size
+            },{
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    },
 
 }
 export default UserService;
