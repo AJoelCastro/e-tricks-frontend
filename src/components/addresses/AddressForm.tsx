@@ -37,7 +37,7 @@ const schema = yup.object().shape({
     .oneOf(['Peru'], 'Solo se permiten direcciones dentro de Perú')
     .required('El país es obligatorio'),
   phone: yup.string().required('El teléfono es obligatorio'),
-  isDefault: yup.boolean(),
+  // isDefault: yup.boolean(),
 });
 
 const mapContainerStyle = {
@@ -81,7 +81,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
       zipCode: initialValues?.zipCode || '',
       country: initialValues?.country || '',
       phone: initialValues?.phone || '',
-      isDefault: initialValues?.isDefault || false,
+      // isDefault: initialValues?.isDefault || false,
     },
   });
 
@@ -237,7 +237,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
             />
           </Grid>
 
-          <Grid size={{xs:12, sm:12, md:6}}>
+          {/* <Grid size={{xs:12, sm:12, md:6}}>
             <Controller
               name="isDefault"
               control={control}
@@ -248,9 +248,9 @@ const AddressForm: React.FC<AddressFormProps> = ({
                 />
               )}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid size={{xs:12, sm:12, md:6}}>
+          <Grid size={{xs:12, sm:12, md:12}}>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
               <Button variant="outlined" onClick={onCancel} disabled={loading}>
                 Cancelar

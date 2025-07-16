@@ -1,4 +1,5 @@
 export interface IAddress {
+  _id?: string;
   name: string;
   street: string;
   number: string;
@@ -7,5 +8,5 @@ export interface IAddress {
   zipCode: string;
   country: string;
   phone: string;
-  isDefault?: boolean;
+  // isDefault?: boolean;
 }

@@ -163,7 +163,7 @@ const UserService = {
         }
     },
 
-    addAddress: async (address: Omit<IAddress, '_id'>) => {
+    addAddress: async (address: IAddress) => {
         const { userId, token } = store.getState().auth;
 
         if (!userId || !token) {
@@ -172,8 +172,7 @@ const UserService = {
 
         try {
             const response = await axios.post(`${API_URL}/user/addresses/${userId}`, {
-                ...address,
-                userId
+                address
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -223,24 +222,24 @@ const UserService = {
         }
     },
 
-    setDefaultAddress: async (addressId: string) => {
-        const { userId, token } = store.getState().auth;
+    // setDefaultAddress: async (addressId: string) => {
+    //     const { userId, token } = store.getState().auth;
 
-        if (!userId || !token) {
-            throw new Error('Faltan credenciales del usuario');
-        }
+    //     if (!userId || !token) {
+    //         throw new Error('Faltan credenciales del usuario');
+    //     }
 
-        try {
-            const response = await axios.put(`${API_URL}/user/addresses/${userId}/${addressId}/default`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
+    //     try {
+    //         const response = await axios.put(`${API_URL}/user/addresses/${userId}/${addressId}/default`, {}, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`
+    //             }
+    //         });
+    //         return response.data;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 };
 
 export default UserService;
