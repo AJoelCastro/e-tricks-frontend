@@ -77,7 +77,7 @@ const LeftSide:React.FC<Props> = ({title}) => {
                     </ListItem>
                     <Divider component="li" />
                     <ListItem>
-                        <StyledNavItem href="/trash" isActive={isActive('/trash')}>
+                        <StyledNavItem href="/addresses" isActive={isActive('/addresses')}>
                             <Typography>
                                 DIRECCIONES
                             </Typography>

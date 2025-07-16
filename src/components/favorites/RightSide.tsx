@@ -32,8 +32,17 @@ const RightSide = () => {
       },
       [],
     )
-    console.log("right side")
-    
+    if(isLoading){
+        return(
+            <Grid size={{
+                xs: 12, sm: 12, md: 12
+            }} 
+            sx={{ textAlign: 'center', mt: 4 }}
+            >
+                <CircularProgress/>
+            </Grid>
+        )
+    }    
     return (
         <Box>
             <Grid container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2, paddingY: 1 }}>
@@ -82,47 +91,36 @@ const RightSide = () => {
             </Grid>
             <Grid container sx={{ marginX: 4, marginBottom: 4 }} spacing={3}>
                 {
-                    isLoading?(
+                    favorites.length === 0 ? (
                         <Grid size={{
-                            xs: 12, sm: 12, md: 12
-                        }} 
-                        sx={{ textAlign: 'center', mt: 4 }}
+                                    xs: 12, sm: 12, md: 12
+                            }} 
+                            sx={{ textAlign: 'center', mt: 4 }}
                         >
-                            <CircularProgress/>
+                            <Typography variant="h4" sx={{ color: 'text.secondary' }}>
+                                Tu lista de favoritos está vacía 💔
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
+                                Agrega productos a favoritos y aparecerán aquí.
+                            </Typography>
                         </Grid>
-                    ):(
-                        favorites.length === 0 ? (
-                            <Grid size={{
-                                        xs: 12, sm: 12, md: 12
-                                }} 
-                                sx={{ textAlign: 'center', mt: 4 }}
+                    ) : (
+                        favorites.map((favorite) => (
+                            <Grid
+                                key={favorite._id}
+                                size={{
+                                    xs: 12, sm: 6, md: 4
+                                }}
                             >
-                                <Typography variant="h4" sx={{ color: 'text.secondary' }}>
-                                    Tu lista de favoritos está vacía 💔
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
-                                    Agrega productos a favoritos y aparecerán aquí.
-                                </Typography>
+                                <ProductCard
+                                    products={favorite}
+                                    markedFavorite={true}
+                                    handleRemoveFavorite={handleRemoveFavorite}
+                                />
                             </Grid>
-                        ) : (
-                            favorites.map((favorite) => (
-                                <Grid
-                                    key={favorite._id}
-                                    size={{
-                                        xs: 12, sm: 6, md: 4
-                                    }}
-                                >
-                                    <ProductCard
-                                        products={favorite}
-                                        markedFavorite={true}
-                                        handleRemoveFavorite={handleRemoveFavorite}
-                                    />
-                                </Grid>
-                            ))
-                        )
+                        ))
                     )
                 }
-                
             </Grid>
         </Box>
         

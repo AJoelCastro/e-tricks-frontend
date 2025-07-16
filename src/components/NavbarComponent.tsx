@@ -192,34 +192,47 @@ const NavbarComponent = () => {
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
-              href="/productos"
+              href="/women"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
                   : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
-              Productos
+              Mujer
             </Link>
             <Link
-              href="/servicios"
+              href="/Marcas"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
                   : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
-              Servicios
+              Marcas
             </Link>
             <Link
-              href="/contacto"
+              href="/favorites"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
                 showWhiteBackground
                   ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
                   : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
-              Contacto
+              <Heart className="inline mr-2"/>
+              Favoritos
+            </Link>
+
+            <Link
+              href="/cart"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
+                showWhiteBackground
+                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              <ShoppingBag className="inline mr-2"/>
+              Carrito
             </Link>
 
             {/* Botón de búsqueda en móvil */}

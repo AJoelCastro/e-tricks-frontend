@@ -1,5 +1,6 @@
 import { store } from '@/store';
 import axios from 'axios';
+import { IAddress } from '@/interfaces/Address';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -143,5 +144,103 @@ const UserService = {
             throw error;
         }
     },
-}
+    getAddresses: async () => {
+        const { userId, token } = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.get(`${API_URL}/user/addresses/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    addAddress: async (address: Omit<IAddress, '_id'>) => {
+        const { userId, token } = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.post(`${API_URL}/user/addresses/${userId}`, {
+                ...address,
+                userId
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    updateAddress: async (addressId: string, address: Partial<IAddress>) => {
+        const { userId, token } = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.put(`${API_URL}/user/addresses/${userId}/${addressId}`, address, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    deleteAddress: async (addressId: string) => {
+        const { userId, token } = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.delete(`${API_URL}/user/addresses/${userId}/${addressId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    setDefaultAddress: async (addressId: string) => {
+        const { userId, token } = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.put(`${API_URL}/user/addresses/${userId}/${addressId}/default`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+};
+
 export default UserService;
