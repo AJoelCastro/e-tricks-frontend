@@ -10,7 +10,7 @@ import {
   Snackbar,
   Alert,
   Divider,
-  IconButton,
+  // IconButton,
 } from '@mui/material';
 import UserService from '@/services/UserService';
 import { IAddress } from '@/interfaces/Address';
@@ -83,27 +83,27 @@ const RightSideAddress = () => {
     }
   };
 
-  const handleSetDefaultAddress = async (addressId: string) => {
-    try {
-      setLoading(true);
-      await UserService.setDefaultAddress(addressId);
-      setSnackbar({
-        open: true,
-        message: 'Dirección establecida como predeterminada',
-        severity: 'success',
-      });
-      fetchAddresses();
-    } catch (error) {
-      console.error('Error al establecer dirección predeterminada:', error);
-      setSnackbar({
-        open: true,
-        message: 'Error al establecer la dirección predeterminada',
-        severity: 'error',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleSetDefaultAddress = async (addressId: string) => {
+  //   try {
+  //     setLoading(true);
+  //     await UserService.setDefaultAddress(addressId);
+  //     setSnackbar({
+  //       open: true,
+  //       message: 'Dirección establecida como predeterminada',
+  //       severity: 'success',
+  //     });
+  //     fetchAddresses();
+  //   } catch (error) {
+  //     console.error('Error al establecer dirección predeterminada:', error);
+  //     setSnackbar({
+  //       open: true,
+  //       message: 'Error al establecer la dirección predeterminada',
+  //       severity: 'error',
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleFormSubmit = async (address: Omit<IAddress, '_id'>) => {
     try {
@@ -157,7 +157,7 @@ const RightSideAddress = () => {
       ) : (
         <>
           {!showForm && (
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 4, display:'flex', justifyContent:{xs:'start', sm:'end', md:'end'} }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -190,7 +190,7 @@ const RightSideAddress = () => {
                     address={address}
                     onEdit={() => handleEditAddress(address)}
                     onDelete={() => handleDeleteAddress(address._id as string)}
-                    onSetDefault={() => handleSetDefaultAddress(address._id as string)}
+                    // onSetDefault={() => handleSetDefaultAddress(address._id as string)}
                   />
                 </Grid>
               ))}
