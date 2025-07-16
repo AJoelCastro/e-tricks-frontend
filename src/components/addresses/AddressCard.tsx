@@ -82,7 +82,7 @@ const AddressCard: React.FC<AddressCardProps> = ({
               <Typography variant="h6" component="div">
                 {address.name}
               </Typography>
-              {address.isDefault && (
+              {/* {address.isDefault && (
                 <Chip
                   icon={<StarIcon fontSize="small" />}
                   label="Predeterminada"
@@ -90,7 +90,7 @@ const AddressCard: React.FC<AddressCardProps> = ({
                   color="primary"
                   variant="outlined"
                 />
-              )}
+              )} */}
             </Box>
 
             <IconButton onClick={handleMenuOpen} size="small">
@@ -146,12 +146,12 @@ const AddressCard: React.FC<AddressCardProps> = ({
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
           Editar
         </MenuItem>
-        {!address.isDefault && (
+        {/* {!address.isDefault && (
           <MenuItem onClick={handleSetDefault}>
             <StarIcon fontSize="small" sx={{ mr: 1 }} />
             Establecer como predeterminada
           </MenuItem>
-        )}
+        )} */}
         <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
           <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
           Eliminar

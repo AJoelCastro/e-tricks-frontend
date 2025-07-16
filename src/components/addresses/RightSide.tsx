@@ -183,9 +183,9 @@ const RightSideAddress = () => {
               />
             </Card>
           ) : addresses.length > 0 ? (
-            <Grid container spacing={3}>
+            <Grid container spacing={1}>
               {addresses.map((address) => (
-                <Grid item xs={12} md={6} key={address._id}>
+                <Grid size={{xs:6, sm:6, md:4}} key={address._id}>
                   <AddressCard
                     address={address}
                     onEdit={() => handleEditAddress(address)}
