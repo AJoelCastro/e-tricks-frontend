@@ -1,6 +1,4 @@
 export interface IAddress {
-  _id?: string;
-  userId: string;
   name: string;
   street: string;
   number: string;
