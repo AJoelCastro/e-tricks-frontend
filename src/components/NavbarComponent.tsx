@@ -12,8 +12,13 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import theme from '@/theme/create-theme';
+import { Typography } from '@mui/material';
 
-const NavbarComponent = () => {
+
+type Props = {
+  main?: boolean
+}
+const NavbarComponent:React.FC<Props> = ({main}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -68,31 +73,48 @@ const NavbarComponent = () => {
 
               <Link
                 href="/women"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${theme.palette.text.primary} hover:text-gray-300`
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
-                MUJER
+                <Typography variant='navbar'>
+                  Mujer
+                </Typography>
               </Link>
               <Link
                 href="/marcas"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                className={`px-3 py-2 transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${theme.palette.text.primary} hover:text-gray-300`
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
-                MARCAS
+                <Typography variant='navbar'>
+                  Marcas
+                </Typography>
               </Link>
+              <Link
+                href="/tendencias"
+                className={`px-3 py-2  transition-colors duration-300 ${
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2]'
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
+                }`}
+              >
+                <Typography variant='navbar'>
+                  Tendencias
+                </Typography>
+              </Link>
+              
             </div>
 
             {/* Logo centrado */}
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center">
                 <Image
-                  src="/tricks_logo_black.svg"
+                  src={`${main?showWhiteBackground?'/tricks_logo_black.svg':'/tricks_logo_white.svg':'/tricks_logo_black.svg'}`}
                   alt="Logo"
                   width={32}
                   height={32}
@@ -100,7 +122,6 @@ const NavbarComponent = () => {
                 />
               </Link>
             </div>
-
             {/* Iconos de la derecha */}
             <div className="hidden md:flex items-center space-x-4">
               {/* Botón de búsqueda */}
@@ -109,7 +130,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${theme.palette.text.primary} hover:text-gray-300`
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Search/>
@@ -119,7 +140,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${theme.palette.text.primary} hover:text-gray-300`
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <Heart/>
@@ -129,7 +150,7 @@ const NavbarComponent = () => {
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${theme.palette.text.primary} hover:text-gray-300`
+                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
                 <ShoppingBag/>
@@ -143,7 +164,7 @@ const NavbarComponent = () => {
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
                       showWhiteBackground
                         ? 'text-gray-900 hover:text-[#7950f2]'
-                        : 'text-white hover:text-gray-300'
+                        : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                     }`}
                   >
                     <User/>

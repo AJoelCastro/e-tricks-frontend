@@ -155,20 +155,20 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                         <FormProvider methods={methods} onSubmit={handleSubmitForm}>
                             <Grid size={{xs:12, sm:12, md:12}} sx={{backgroundColor:'white'}}>
                                 <Link href={`/marcas/${product?.marca.toLowerCase()}`}>
-                                    <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                    <Typography variant="marcaDetail" sx={{ color: 'text.primary' }}>
                                         {product?.marca}
                                     </Typography>
                                 </Link>
                                 <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                                     <Grid>
-                                        <Typography variant="h3" sx={{ color: 'text.primary' }}>
+                                        <Typography variant="nameDetail" sx={{ color: 'text.primary' }}>
                                             {product?.name}
                                         </Typography>
                                     </Grid>
                                 </Grid>
                                 <Grid container spacing={1} sx={{ display:'flex', alignItems: 'center', mt: 1 }}>
                                     <Rating precision={0.5} value={promedio} readOnly />
-                                    <Typography variant="body1" color="text.secondary" fontSize="14px">
+                                    <Typography variant="reseniasDetail" color="text.secondary" >
                                         {product?.resenias?.length ?? 0} reseñas
                                     </Typography>
                                 </Grid>
@@ -206,7 +206,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                         <Typography
                                             sx={{
                                                 color: selectedSize === s ? 'white' : 'text.primary',
-                                                fontSize: 13,
+                                                fontSize: 12,
                                             }}
                                         >
                                             {s} US
@@ -241,12 +241,12 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     <Box mt={2}>
                                         <Grid container spacing={8} alignItems="center">
                                             <Grid >
-                                                <Typography sx={{ color: 'text.primary', fontSize:22, fontFamily:'cursive' }}>
+                                                <Typography variant='priceDetail' sx={{ color: 'text.primary' }}>
                                                     S/ {product?.price}
                                                 </Typography>
                                             </Grid>
                                             <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1.5, py:0.4 }}>
-                                                <Typography variant="body1" sx={{ color: 'white', fontWeight: 'bold' }}>
+                                                <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
                                                     -{product?.descuento}%
                                                 </Typography>
                                             </Grid>
@@ -256,7 +256,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                             sx={{
                                             color: 'text.secondary',
                                             textDecoration: 'line-through',
-                                            fontSize: '14px',
+                                            fontSize: '13px',
                                             }}
                                         >
                                             S/ {product?.price + (product?.price * product?.descuento) / 100}
@@ -270,7 +270,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                             </Grid>
                             <Grid size={{xs:12, sm:12, md:12}} sx={{ marginY:2}}>
                                 <Box sx={{backgroundColor:'#69db7c', paddingX:2, paddingY:1, borderRadius:2, width: 'fit-content', display:'flex', gap:2}}>
-                                    <Typography color='white' sx={{fontFamily:'revert', fontSize:15}}>
+                                    <Typography color='white' sx={{fontFamily:'revert', fontSize:14}}>
                                         Envío en 180 minutos (Trujillo)
                                     </Typography>
                                     <Zap color='white' size={18}/>
@@ -305,7 +305,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                             +
                                         </Button>
                                     </Box>
-                                    <Typography sx={{ fontSize: 13, color: 'gray' }}>MÁXIMO 12 UNIDADES</Typography>
+                                    <Typography sx={{ fontSize: 12, color: 'gray' }}>MÁXIMO 12 UNIDADES</Typography>
                                 </Box>
 
                                 <Button

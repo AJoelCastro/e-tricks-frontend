@@ -29,7 +29,7 @@ export const primary = {
   700: '#4317CA',
   800: '#33129C',
   900: '#240C6E',
-  main: '#6950E8'
+  main: '#5D2C8D'
 };
 export const success = {
   25: '#F1FEF5',

@@ -63,7 +63,7 @@ const MainComponent = () => {
 
   return (
     <>
-      <NavbarComponent/>
+      <NavbarComponent main={true}/>
       <Box sx={{height:{xs:64, sm:64, md:0}}}></Box>
       <Box>
         <MainCarouselComponent />

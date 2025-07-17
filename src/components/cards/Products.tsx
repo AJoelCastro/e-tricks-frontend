@@ -102,14 +102,14 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
         </Link>
         <CardContent sx={{ paddingBottom: '60px' }}> 
           <Link href={`/marcas/${products.marca.toLowerCase()}`}>
-            <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+            <Typography variant="marcaCard" sx={{ color: 'text.primary' }}>
               {products.marca}
             </Typography>
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Grid >
               <Link href={`/product/${products._id}`}>
-                <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                <Typography variant="nameCard" sx={{ color: 'text.primary' }}>
                   {products.name}
                 </Typography>
               </Link>
@@ -120,7 +120,7 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
               <Rating precision={0.5} value={promedio} readOnly />
             </Grid>
             <Grid >
-              <Typography variant="body2" color="text.secondary" fontSize="14px">
+              <Typography variant="reseniasCard" color="text.secondary" >
                 {products.resenias?.length ?? 0} reseñas
               </Typography>
             </Grid>
@@ -130,7 +130,7 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
             <Box mt={2}>
               <Grid container spacing={1} alignItems="center">
                 <Grid >
-                  <Typography variant="body1" sx={{ color: 'text.primary' }}>
+                  <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
                     S/ {products.price}
                   </Typography>
                 </Grid>

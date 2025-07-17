@@ -20,10 +20,10 @@ const StyledNavItem = styled(Link, {
   color: theme.palette.text.secondary,
   transition: 'color 300ms',
   ':hover': {
-    color: '#7950f2'
+    color: '#5D2C8D'
   },
   ...(isActive && {
-    color: '#7950f2'
+    color: '#5D2C8D'
   })
 }));
 
@@ -39,11 +39,11 @@ const LeftSide:React.FC<Props> = ({title}) => {
     console.log("left side")
     return (
         <Box sx={{width: '100%'}}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
+            {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
                 <Typography variant='h4' sx={{fontFamily:'monospace'}}>
                     {title.toUpperCase()}
                 </Typography>
-            </Box>
+            </Box> */}
             <Box sx={{ paddingX: 6, paddingY: 3, backgroundColor:'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2 }} >
 
                 <Typography variant='h6' sx={{fontFamily:'revert', fontWeight:'bold'}}>

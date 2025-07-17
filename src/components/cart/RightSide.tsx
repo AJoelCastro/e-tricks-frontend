@@ -7,6 +7,9 @@ import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IAddress } from '@/interfaces/Address';
+import AddressCard from '../addresses/AddressCard';
+import SelectableAddressCard from '../addresses/SelectableAddressCard';
 
 
 const RightSideCart = () => {
@@ -47,9 +50,10 @@ const RightSideCart = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [etapa, setEtapa] = useState<number>(0);
     const [carrito, setCarrito] = useState<Array<ICartItem>>([]);
+    const [addresses, setAddresses] = useState<Array<IAddress>>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const getCartItems = async()=>{
         try {
-            setIsLoading(true)
             const rawCart = await UserService.getCartItems(); // tu array original
             const cartWithProducts = await Promise.all(
             rawCart.map(async (item:ICartItem ) => {
@@ -61,14 +65,24 @@ const RightSideCart = () => {
             })
             );
             setCarrito(cartWithProducts); // carrito con datos completos
-            setIsLoading(false);
+        } catch (error) {
+            throw error
+        }
+    }
+    const getAddresses = async()=>{
+        try {
+            const dataAddresses = await UserService.getAddresses()
+            setAddresses(dataAddresses)
         } catch (error) {
             throw error
         }
     }
 
     useEffect(() => {
+        setIsLoading(true)
         getCartItems()
+        getAddresses()
+        setIsLoading(false);
     }, [])
    
     // const handleRemoveFavorite = useCallback(
@@ -103,155 +117,6 @@ const RightSideCart = () => {
             throw error
         }
     }
-    const firstStep = () => {
-        return(
-            carrito.map((item, index) => (
-                <Grid
-                    container
-                    key={item._id}
-                    sx={{marginY:2}}
-                >
-                    <Grid size={{xs:3, sm:4, md:2}} sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
-                        <Image
-                            src={item.product.images[0]}
-                            alt="principal"
-                            width={80}
-                            height={80}
-                            style={{ objectFit: 'contain', borderRadius:4 }}
-                        />
-                    </Grid>
-                    <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
-                        <Box>
-                            <Link href={`/marcas/${item.product.marca.toLowerCase()}`}>
-                                <Typography fontSize={13}  sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                    {item.product.marca}
-                                </Typography>
-                            </Link>
-                            <Link href={`/product/${item.product._id}`}>
-                                <Typography fontSize={21} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
-                                    {item.product.name }
-                                </Typography>
-                            </Link>
-                            <Typography fontSize={12} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
-                                {item.size} US
-                            </Typography>
-                        </Box>
-                    </Grid>
-                    <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:3, sm:4, md:3}}>
-                        {item.product.descuento ? (
-                            <Box>
-                                <Grid container spacing={1} alignItems="center">
-                                    <Grid >
-                                    <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                        S/ {item.product.price}
-                                    </Typography>
-                                    </Grid>
-                                    <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
-                                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
-                                        -{item.product.descuento}%
-                                    </Typography>
-                                    </Grid>
-                                </Grid>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: 'text.secondary',
-                                        textDecoration: 'line-through',
-                                        fontSize: '12px',
-                                        mt:{xs:1, sm:0, md:0}
-                                    }}
-                                >
-                                    S/ {item.product.price + (item.product.price * item.product.descuento) / 100}
-                                </Typography>
-                            </Box>
-                        ) : (
-                            <Typography variant="body1" sx={{ color: 'text.primary', mt: 2, fontWeight: 'bold' }}>
-                            S/ {item.product.price}
-                            </Typography>
-                        )}
-                    </Grid>
-                    <Grid sx={{ display:'flex', justifyContent:'center', alignItems:'center', ml:{xs:2, sm:6, md:0}, mt:{xs:1, sm:0, md:0} }} size={{xs:5, sm:4, md:3}}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                border: '1px solid #ccc',
-                                borderRadius: 2,
-                                backgroundColor: '#f9f9f9'
-                            }}>
-                                <Button
-                                    size="small"
-                                    sx={{ minWidth: 0, padding: '4px 8px' }}
-                                    onClick={() => handleChangeQuantity(index, item.quantity - 1)}
-                                >
-                                    -
-                                </Button>
-                                <Typography sx={{ mx: 1 }}>
-                                    {item.quantity}
-                                </Typography>
-                                <Button
-                                    size="small"
-                                    sx={{ minWidth: 0, padding: '2px 8px' }}
-                                    onClick={() => handleChangeQuantity(index, item.quantity + 1)}
-                                >
-                                    +
-                                </Button>
-                            </Box>
-                            <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
-                                MÁXIMO 12 UNIDADES
-                            </Typography>
-                        </Box>
-                        <Box >
-                            <IconButton
-                                id="lock-button"
-                                aria-haspopup="listbox"
-                                aria-controls="lock-menu"
-                                aria-label="when device is locked"
-                                aria-expanded={open ? 'true' : undefined}
-                                onClick={(e) => handleClickListItem(e, item._id)}
-                                sx={{
-                                    borderRadius: '50%',
-                                    padding: 1,
-                                    '&:hover': {
-                                        backgroundColor: '#e0e0e0',
-                                    },
-                                }}
-                            >
-                                <MoreVertIcon  
-                                    sx={{
-                                        color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
-                                    }}
-                                />
-                            </IconButton>
-                            <Menu
-                                anchorEl={menuAnchor.anchor}
-                                open={menuAnchor.itemId === item._id}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={handleMenuItemClick}>
-                                    <Typography variant="body2">Eliminar</Typography>
-                                </MenuItem>
-                            </Menu>
-                        </Box>
-                    </Grid>
-                </Grid>
-            ))
-        )
-    }
-    const secondStep = () => {
-        return(
-            <Box>
-                <Typography>A</Typography>
-            </Box>
-        )
-    }
-    const thirdStep = () => {
-        return(
-            <Box>
-                <Typography>B</Typography>
-            </Box>
-        )
-    }
 
     if(isLoading){
         return(
@@ -275,17 +140,159 @@ const RightSideCart = () => {
                             sm:12,
                             md:7.5
                         }}
-                        sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2}}
+                        sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
                     >
                         <CartProgress activeStep={etapa}/>
                         {
                             etapa===0?(
-                                firstStep()
+                                carrito.map((item, index) => (
+                                    <Grid
+                                        container
+                                        key={item._id}
+                                        sx={{marginY:2}}
+                                    >
+                                        <Grid size={{xs:3, sm:4, md:2}} sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
+                                            <Image
+                                                src={item.product.images[0]}
+                                                alt="principal"
+                                                width={80}
+                                                height={80}
+                                                style={{ objectFit: 'contain', borderRadius:4 }}
+                                            />
+                                        </Grid>
+                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
+                                            <Box>
+                                                <Link href={`/marcas/${item.product.marca.toLowerCase()}`}>
+                                                    <Typography fontSize={13}  sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                        {item.product.marca}
+                                                    </Typography>
+                                                </Link>
+                                                <Link href={`/product/${item.product._id}`}>
+                                                    <Typography fontSize={21} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
+                                                        {item.product.name }
+                                                    </Typography>
+                                                </Link>
+                                                <Typography fontSize={12} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
+                                                    {item.size} US
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
+                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:3, sm:4, md:3}}>
+                                            {item.product.descuento ? (
+                                                <Box>
+                                                    <Grid container spacing={1} alignItems="center">
+                                                        <Grid >
+                                                        <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                            S/ {item.product.price}
+                                                        </Typography>
+                                                        </Grid>
+                                                        <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                                                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
+                                                            -{item.product.descuento}%
+                                                        </Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{
+                                                            color: 'text.secondary',
+                                                            textDecoration: 'line-through',
+                                                            fontSize: '12px',
+                                                            mt:{xs:1, sm:0, md:0}
+                                                        }}
+                                                    >
+                                                        S/ {item.product.price + (item.product.price * item.product.descuento) / 100}
+                                                    </Typography>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="body1" sx={{ color: 'text.primary', mt: 2, fontWeight: 'bold' }}>
+                                                S/ {item.product.price}
+                                                </Typography>
+                                            )}
+                                        </Grid>
+                                        <Grid sx={{ display:'flex', justifyContent:'center', alignItems:'center', ml:{xs:2, sm:6, md:0}, mt:{xs:1, sm:0, md:0} }} size={{xs:5, sm:4, md:3}}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: 2,
+                                                    backgroundColor: '#f9f9f9'
+                                                }}>
+                                                    <Button
+                                                        size="small"
+                                                        sx={{ minWidth: 0, padding: '4px 8px' }}
+                                                        onClick={() => handleChangeQuantity(index, item.quantity - 1)}
+                                                    >
+                                                        -
+                                                    </Button>
+                                                    <Typography sx={{ mx: 1 }}>
+                                                        {item.quantity}
+                                                    </Typography>
+                                                    <Button
+                                                        size="small"
+                                                        sx={{ minWidth: 0, padding: '2px 8px' }}
+                                                        onClick={() => handleChangeQuantity(index, item.quantity + 1)}
+                                                    >
+                                                        +
+                                                    </Button>
+                                                </Box>
+                                                <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
+                                                    MÁXIMO 12 UNIDADES
+                                                </Typography>
+                                            </Box>
+                                            <Box >
+                                                <IconButton
+                                                    id="lock-button"
+                                                    aria-haspopup="listbox"
+                                                    aria-controls="lock-menu"
+                                                    aria-label="when device is locked"
+                                                    aria-expanded={open ? 'true' : undefined}
+                                                    onClick={(e) => handleClickListItem(e, item._id)}
+                                                    sx={{
+                                                        borderRadius: '50%',
+                                                        padding: 1,
+                                                        '&:hover': {
+                                                            backgroundColor: '#e0e0e0',
+                                                        },
+                                                    }}
+                                                >
+                                                    <MoreVertIcon  
+                                                        sx={{
+                                                            color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
+                                                        }}
+                                                    />
+                                                </IconButton>
+                                                <Menu
+                                                    anchorEl={menuAnchor.anchor}
+                                                    open={menuAnchor.itemId === item._id}
+                                                    onClose={handleClose}
+                                                >
+                                                    <MenuItem onClick={handleMenuItemClick}>
+                                                        <Typography variant="body2">Eliminar</Typography>
+                                                    </MenuItem>
+                                                </Menu>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
+                                ))
                             ):
                             etapa===1?(
-                                secondStep()
+                                <Grid container spacing={1}>
+                                    {addresses.map((address)=>(
+                                        <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
+                                            <SelectableAddressCard
+                                                address={address}
+                                                selected={selectedAddressId === address._id}
+                                                onSelect={() => setSelectedAddressId(address._id??null)}
+                                            />
+                                        </Grid>  
+                                    ))}
+                                </Grid>  
                             ):(
-                                thirdStep()
+                                <Box>
+                                    <Typography>B</Typography>
+                                </Box>
                             )
                         }
                         
