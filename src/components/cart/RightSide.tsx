@@ -12,6 +12,7 @@ import SelectableAddressCard from '../addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
+import { useAuth } from '@clerk/nextjs';
 const RightSideCart = () => {
 
     //datos del menu list 
@@ -59,10 +60,12 @@ const RightSideCart = () => {
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
     const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
+    const { getToken } = useAuth();
 
     const getCartItems = async()=>{
         try {
-            const rawCart = await UserService.getCartItems(); // tu array original
+            const token = await getToken();
+            const rawCart = await UserService.getCartItems(token as string); // tu array original
             const cartWithProducts = await Promise.all(
             rawCart.map(async (item:ICartItem ) => {
                 const product = await ProductService.GetProductById(item.productId);
@@ -79,7 +82,8 @@ const RightSideCart = () => {
     }
     const getAddresses = async()=>{
         try {
-            const dataAddresses = await UserService.getAddresses()
+            const token = await getToken();
+            const dataAddresses = await UserService.getAddresses(token as string)
             setAddresses(dataAddresses)
         } catch (error) {
             throw error

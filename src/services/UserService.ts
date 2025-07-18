@@ -18,8 +18,8 @@ const UserService = {
         }
     },
 
-    getFavorites: async ()=>{
-        const { userId, token} = store.getState().auth;
+    getFavorites: async (token: string)=>{
+        const { userId} = store.getState().auth;
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
@@ -34,8 +34,8 @@ const UserService = {
             throw error
         }
     },
-    getCartItems: async ()=>{
-        const { userId, token} = store.getState().auth;
+    getCartItems: async (token: string)=>{
+        const { userId} = store.getState().auth;
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
@@ -50,8 +50,8 @@ const UserService = {
             throw error
         }
     },
-    getFavoriteIds: async ()=>{
-        const { userId, token} = store.getState().auth;
+    getFavoriteIds: async (token: string)=>{
+        const { userId} = store.getState().auth;
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
@@ -67,8 +67,8 @@ const UserService = {
         }
     },
 
-    addFavorite: async (idProduct: string)=>{
-        const { userId, token} = store.getState().auth;
+    addFavorite: async (token: string,idProduct: string)=>{
+        const { userId} = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -87,8 +87,8 @@ const UserService = {
         }
     },
 
-    removeFavorite: async (idProduct: string) => {
-        const { userId, token} = store.getState().auth;
+    removeFavorite: async (token: string,idProduct: string) => {
+        const { userId} = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -106,8 +106,8 @@ const UserService = {
             throw error;
         }
     },
-    addCartItem: async (idProduct: string, quantity: number, size: string)=>{
-        const { userId, token} = store.getState().auth;
+    addCartItem: async (token: string, idProduct: string, quantity: number, size: string)=>{
+        const { userId} = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -125,8 +125,8 @@ const UserService = {
             throw error
         }
     },
-    removeCartItem: async (idCartItem: string) => {
-        const { userId, token} = store.getState().auth;
+    removeCartItem: async (token: string,idCartItem: string) => {
+        const { userId} = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -144,8 +144,8 @@ const UserService = {
             throw error;
         }
     },
-    getAddresses: async () => {
-        const { userId, token } = store.getState().auth;
+    getAddresses: async (token: string) => {
+        const { userId } = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -163,8 +163,8 @@ const UserService = {
         }
     },
 
-    addAddress: async (address: IAddress) => {
-        const { userId, token } = store.getState().auth;
+    addAddress: async (token: string,address: IAddress) => {
+        const { userId } = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -184,8 +184,8 @@ const UserService = {
         }
     },
 
-    updateAddress: async (addressId: string, address: Partial<IAddress>) => {
-        const { userId, token } = store.getState().auth;
+    updateAddress: async (token: string,addressId: string, address: Partial<IAddress>) => {
+        const { userId } = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
@@ -203,8 +203,8 @@ const UserService = {
         }
     },
 
-    deleteAddress: async (addressId: string) => {
-        const { userId, token } = store.getState().auth;
+    deleteAddress: async (token: string,addressId: string) => {
+        const { userId } = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');

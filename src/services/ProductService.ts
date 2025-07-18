@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { store } from '@/store';
 import { IProduct } from '@/interfaces/Product';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -32,8 +31,7 @@ const ProductService = {
             throw error;
         }
     },
-    CreateProduct : async (productData: Omit<IProduct, '_id'>) => {
-        const { token } = store.getState().auth;
+    CreateProduct : async (token: string,productData: Omit<IProduct, '_id'>) => {
 
         if (!token) {
             throw new Error('No hay token de autenticación');

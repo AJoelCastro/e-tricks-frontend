@@ -12,7 +12,7 @@ import FooterComponent from '@/components/FooterComponent';
 
 
 const MainComponent = () => {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
   const [dataProducts, setDataProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
 
@@ -26,7 +26,8 @@ const MainComponent = () => {
   }
   const getFavorites = async () => {
     if (!isSignedIn) return;
-    const data = await UserService.getFavoriteIds();
+    const token = await getToken();
+    const data = await UserService.getFavoriteIds(token as string);
     setFavoriteIds(data);
   }
   useEffect(() => {
@@ -37,7 +38,8 @@ const MainComponent = () => {
   const handleRemoveFavorite = useCallback(
     async (id:string) => {
       try {
-          const dataRemove = await UserService.removeFavorite(id)
+        const token = await getToken();
+          const dataRemove = await UserService.removeFavorite(token as string,id)
           console.log("data r", dataRemove)
           getFavorites()
       } catch (error) {
@@ -50,7 +52,8 @@ const MainComponent = () => {
   const handleAddFavorite = useCallback(
     async(id:string) => {
       try {
-        const dataAdd = await UserService.addFavorite(id)
+        const token = await getToken();
+        const dataAdd = await UserService.addFavorite(token as string,id)
         console.log("data a", dataAdd)
         getFavorites()
       } catch (error) {

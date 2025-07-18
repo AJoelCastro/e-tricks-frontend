@@ -2,14 +2,18 @@ import UserService from '@/services/UserService'
 import { Box, Button, CircularProgress, Grid, Typography } from '@mui/material'
 import React, { useCallback, useEffect, useState } from 'react'
 import ProductCard from '../cards/Products';
+import { useAuth } from '@clerk/nextjs';
 
 const RightSide = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [favorites, setFavorites] = useState([]);
+    const { getToken } = useAuth();
+
     const getFavorites = async() =>{
         try {
             setIsLoading(true)
-            const dataFavorites = await UserService.getFavorites()
+            const token = await getToken();
+            const dataFavorites = await UserService.getFavorites(token as string)
             setFavorites(dataFavorites)
             setIsLoading(false)
         } catch (error) {
@@ -23,7 +27,8 @@ const RightSide = () => {
     const handleRemoveFavorite = useCallback(
       async (id:string) => {
         try {
-            const dataRemove = await UserService.removeFavorite(id)
+            const token = await getToken();
+            const dataRemove = await UserService.removeFavorite(token as string,id)
             console.log("data r", dataRemove)
             getFavorites()
         } catch (error) {
