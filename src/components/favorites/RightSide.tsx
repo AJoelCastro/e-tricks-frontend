@@ -15,9 +15,10 @@ const RightSide = () => {
             const token = await getToken();
             const dataFavorites = await UserService.getFavorites(token as string)
             setFavorites(dataFavorites)
-            setIsLoading(false)
         } catch (error) {
             throw error
+        }finally {
+            setIsLoading(false)
         }
     }
     useEffect(() => {

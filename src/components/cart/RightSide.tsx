@@ -64,6 +64,7 @@ const RightSideCart = () => {
 
     const getCartItems = async()=>{
         try {
+            setIsLoading(true)
             const token = await getToken();
             const rawCart = await UserService.getCartItems(token as string); // tu array original
             const cartWithProducts = await Promise.all(
@@ -78,6 +79,8 @@ const RightSideCart = () => {
             setCarrito(cartWithProducts); // carrito con datos completos
         } catch (error) {
             throw error
+        } finally {
+            setIsLoading(false);
         }
     }
     const getAddresses = async()=>{
@@ -91,10 +94,8 @@ const RightSideCart = () => {
     }
 
     useEffect(() => {
-        setIsLoading(true)
         getCartItems()
         getAddresses()
-        setIsLoading(false);
     }, [])
    
     // const handleRemoveFavorite = useCallback(
