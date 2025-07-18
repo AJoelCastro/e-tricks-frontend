@@ -407,20 +407,31 @@ const RightSideCart = () => {
                                     </Grid>
                                     {deliveryType === 'address' && (
                                         <>
-                                            <Grid size={12}>
-                                                <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
-                                                    Selecciona una de tus direcciones:
-                                                </Typography>
-                                            </Grid>
-                                            {addresses.map((address)=>(
-                                                <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
-                                                    <SelectableAddressCard
-                                                        address={address}
-                                                        selected={selectedAddressId === address._id}
-                                                        onSelect={() => setSelectedAddressId(address._id??null)}
-                                                    />
-                                                </Grid>  
-                                            ))}
+                                            {addresses.length === 0 ? 
+                                                (
+                                                    <Grid size={12}>
+                                                        <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+                                                            🙁 Aún no tienes direcciones guardadas.
+                                                            <br />
+                                                            Puedes agregar una desde tu{' '}
+                                                            <Link href="/addresses" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                                                sección de direcciones
+                                                            </Link>{' '}
+                                                            en tu perfil.
+                                                        </Typography>
+                                                    </Grid>
+                                                ) : (
+                                                    addresses.map((address)=>(
+                                                        <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
+                                                            <SelectableAddressCard
+                                                                address={address}
+                                                                selected={selectedAddressId === address._id}
+                                                                onSelect={() => setSelectedAddressId(address._id??null)}
+                                                            />
+                                                        </Grid>  
+                                                    ))
+                                                )
+                                            }
                                         </>
                                     )}
                                     {/* Recojo en tienda */}
