@@ -4,6 +4,13 @@ import { Box, Button, CircularProgress, Grid, Rating, Typography } from '@mui/ma
 import { IProduct } from '@/interfaces/Product';
 import Link from 'next/link';
 import { Zap, TruckElectric, Store } from 'lucide-react';
+import { Snackbar, Alert } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
 // react hook form
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
@@ -11,6 +18,8 @@ import { FormProvider } from '@/components/form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import UserService from '@/services/UserService';
 import { primary } from '@/theme/colors';
+import Image from 'next/image';
+
 type Props = {
   id: string;
 };
@@ -30,6 +39,13 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({});
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
+    const [snackbar, setSnackbar] = useState<{
+        open: boolean;
+        message: string;
+        severity: 'success' | 'error' | 'info' | 'warning';
+    }>({ open: false, message: '', severity: 'info' });
+    const [openModal, setOpenModal] = useState(false);
+    const [lastAddedProduct, setLastAddedProduct] = useState<IProduct | null>(null);
 
     const promedio =
         product?.resenias && product?.resenias.length
@@ -48,21 +64,23 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const handleSubmitForm = handleSubmit(async(values)=>{
         try {
             const dataAdd = await UserService.addCartItem(values.productId, values.quantity, values.size);
-            console.log(dataAdd)
+            setLastAddedProduct(product??null); // Guarda el producto actual para mostrarlo
+            setOpenModal(true); // Abre el modal
         } catch (error) {
-            throw error
+            handleShowSnackbar('Error al agregar el producto al carrito','error');
         }
     })
     const getProduct = async () => {
         try {
-        setLoading(true);
-        const dataProduct = await ProductService.GetProductById(id);
-        setProduct(dataProduct);
-        setImages(dataProduct?.images || []);
-        setSelectedImage(dataProduct?.images[0]);
-        setLoading(false);
+            setLoading(true);
+            const dataProduct = await ProductService.GetProductById(id);
+            setProduct(dataProduct);
+            setImages(dataProduct?.images || []);
+            setSelectedImage(dataProduct?.images[0]);
+            setLoading(false);
         } catch (error) {
-        throw error;
+            setLoading(false);
+            handleShowSnackbar('Error al cargar el producto','error');
         }
     };
 
@@ -86,6 +104,16 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
         backgroundPosition: `${x}% ${y}%`
         });
     };
+
+    const handleShowSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
+
+
     if(loading){
         return(
             <Grid size={{
@@ -361,6 +389,60 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     </Grid>
                 </>
             </Grid>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+            <Dialog open={openModal} onClose={() => setOpenModal(false)} PaperProps={{
+                sx: {
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                m: 0,
+                width: 400, // Puedes ajustar el ancho si deseas
+                borderRadius: 3,
+                },
+            }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>¡Producto agregado al carrito!</DialogTitle>
+                <DialogContent>
+                    {lastAddedProduct && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Image
+                            src={lastAddedProduct.images[0]}
+                            alt={lastAddedProduct.name}
+                            width={100}
+                            height={100}
+                        />
+                        <Box>
+                            <Typography fontWeight="bold">{lastAddedProduct.name}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Talla: {selectedSize} — Cantidad: {quantity}
+                            </Typography>
+                            <Typography variant="body2" color="text.primary" fontWeight="bold">
+                                S/ {(lastAddedProduct.price).toFixed(2)}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Button onClick={() => setOpenModal(false)} variant="outlined" color="primary">
+                        Seguir comprando
+                    </Button>
+                    <Link href="/cart">
+                        <Button variant="contained" sx={{ backgroundColor: 'black', color: 'white' }}>
+                            Ir al carrito
+                        </Button>
+                    </Link>
+                </DialogActions>
+            </Dialog>
+
         </>
     )
 }
