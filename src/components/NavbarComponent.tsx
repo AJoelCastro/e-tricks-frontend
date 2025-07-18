@@ -66,8 +66,9 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+          
           <div className="flex justify-between h-16">
-
+            
             {/* Links de navegación izquierda */}
             <div className="hidden md:flex items-center space-x-4 ">
 
@@ -123,7 +124,7 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
               </Link>
             </div>
             {/* Iconos de la derecha */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="items-center space-x-4 flex ">
               {/* Botón de búsqueda */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -172,7 +173,6 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
                 </SignInButton>
               </SignedOut>
             </div>
-
             {/* Botón de menú móvil */}
             <div className="md:hidden flex items-center">
               <button
@@ -204,6 +204,7 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
                 </svg>
               </button>
             </div>
+            
           </div>
         </div>
 
@@ -232,42 +233,6 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
             >
               Marcas
             </Link>
-            <Link
-              href="/favorites"
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              <Heart className="inline mr-2"/>
-              Favoritos
-            </Link>
-
-            <Link
-              href="/cart"
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              <ShoppingBag className="inline mr-2"/>
-              Carrito
-            </Link>
-
-            {/* Botón de búsqueda en móvil */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className={`w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              <Search className="inline mr-2"/>
-              Buscar
-            </button>
           </div>
         </div>
       </nav>
