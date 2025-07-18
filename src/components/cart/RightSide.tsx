@@ -10,7 +10,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IAddress } from '@/interfaces/Address';
 import SelectableAddressCard from '../addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-
+import { LucideArrowLeft } from 'lucide-react';
+import { Snackbar, Alert } from '@mui/material';
 const RightSideCart = () => {
 
     //datos del menu list 
@@ -36,14 +37,15 @@ const RightSideCart = () => {
             setIsLoading(true);
             if (!menuAnchor.itemId) return;
             const dataRemove = await UserService.removeCartItem(menuAnchor.itemId);
-            console.log(dataRemove)
             await getCartItems();
             setIsLoading(false);
+            handleShowSnackbar("Producto eliminado del carrito", 'success');
             handleClose();
         } catch (error) {
-            throw error;
+            handleShowSnackbar("Error al eliminar el producto", 'error');
         }
     };
+
 
     //datos propios
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,6 +53,12 @@ const RightSideCart = () => {
     const [carrito, setCarrito] = useState<Array<ICartItem>>([]);
     const [addresses, setAddresses] = useState<Array<IAddress>>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+    const [snackbar, setSnackbar] = useState<{
+        open: boolean;
+        message: string;
+        severity: 'success' | 'error' | 'info' | 'warning';
+    }>({ open: false, message: '', severity: 'info' });
+
     const getCartItems = async()=>{
         try {
             const rawCart = await UserService.getCartItems(); // tu array original
@@ -113,15 +121,20 @@ const RightSideCart = () => {
         try {
             switch (etapa) {
                 case 0:
-                    if (carrito.length === 0) {
-                        alert('Tu carrito está vacío. Agrega productos para continuar.');
-                    }
+                    if (carrito.length !== 0) {
+                        setEtapa(etapa + 1);
+                    } 
                     break;
                 case 1:
-                    // Lógica para la etapa 1
+                    if (selectedAddressId) {
+                        setEtapa(etapa + 1);
+                    }else{
+                        handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
+                        return;
+                    }
                     break;
                 case 2:
-                    // Lógica para la etapa 2
+                    // aqui va la logica de pago
                     break;
                 default:
                     break;
@@ -162,6 +175,13 @@ const RightSideCart = () => {
         const urlWhatsApp = `https://wa.me/51969742589?text=${encodeURIComponent(mensaje)}`;
         window.open(urlWhatsApp, '_blank');
     };
+    const handleShowSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
 
 
     if(isLoading){
@@ -188,6 +208,9 @@ const RightSideCart = () => {
                         }}
                         sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
                     >
+                        <IconButton onClick={() => setEtapa(etapa - 1)} disabled={etapa === 0} sx={{ mb: 1 }}>
+                            <LucideArrowLeft color='#7950f2'/>
+                        </IconButton>
                         <CartProgress activeStep={etapa}/>
                         {
                             etapa===0?(
@@ -479,6 +502,16 @@ const RightSideCart = () => {
                     </Grid>
                 </>
             </Grid>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
         
     )
