@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { FormProvider } from '@/components/form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import UserService from '@/services/UserService';
+import { primary } from '@/theme/colors';
 type Props = {
   id: string;
 };
@@ -307,25 +308,28 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     </Box>
                                     <Typography sx={{ fontSize: 12, color: 'gray' }}>MÁXIMO 12 UNIDADES</Typography>
                                 </Box>
-
                                 <Button
-                                    fullWidth
                                     sx={{
                                         mt: 2,
-                                        backgroundColor: '#adb5bd',
+                                        backgroundColor: '#7950f2',
                                         color: 'white',
+                                        width: '100%',
+                                        marginRight:2,
                                         fontWeight: 'bold',
                                         fontSize: 16,
                                         borderRadius: 2,
                                         paddingY: 1.5,
-                                        '&:hover': {
-                                            backgroundColor: '#868e96'
+                                        ":hover": {
+                                            backgroundColor: '#5f3dc4',
+                                            color: 'white'
                                         }
                                     }}
                                     type="submit"  
                                     loading={isSubmitting}
                                 >
-                                    AGREGAR AL CARRO
+                                    <Typography sx={{ fontSize: 14, fontWeight: 'bold' }}>
+                                        AGREGAR AL CARRO
+                                    </Typography>
                                 </Button>
                             </Grid>
                         </FormProvider>
@@ -335,20 +339,20 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 mt: 3,
-                                border: '1px solid #69db7c',
                                 borderRadius: 3,
                                 py: 1,
-                                px: 2
+                                px: 2,
+                                mx: 2
                             }}>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '50%' }}>
-                                    <TruckElectric size={24} />
-                                    <Typography variant='overline' sx={{ fontSize: 14 }}>
+                                    <TruckElectric size={20} color={primary.main}/>
+                                    <Typography variant='overline' sx={{ fontSize: 12, color:'primary.main' }}>
                                         ENVÍO A DOMICILIO
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '50%' }}>
-                                    <Store size={24} />
-                                    <Typography variant='overline' sx={{ fontSize: 14 }}>
+                                    <Store size={20} color={primary.main}/>
+                                    <Typography variant='overline' sx={{ fontSize: 12, color:'primary.main' }}>
                                         RETIRO EN UN PUNTO
                                     </Typography>
                                 </Box>

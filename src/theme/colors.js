@@ -29,7 +29,7 @@ export const primary = {
   700: '#4317CA',
   800: '#33129C',
   900: '#240C6E',
-  main: '#5D2C8D'
+  main: '#7950f2'
 };
 export const success = {
   25: '#F1FEF5',
@@ -87,7 +87,7 @@ export const info = {
 export const textLight = {
   primary: grey[900],
   disabled: grey[200],
-  secondary: grey[500]
+  secondary: grey[500],
 };
 
 

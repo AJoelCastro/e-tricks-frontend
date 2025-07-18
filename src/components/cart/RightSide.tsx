@@ -8,9 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IAddress } from '@/interfaces/Address';
-import AddressCard from '../addresses/AddressCard';
 import SelectableAddressCard from '../addresses/SelectableAddressCard';
-
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 const RightSideCart = () => {
 
@@ -112,11 +111,58 @@ const RightSideCart = () => {
     };
     const handleChangeEtapa = async()=>{
         try {
-            setEtapa(etapa+1)
+            switch (etapa) {
+                case 0:
+                    if (carrito.length === 0) {
+                        alert('Tu carrito está vacío. Agrega productos para continuar.');
+                    }
+                    break;
+                case 1:
+                    // Lógica para la etapa 1
+                    break;
+                case 2:
+                    // Lógica para la etapa 2
+                    break;
+                default:
+                    break;
+            }
         } catch (error) {
             throw error
         }
     }
+
+    const handleContinueByWhatsApp = () => {
+        const carritoTexto = carrito.map((item, index) => {
+            const nombre = item.product.name;
+            const cantidad = item.quantity;
+            const talla = item.size;
+            const precioFinal = (item.product.price - (item.product.price * (item.product.descuento || 0) / 100)).toFixed(2);
+            const subtotal = (Number(precioFinal) * item.quantity).toFixed(2);
+            const linkProducto = `https://tusitioweb.com/product/${item.product._id}`;
+            const imagen = item.product.images[0];
+
+            return `🛍️ *${nombre}*\n🔗 ${linkProducto}\n📸 ${imagen}\n📏 Talla: ${talla} | Cant: ${cantidad}\n💵 Subtotal: S/ ${subtotal}\n`;
+        }).join('\n');
+
+        const total = carrito.reduce((sum, item) => {
+            const descuento = item.product.descuento ? (item.product.price * item.product.descuento) / 100 : 0;
+            return sum + (item.product.price - descuento) * item.quantity;
+        }, 0).toFixed(2);
+
+        const metodoEntrega = selectedAddressId === 'pickup'
+            ? '📦 Recojo en tienda (Av. Principal 123, Trujillo)'
+            : (() => {
+                const selected = addresses.find(a => a._id === selectedAddressId);
+                if (!selected) return '📍 Dirección no especificada';
+                return `📍 Entrega a: ${selected.name} - ${selected.street} ${selected.number}, ${selected.city}, ${selected.state}`;
+            })();
+
+        const mensaje = `👋 ¡Hola! Quisiera hacer un pedido:\n\n${carritoTexto}\n${metodoEntrega}\n\n💰 *Total: S/ ${total}*\n\n🛒 Gracias, quedo atento(a).`;
+
+        const urlWhatsApp = `https://wa.me/51969742589?text=${encodeURIComponent(mensaje)}`;
+        window.open(urlWhatsApp, '_blank');
+    };
+
 
     if(isLoading){
         return(
@@ -145,137 +191,160 @@ const RightSideCart = () => {
                         <CartProgress activeStep={etapa}/>
                         {
                             etapa===0?(
-                                carrito.map((item, index) => (
-                                    <Grid
-                                        container
-                                        key={item._id}
-                                        sx={{marginY:2}}
-                                    >
-                                        <Grid size={{xs:3, sm:4, md:2}} sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
-                                            <Image
-                                                src={item.product.images[0]}
-                                                alt="principal"
-                                                width={80}
-                                                height={80}
-                                                style={{ objectFit: 'contain', borderRadius:4 }}
-                                            />
-                                        </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
-                                            <Box>
-                                                <Link href={`/marcas/${item.product.marca.toLowerCase()}`}>
-                                                    <Typography fontSize={13}  sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                                        {item.product.marca}
-                                                    </Typography>
-                                                </Link>
-                                                <Link href={`/product/${item.product._id}`}>
-                                                    <Typography fontSize={21} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
-                                                        {item.product.name }
-                                                    </Typography>
-                                                </Link>
-                                                <Typography fontSize={12} sx={{ color: 'text.primary', fontWeight:'bold',  }}>
-                                                    {item.size} US
+                                !carrito || carrito.length === 0 ?(
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  height: '100%' }}>
+                                            <Box sx={{ textAlign: 'center', py: 3 }}>
+                                                <ShoppingCartOutlinedIcon sx={{ fontSize: 64, color: 'grey.500', mb: 2 }} />
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                                    ¡Tu carrito está vacío!
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Aún no has agregado ningún producto. Explora nuestras categorías y descubre lo que tenemos para ti.
                                                 </Typography>
                                             </Box>
-                                        </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:3, sm:4, md:3}}>
-                                            {item.product.descuento ? (
-                                                <Box>
-                                                    <Grid container spacing={1} alignItems="center">
-                                                        <Grid >
-                                                        <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                                            S/ {item.product.price}
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                component={Link}
+                                                href="/"
+                                            >
+                                                Ir a comprar
+                                            </Button>
+                                        </Box>
+                                ):(
+                                    carrito.map((item, index) => (
+                                        <Grid
+                                            container
+                                            key={item._id}
+                                            sx={{marginY:2}}
+                                        >
+                                            <Grid size={{xs:3, sm:4, md:2}} sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
+                                                <Image
+                                                    src={item.product.images[0]}
+                                                    alt="principal"
+                                                    width={80}
+                                                    height={80}
+                                                    style={{ objectFit: 'contain', borderRadius:4 }}
+                                                />
+                                            </Grid>
+                                            <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
+                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <Link href={`/marcas/${item.product.marca.toLowerCase()}`}>
+                                                        <Typography variant='marcaCard'  sx={{ color: 'text.primary'}}>
+                                                            {item.product.marca}
                                                         </Typography>
-                                                        </Grid>
-                                                        <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
-                                                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
-                                                            -{item.product.descuento}%
+                                                    </Link>
+                                                    <Link href={`/product/${item.product._id}`}>
+                                                        <Typography variant='nameCard' sx={{ color: 'text.primary'  }}>
+                                                            {item.product.name }
                                                         </Typography>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            color: 'text.secondary',
-                                                            textDecoration: 'line-through',
-                                                            fontSize: '12px',
-                                                            mt:{xs:1, sm:0, md:0}
-                                                        }}
-                                                    >
-                                                        S/ {item.product.price + (item.product.price * item.product.descuento) / 100}
+                                                    </Link>
+                                                    <Typography fontSize={11} sx={{ color: 'text.secondary', fontWeight:'bold',  }}>
+                                                        Talla: {item.size} US
                                                     </Typography>
                                                 </Box>
-                                            ) : (
-                                                <Typography variant="body1" sx={{ color: 'text.primary', mt: 2, fontWeight: 'bold' }}>
-                                                S/ {item.product.price}
-                                                </Typography>
-                                            )}
-                                        </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'center', alignItems:'center', ml:{xs:2, sm:6, md:0}, mt:{xs:1, sm:0, md:0} }} size={{xs:5, sm:4, md:3}}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                <Box sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    border: '1px solid #ccc',
-                                                    borderRadius: 2,
-                                                    backgroundColor: '#f9f9f9'
-                                                }}>
-                                                    <Button
-                                                        size="small"
-                                                        sx={{ minWidth: 0, padding: '4px 8px' }}
-                                                        onClick={() => handleChangeQuantity(index, item.quantity - 1)}
-                                                    >
-                                                        -
-                                                    </Button>
-                                                    <Typography sx={{ mx: 1 }}>
-                                                        {item.quantity}
+                                            </Grid>
+                                            <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:3, sm:4, md:3}}>
+                                                {item.product.descuento ? (
+                                                    <Box>
+                                                        <Grid container spacing={1} alignItems="center">
+                                                            <Grid >
+                                                            <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
+                                                                S/ {item.product.price}
+                                                            </Typography>
+                                                            </Grid>
+                                                            <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                                                            <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
+                                                                -{item.product.descuento}%
+                                                            </Typography>
+                                                            </Grid>
+                                                        </Grid>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                color: 'text.secondary',
+                                                                textDecoration: 'line-through',
+                                                                fontSize: '12px',
+                                                                mt:{xs:1, sm:0, md:0}
+                                                            }}
+                                                        >
+                                                            S/ {item.product.price + (item.product.price * item.product.descuento) / 100}
+                                                        </Typography>
+                                                    </Box>
+                                                ) : (
+                                                    <Typography variant="priceCard" sx={{ color: 'text.primary', mt: 2 }}>
+                                                    S/ {item.product.price}
                                                     </Typography>
-                                                    <Button
-                                                        size="small"
-                                                        sx={{ minWidth: 0, padding: '2px 8px' }}
-                                                        onClick={() => handleChangeQuantity(index, item.quantity + 1)}
-                                                    >
-                                                        +
-                                                    </Button>
+                                                )}
+                                            </Grid>
+                                            <Grid sx={{ display:'flex', justifyContent:'center', alignItems:'center', ml:{xs:2, sm:6, md:0}, mt:{xs:1, sm:0, md:0} }} size={{xs:5, sm:4, md:3}}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        border: '1px solid #ccc',
+                                                        borderRadius: 2,
+                                                        backgroundColor: '#f9f9f9'
+                                                    }}>
+                                                        <Button
+                                                            size="small"
+                                                            sx={{ minWidth: 0, padding: '4px 8px' }}
+                                                            onClick={() => handleChangeQuantity(index, item.quantity - 1)}
+                                                        >
+                                                            -
+                                                        </Button>
+                                                        <Typography sx={{ mx: 1 }}>
+                                                            {item.quantity}
+                                                        </Typography>
+                                                        <Button
+                                                            size="small"
+                                                            sx={{ minWidth: 0, padding: '2px 8px' }}
+                                                            onClick={() => handleChangeQuantity(index, item.quantity + 1)}
+                                                        >
+                                                            +
+                                                        </Button>
+                                                    </Box>
+                                                    <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
+                                                        MÁXIMO 12 UNIDADES
+                                                    </Typography>
                                                 </Box>
-                                                <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
-                                                    MÁXIMO 12 UNIDADES
-                                                </Typography>
-                                            </Box>
-                                            <Box >
-                                                <IconButton
-                                                    id="lock-button"
-                                                    aria-haspopup="listbox"
-                                                    aria-controls="lock-menu"
-                                                    aria-label="when device is locked"
-                                                    aria-expanded={open ? 'true' : undefined}
-                                                    onClick={(e) => handleClickListItem(e, item._id)}
-                                                    sx={{
-                                                        borderRadius: '50%',
-                                                        padding: 1,
-                                                        '&:hover': {
-                                                            backgroundColor: '#e0e0e0',
-                                                        },
-                                                    }}
-                                                >
-                                                    <MoreVertIcon  
+                                                <Box >
+                                                    <IconButton
+                                                        id="lock-button"
+                                                        aria-haspopup="listbox"
+                                                        aria-controls="lock-menu"
+                                                        aria-label="when device is locked"
+                                                        aria-expanded={open ? 'true' : undefined}
+                                                        onClick={(e) => handleClickListItem(e, item._id)}
                                                         sx={{
-                                                            color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
+                                                            borderRadius: '50%',
+                                                            padding: 1,
+                                                            '&:hover': {
+                                                                backgroundColor: '#e0e0e0',
+                                                            },
                                                         }}
-                                                    />
-                                                </IconButton>
-                                                <Menu
-                                                    anchorEl={menuAnchor.anchor}
-                                                    open={menuAnchor.itemId === item._id}
-                                                    onClose={handleClose}
-                                                >
-                                                    <MenuItem onClick={handleMenuItemClick}>
-                                                        <Typography variant="body2">Eliminar</Typography>
-                                                    </MenuItem>
-                                                </Menu>
-                                            </Box>
+                                                    >
+                                                        <MoreVertIcon  
+                                                            sx={{
+                                                                color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
+                                                            }}
+                                                        />
+                                                    </IconButton>
+                                                    <Menu
+                                                        anchorEl={menuAnchor.anchor}
+                                                        open={menuAnchor.itemId === item._id}
+                                                        onClose={handleClose}
+                                                    >
+                                                        <MenuItem onClick={handleMenuItemClick}>
+                                                            <Typography variant="body2">Eliminar</Typography>
+                                                        </MenuItem>
+                                                    </Menu>
+                                                </Box>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                ))
+                                    ))
+                                )
+                                
                             ):
                             etapa===1?(
                                 <Grid container spacing={1}>
@@ -288,10 +357,46 @@ const RightSideCart = () => {
                                             />
                                         </Grid>  
                                     ))}
+                                    {/* Recojo en tienda */}
+                                    <Grid size={{xs:12, sm:12, md:6}}>
+                                        <SelectableAddressCard
+                                            address={{
+                                                _id: 'pickup',
+                                                name: 'Recojo en tienda',
+                                                street: 'Av. Principal',
+                                                number: '123',
+                                                city: 'Trujillo',
+                                                state: 'La Libertad',
+                                                zipCode: '13001',
+                                                country: 'Perú',
+                                                phone: '000000000',
+                                            }}
+                                            selected={selectedAddressId === 'pickup'}
+                                            onSelect={() => setSelectedAddressId('pickup')}
+                                        />
+                                    </Grid>
                                 </Grid>  
                             ):(
                                 <Box>
-                                    <Typography>B</Typography>
+                                    <Typography variant="h6" sx={{ mb: 2 }}>¿Cómo deseas finalizar tu compra?</Typography>
+
+                                    <Button
+                                        variant="outlined"
+                                        fullWidth
+                                        sx={{ mb: 2 }}
+                                        onClick={handleContinueByWhatsApp}
+                                    >
+                                        Finalizar por WhatsApp
+                                    </Button>
+
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                        color="primary"
+                                        onClick={() => {/* lógica de pago en la web */}}
+                                    >
+                                        Pagar con tarjeta (Web)
+                                    </Button>
                                 </Box>
                             )
                         }
@@ -311,61 +416,65 @@ const RightSideCart = () => {
                         </Box>
                         <Box sx={{ px: 1 }}>
                             {/* Subtotal */}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                <Typography variant="body1" fontWeight="medium">Subtotal</Typography>
-                                <Typography variant="body1">
-                                    S/ {
-                                    carrito.reduce((sum, item) => {
-                                        const precioUnitario = item.product.descuento
-                                        ? item.product.price
-                                        : item.product.price;
-                                        return sum + precioUnitario * item.quantity;
-                                    }, 0).toFixed(2)
-                                    }
-                                </Typography>
-                            </Box>
+                            {
+                                carrito.length > 0 && (
+                                    <>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                            <Typography variant="body1" fontWeight="medium">Subtotal</Typography>
+                                            <Typography variant="body1">
+                                                S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    const precioUnitario = item.product.descuento
+                                                    ? item.product.price
+                                                    : item.product.price;
+                                                    return sum + precioUnitario * item.quantity;
+                                                }, 0).toFixed(2)
+                                                }
+                                            </Typography>
+                                        </Box>
 
-                            {/* Descuento Total */}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                <Typography variant="body1" fontWeight="medium">Descuentos</Typography>
-                                <Typography variant="body1" color="error">
-                                    - S/ {
-                                    carrito.reduce((sum, item) => {
-                                        if (item.product.descuento) {
-                                        const descuento = (item.product.price * item.product.descuento) / 100;
-                                        return sum + descuento * item.quantity;
-                                        }
-                                        return sum;
-                                    }, 0).toFixed(2)
-                                    }
-                                </Typography>
-                            </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                            <Typography variant="body1" fontWeight="medium">Descuentos</Typography>
+                                            <Typography variant="body1" color="error">
+                                                - S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    if (item.product.descuento) {
+                                                    const descuento = (item.product.price * item.product.descuento) / 100;
+                                                    return sum + descuento * item.quantity;
+                                                    }
+                                                    return sum;
+                                                }, 0).toFixed(2)
+                                                }
+                                            </Typography>
+                                        </Box>
 
-                            {/* Total */}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
-                                <Typography variant="h6">Total</Typography>
-                                <Typography variant="h6">
-                                    S/ {
-                                    carrito.reduce((sum, item) => {
-                                        const descuento = item.product.descuento
-                                        ? (item.product.price * item.product.descuento) / 100
-                                        : 0;
-                                        return sum + (item.product.price - descuento) * item.quantity;
-                                    }, 0).toFixed(2)
-                                    }
-                                </Typography>
-                            </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
+                                            <Typography variant="h6">Total</Typography>
+                                            <Typography variant="h6">
+                                                S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    const descuento = item.product.descuento
+                                                    ? (item.product.price * item.product.descuento) / 100
+                                                    : 0;
+                                                    return sum + (item.product.price - descuento) * item.quantity;
+                                                }, 0).toFixed(2)
+                                                }
+                                            </Typography>
+                                        </Box>
 
-                            {/* Botón de continuar */}
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                fullWidth
-                                sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
-                                onClick={handleChangeEtapa}
-                            >
-                                Continuar compra
-                            </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
+                                            onClick={handleChangeEtapa}
+                                        >
+                                            Continuar compra
+                                        </Button>
+                                    </>
+                                )
+                            }
+                            
                         </Box>
                     </Grid>
                 </>
