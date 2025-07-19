@@ -99,7 +99,7 @@ const MainComponent = () => {
         <Grid container size={12} spacing={2} padding={2}>
             {dataProducts.map((product, index) => (
               <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
-                <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
+                <ProductCard products={product} />
               </Grid>
             ))}
         </Grid>
