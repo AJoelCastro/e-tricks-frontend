@@ -24,6 +24,8 @@ const style = {
   width: 600,
   bgcolor: 'background.paper',
   boxShadow: 24,
+  display:'flex',
+  flexDirection: 'column',
   p: 4,
 };
 const RightSideCart = () => {
@@ -626,21 +628,21 @@ const RightSideCart = () => {
                 }}
             >
                 <Fade in={showModalWebPay}>
-                <Box sx={style}>
-                    <Typography id="transition-modal-title" variant="h6" component="h2">
-                        Pasos para realizar tu compra
-                    </Typography>
-                    <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                        1. Scanea el codigo QR.
-                        <br />
-                        2. Confirma el pago con el monto S/ {carrito.reduce((sum, item) => {
-                                                    const descuento = item.product.descuento
-                                                    ? (item.product.price * item.product.descuento) / 100
-                                                    : 0;
-                                                    return sum + (item.product.price - descuento) * item.quantity;
-                                                }, 0).toFixed(2)} en la app de Yape.
-                    </Typography>
-                </Box>
+                    <Box sx={style} >
+                        <Typography id="transition-modal-title" variant="priceCard" >
+                            Pasos para realizar tu compra
+                        </Typography>
+                        <Typography variant='yapeSteps' id="transition-modal-description" sx={{ mt: 2 }}>
+                            1. Scanea el codigo QR.
+                            <br />
+                            2. Confirma el pago con el monto S/ {carrito.reduce((sum, item) => {
+                                                        const descuento = item.product.descuento
+                                                        ? (item.product.price * item.product.descuento) / 100
+                                                        : 0;
+                                                        return sum + (item.product.price - descuento) * item.quantity;
+                                                    }, 0).toFixed(2)} en la app de Yape.
+                        </Typography>
+                    </Box>
                 </Fade>
             </Modal>
             <Snackbar
