@@ -49,7 +49,7 @@ const SearchSidebar: React.FC<Props> = ({ isOpen, onClose }) => {
  
 
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: any) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
