@@ -49,7 +49,7 @@ const ProductCard: React.FC<Props> = ({ products}) => {
           <Link href={`/marcas/${products.marca.toLowerCase()}`}>
             <Typography variant="marcaCard" sx={{ color: 'text.primary' }}>
               {products.marca}
-            </Typography>
+            </Typography> 
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Grid >
