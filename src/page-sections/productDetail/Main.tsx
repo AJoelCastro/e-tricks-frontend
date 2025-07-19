@@ -69,7 +69,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
             setLastAddedProduct(product??null); // Guarda el producto actual para mostrarlo
             setOpenModal(true); // Abre el modal
         } catch (error) {
-            handleShowSnackbar('Error al agregar el producto al carrito','error');
+            handleShowSnackbar(`${error}`,'error');
         }
     })
     const getProduct = async () => {
@@ -82,7 +82,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
             setLoading(false);
         } catch (error) {
             setLoading(false);
-            handleShowSnackbar('Error al cargar el producto','error');
+            handleShowSnackbar(`${error}`,'error');
         }
     };
 

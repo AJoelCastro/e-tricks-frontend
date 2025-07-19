@@ -133,7 +133,7 @@ const SearchSidebar: React.FC<Props> = ({ isOpen, onClose }) => {
                 >
                   {/* Imagen del Producto */}
                   <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                    <img src={product.images[0]} className=" bg-gray-300 rounded-lg"/>
+                    <img src={product.images[0]} className=" bg-gray-300 rounded-lg" alt={product.name}/>
                   </div>
 
                   {/* Info del Producto */}

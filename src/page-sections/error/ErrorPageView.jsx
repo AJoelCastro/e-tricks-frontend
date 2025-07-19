@@ -16,7 +16,7 @@ export default function ErrorPageView() {
           <SectionTitle centered title="Page Not Found!" />
 
           <Typography variant="body1" fontSize={18} color="text.secondary">
-            Whoops! It seems like we've unplugged this page by accident. 🔌🙈
+            Whoops! It seems like we&apos;sve unplugged this page by accident. 🔌🙈
             <br />
             <br /> <strong>#404NotFound</strong>
           </Typography>

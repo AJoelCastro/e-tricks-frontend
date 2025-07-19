@@ -111,17 +111,15 @@ const RightSide = () => {
                             </Typography>
                         </Grid>
                     ) : (
-                        favorites.map((favorite) => (
+                        favorites.map((favorite, idx) => (
                             <Grid
-                                key={favorite._id}
+                                key={idx}
                                 size={{
                                     xs: 12, sm: 6, md: 4
                                 }}
                             >
                                 <ProductCard
                                     products={favorite}
-                                    markedFavorite={true}
-                                    handleRemoveFavorite={handleRemoveFavorite}
                                 />
                             </Grid>
                         ))

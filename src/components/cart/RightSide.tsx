@@ -58,7 +58,7 @@ const RightSideCart = () => {
             handleShowSnackbar("Producto eliminado del carrito", 'success');
             handleClose();
         } catch (error) {
-            handleShowSnackbar("Error al eliminar el producto", 'error');
+            handleShowSnackbar(`${error}`, 'error');
         }finally{
             setIsLoading(false);
         }
