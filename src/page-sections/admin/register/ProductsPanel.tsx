@@ -23,6 +23,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import ProductService from '@/services/ProductService';
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 
 // Esquema de validación
 const schema = yup.object().shape({
@@ -60,7 +61,7 @@ const ProductsPanel = () => {
     message: '',
     severity: 'success' as 'success' | 'error',
   });
-
+  const { getToken } = useAuth();
   const {
     control,
     handleSubmit,
@@ -100,8 +101,9 @@ const ProductsPanel = () => {
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
+      const token = await getToken();
       // Llamada al servicio para crear el producto
-      await ProductService.CreateProduct(data);
+      await ProductService.CreateProduct(token as string, data);
       
       setSnackbar({
         open: true,
