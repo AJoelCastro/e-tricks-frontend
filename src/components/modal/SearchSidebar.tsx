@@ -11,7 +11,9 @@ type Product = {
   descuento?: number;
 };
 type Props = {
-  products: Product;
+  products?: Product;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 
