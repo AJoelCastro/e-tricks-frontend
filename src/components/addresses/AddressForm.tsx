@@ -6,8 +6,6 @@ import {
   Grid,
   TextField,
   CircularProgress,
-  FormControlLabel,
-  Checkbox,
   Typography,
   Snackbar,
   Alert,
@@ -123,7 +121,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
     }
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: Omit<IAddress, '_id'>) => {
     onSubmit(data);
   };
 

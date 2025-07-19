@@ -6,7 +6,7 @@ import ProductCard from '../../components/cards/Products'
 import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
 import UserService from '@/services/UserService';
-import { Box, Grid } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import NavbarComponent from '@/components/NavbarComponent';
 import FooterComponent from '@/components/FooterComponent';
 
@@ -77,7 +77,12 @@ const MainComponent = () => {
               <MainCarouselComponent images={['https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80', 'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80']}/>
             </Grid>
         </Grid>
-        <Grid container size={12}>
+        <Box sx={{display:'flex', flexDirection:'column', marginY:3, marginLeft:2}}>
+          <Typography variant='subtitleMain' sx={{ marginY:2}}>
+            DESCUENTOS
+          </Typography>
+        </Box>
+        <Grid container size={12} spacing={2} padding={2}>
           {
             imagesPrueba.map((image, index) => (
               <Grid key={index} size={{xs:12, sm:6, md:4}} sx={{marginX:'auto'}}>
@@ -86,7 +91,12 @@ const MainComponent = () => {
             ))
           }
         </Grid>
-        <Grid container size={12}>
+        <Box sx={{display:'flex', flexDirection:'column', marginY:3, marginLeft:2}}>
+          <Typography variant='subtitleMain' sx={{ marginY:2}}>
+            NOVEDADES
+          </Typography>
+        </Box>
+        <Grid container size={12} spacing={2} padding={2}>
             {dataProducts.map((product, index) => (
               <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
                 <ProductCard products={product} markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>

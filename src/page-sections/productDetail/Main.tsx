@@ -19,10 +19,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import UserService from '@/services/UserService';
 import { primary } from '@/theme/colors';
 import Image from 'next/image';
-import { useAuth } from '@clerk/nextjs';
 
 type Props = {
-  id: string;
+    id: string;
 };
 
 const schema = Yup.object().shape({
@@ -47,7 +46,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     }>({ open: false, message: '', severity: 'info' });
     const [openModal, setOpenModal] = useState(false);
     const [lastAddedProduct, setLastAddedProduct] = useState<IProduct | null>(null);
-    const { getToken } = useAuth();
+    const { getToken, isSignedIn } = useAuth();
     const promedio =
         product?.resenias && product?.resenias.length
         ? product?.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / product?.resenias.length
@@ -115,6 +114,19 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
         setSnackbar(prev => ({ ...prev, open: false }));
     };
 
+    // const handleAddFav = React.useCallback(
+    //     async () => {
+    //     handleAddFavorite?.(product!._id);
+    //     },
+    //     [handleAddFavorite, product!._id],
+    // )
+
+    // const handleRemoveFav = React.useCallback(
+    //     async () => {
+    //     handleRemoveFavorite?.(product!._id);
+    //     },
+    //     [handleRemoveFavorite, product!._id],
+    // )
 
     if(loading){
         return(
@@ -185,11 +197,13 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     <Grid size={{xs:12, sm:12, md:4}} sx={{ py:{xs:0, sm:2, md:4}, px:{xs:2, sm:1, md:0}}} spacing={2}>
                         <FormProvider methods={methods} onSubmit={handleSubmitForm}>
                             <Grid size={{xs:12, sm:12, md:12}} sx={{backgroundColor:'white'}}>
-                                <Link href={`/marcas/${product?.marca.toLowerCase()}`}>
-                                    <Typography variant="marcaDetail" sx={{ color: 'text.primary' }}>
-                                        {product?.marca}
-                                    </Typography>
-                                </Link>
+                                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between',  paddingRight:4}}>
+                                    <Link href={`/marcas/${product?.marca.toLowerCase()}`}>
+                                        <Typography variant="marcaDetail" sx={{ color: 'text.primary' }}>
+                                            {product?.marca}
+                                        </Typography>
+                                    </Link>
+                                </Box>
                                 <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                                     <Grid>
                                         <Typography variant="nameDetail" sx={{ color: 'text.primary' }}>
@@ -338,29 +352,31 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     </Box>
                                     <Typography sx={{ fontSize: 12, color: 'gray' }}>MÁXIMO 12 UNIDADES</Typography>
                                 </Box>
-                                <Button
-                                    sx={{
-                                        mt: 2,
-                                        backgroundColor: '#7950f2',
-                                        color: 'white',
-                                        width: '100%',
-                                        marginRight:2,
-                                        fontWeight: 'bold',
-                                        fontSize: 16,
-                                        borderRadius: 2,
-                                        paddingY: 1.5,
-                                        ":hover": {
-                                            backgroundColor: '#5f3dc4',
-                                            color: 'white'
-                                        }
-                                    }}
-                                    type="submit"  
-                                    loading={isSubmitting}
-                                >
-                                    <Typography sx={{ fontSize: 14, fontWeight: 'bold' }}>
-                                        AGREGAR AL CARRO
-                                    </Typography>
-                                </Button>
+                                <Box sx={{paddingRight:2}}>
+                                    <Button
+                                        sx={{
+                                            mt: 2,
+                                            backgroundColor: '#7950f2',
+                                            color: 'white',
+                                            width: '100%',
+                                            marginRight:2,
+                                            fontWeight: 'bold',
+                                            fontSize: 16,
+                                            borderRadius: 2,
+                                            paddingY: 1.5,
+                                            ":hover": {
+                                                backgroundColor: '#5f3dc4',
+                                                color: 'white'
+                                            }
+                                        }}
+                                        type="submit"  
+                                        loading={isSubmitting}
+                                    >
+                                        <Typography sx={{ fontSize: 14, fontWeight: 'bold' }}>
+                                            AGREGAR AL CARRO
+                                        </Typography>
+                                    </Button>
+                                </Box>
                             </Grid>
                         </FormProvider>
                         <Grid size={{xs:12, sm:12, md:12}} sx={{ pX:{xs:0,sm:1,md:2}}}>

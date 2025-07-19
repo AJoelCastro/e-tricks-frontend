@@ -21,7 +21,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   borderRadius:2,
-  width: 600,
+  width: { xs: '90%', sm: '70%', md: '50%' },
   bgcolor: 'background.paper',
   boxShadow: 24,
   display:'flex',
@@ -216,6 +216,13 @@ const RightSideCart = () => {
         setSnackbar(prev => ({ ...prev, open: false }));
     };
 
+    const handleUploadComprobante = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            // Aquí subes a tu backend o cloud yape
+            console.log('Comprobante subido:', file.name);
+        }
+    };
 
     if(isLoading){
         return(
@@ -230,8 +237,8 @@ const RightSideCart = () => {
     }
     
     return (
-        <Box>
-            <Grid container sx={{ marginX: 2, marginBottom: 4, marginTop:2, paddingY: 1 }} spacing={2}>
+        <Box >
+            <Grid container sx={{ marginX: 2, marginBottom: 4, mt:{ xs: 0, sm: 2, md: 2 }, paddingY: 1 }} spacing={2}>
                 <>
                     <Grid 
                         size={{
@@ -405,9 +412,11 @@ const RightSideCart = () => {
                             etapa===1?(
                                 <Grid container spacing={1}>
                                     <Grid size={{xs:12, sm:12, md:12}}>
-                                        <Typography variant="h6" sx={{ mb: 2 }}>
-                                            ¿Cómo deseas recibir tu pedido?
-                                        </Typography>
+                                        <Grid sx={{mb:2}}>
+                                            <Typography variant="leftside" sx={{ mb: 2 }}>
+                                                Método de envío
+                                            </Typography>
+                                        </Grid>
                                         <Grid container spacing={2}>
                                             <Grid size={{xs:12, sm:12, md:6}}>
                                                 <Button
@@ -491,15 +500,16 @@ const RightSideCart = () => {
                                 </Grid>  
                             ):(
                                 <Box>
-                                    <Typography variant="h6" sx={{ mb: 2 }}>¿Cómo deseas finalizar tu compra?</Typography>
-
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography variant="leftside" >Finalizar transacción</Typography>
+                                    </Box>
                                     <Button
                                         variant="outlined"
                                         fullWidth
                                         sx={{ mb: 2 }}
                                         onClick={handleContinueByWhatsApp}
                                     >
-                                        Finalizar por WhatsApp
+                                        WhatsApp
                                     </Button>
 
                                     <Button
@@ -508,7 +518,7 @@ const RightSideCart = () => {
                                         color="primary"
                                         onClick={handleContinueByWebPay}
                                     >
-                                        Pago Web
+                                        Web
                                     </Button>
                                 </Box>
                             )
@@ -628,20 +638,54 @@ const RightSideCart = () => {
                 }}
             >
                 <Fade in={showModalWebPay}>
-                    <Box sx={style} >
-                        <Typography id="transition-modal-title" variant="priceCard" >
-                            Pasos para realizar tu compra
+                    <Box sx={style}>
+                        <Typography id="transition-modal-title" variant="yapeTitle">
+                            Pasos para realizar tu compra vía Yape
                         </Typography>
-                        <Typography variant='yapeSteps' id="transition-modal-description" sx={{ mt: 2 }}>
-                            1. Scanea el codigo QR.
+
+                        <Typography variant="yapeSteps" id="transition-modal-description" sx={{ mt: 2 }}>
+                            1. Escanea el código QR con tu app de Yape.
                             <br />
-                            2. Confirma el pago con el monto S/ {carrito.reduce((sum, item) => {
-                                                        const descuento = item.product.descuento
-                                                        ? (item.product.price * item.product.descuento) / 100
-                                                        : 0;
-                                                        return sum + (item.product.price - descuento) * item.quantity;
-                                                    }, 0).toFixed(2)} en la app de Yape.
+                            2. Ingresa el monto exacto: <strong>S/ {carrito.reduce((sum, item) => {
+                            const descuento = item.product.descuento
+                                ? (item.product.price * item.product.descuento) / 100
+                                : 0;
+                            return sum + (item.product.price - descuento) * item.quantity;
+                            }, 0).toFixed(2)}</strong>
+                            <br />
+                            3. En el mensaje de Yape, escribe tu nombre o número de pedido si lo tienes.
+                            <br />
+                            4. Realiza el pago y toma una captura del comprobante.
+                            <br />
+                            5. Luego de pagar, presiona el botón <strong>"Subir Comprobante"</strong> para cargar la imagen.
                         </Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                            <Image
+                                src={'https://sodastereobucket.s3.us-east-2.amazonaws.com/qryape.jpg'}
+                                alt='Código QR de Yape'
+                                width={300}
+                                height={300}
+                                style={{ borderRadius: 12 }}
+                            />
+                        </Box>
+
+                        <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="caption" color="text.secondary">
+                                Recuerda subir el comprobante para confirmar tu compra.
+                            </Typography>
+
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                component="label"
+                                sx={{ borderRadius: 2, textTransform: 'none' }}
+                            >
+                                Subir Comprobante
+                                <input hidden accept="image/*" type="file" onChange={handleUploadComprobante} />
+                            </Button>
+
+                        </Box>
                     </Box>
                 </Fade>
             </Modal>
