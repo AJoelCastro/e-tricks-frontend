@@ -41,11 +41,8 @@ const StyledNavItem = styled(Link, {
   }),
 }));
 
-type Props = {
-  title: string;
-};
 
-const LeftSide: React.FC<Props> = ({ title }) => {
+const LeftSide= () => {
   const { user } = useUser();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;

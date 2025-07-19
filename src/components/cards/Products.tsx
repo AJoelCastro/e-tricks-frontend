@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Box, Card, CardContent, CardMedia, Typography, IconButton,
+  Box, Card, CardContent, CardMedia, Typography, 
   Grid, Rating
 } from '@mui/material';
 

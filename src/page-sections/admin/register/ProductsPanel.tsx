@@ -21,7 +21,6 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { IProduct } from '@/interfaces/Product';
 import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 

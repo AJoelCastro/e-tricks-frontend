@@ -1,6 +1,6 @@
 import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import CartProgress from './Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
 import ProductService from '@/services/ProductService';
@@ -53,7 +53,7 @@ const RightSideCart = () => {
             setIsLoading(true);
             if (!menuAnchor.itemId) return;
             const token = await getToken()
-            const dataRemove = await UserService.removeCartItem(token as string,menuAnchor.itemId);
+            await UserService.removeCartItem(token as string,menuAnchor.itemId);
             await getCartItems();
             handleShowSnackbar("Producto eliminado del carrito", 'success');
             handleClose();
@@ -657,7 +657,7 @@ const RightSideCart = () => {
                             <br />
                             4. Realiza el pago y toma una captura del comprobante.
                             <br />
-                            5. Luego de pagar, presiona el botón <strong>"Subir Comprobante"</strong> para cargar la imagen.
+                            5. Luego de pagar, presiona el botón <strong>Subir Comprobante</strong> para cargar la imagen.
                         </Typography>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>

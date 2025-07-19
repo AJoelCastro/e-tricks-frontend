@@ -11,7 +11,7 @@ const MainAddresses = () => {
         <Grid size={{
           xs:12, sm:5, md:3
         }}>
-          <LeftSide title='direcciones'/>
+          <LeftSide />
         </Grid>
         <Grid size={{
           xs:12, sm:7, md:9

@@ -31,9 +31,9 @@ const schema = yup.object().shape({
   state: yup.string().required('El estado/provincia es obligatorio'),
   zipCode: yup.string().required('El código postal es obligatorio'),
   country: yup
-    .string()
-    .oneOf(['Peru'], 'Solo se permiten direcciones dentro de Perú')
-    .required('El país es obligatorio'),
+  .string()
+  .required('El país es obligatorio')
+  .test('is-peru', 'Solo se permiten direcciones dentro de Perú', (value) => value === 'Peru'),
   phone: yup.string().required('El teléfono es obligatorio'),
   // isDefault: yup.boolean(),
 });
@@ -88,7 +88,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
     const latlng = { lat, lng };
 
     geocoder.geocode({ location: latlng }, (results, status) => {
-      if (status === 'OK' && results[0]) {
+      if (status === 'OK' && results?.[0]) {
         const components = results[0].address_components;
 
         const getComponent = (type: string) =>

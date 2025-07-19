@@ -19,6 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import UserService from '@/services/UserService';
 import { primary } from '@/theme/colors';
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 
 type Props = {
     id: string;
@@ -46,7 +47,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     }>({ open: false, message: '', severity: 'info' });
     const [openModal, setOpenModal] = useState(false);
     const [lastAddedProduct, setLastAddedProduct] = useState<IProduct | null>(null);
-    const { getToken, isSignedIn } = useAuth();
+    const { getToken } = useAuth();
     const promedio =
         product?.resenias && product?.resenias.length
         ? product?.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / product?.resenias.length
@@ -64,7 +65,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const handleSubmitForm = handleSubmit(async(values)=>{
         try {
             const token = await getToken();
-            const dataAdd = await UserService.addCartItem(token as string, values.productId, values.quantity, values.size);
+            await UserService.addCartItem(token as string, values.productId, values.quantity, values.size);
             setLastAddedProduct(product??null); // Guarda el producto actual para mostrarlo
             setOpenModal(true); // Abre el modal
         } catch (error) {
