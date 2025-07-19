@@ -1,5 +1,5 @@
 import UserService from '@/services/UserService'
-import { Box, Button, CircularProgress, Grid, IconButton, Menu, MenuItem, Typography } from '@mui/material'
+import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, { useCallback, useEffect, useState } from 'react'
 import CartProgress from './Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
@@ -13,6 +13,19 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
+
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  borderRadius:2,
+  width: 600,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
 const RightSideCart = () => {
 
     //datos del menu list 
@@ -37,13 +50,15 @@ const RightSideCart = () => {
         try {
             setIsLoading(true);
             if (!menuAnchor.itemId) return;
-            const dataRemove = await UserService.removeCartItem(menuAnchor.itemId);
+            const token = await getToken()
+            const dataRemove = await UserService.removeCartItem(token as string,menuAnchor.itemId);
             await getCartItems();
-            setIsLoading(false);
             handleShowSnackbar("Producto eliminado del carrito", 'success');
             handleClose();
         } catch (error) {
             handleShowSnackbar("Error al eliminar el producto", 'error');
+        }finally{
+            setIsLoading(false);
         }
     };
 
@@ -60,6 +75,7 @@ const RightSideCart = () => {
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
     const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
+    const [showModalWebPay, setShowModalWebPay] = useState<boolean>(false);
     const { getToken } = useAuth();
 
     const getCartItems = async()=>{
@@ -181,6 +197,15 @@ const RightSideCart = () => {
         const urlWhatsApp = `https://wa.me/51969742589?text=${encodeURIComponent(mensaje)}`;
         window.open(urlWhatsApp, '_blank');
     };
+
+    const handleContinueByWebPay = () => {
+        try {
+            setShowModalWebPay(true);
+        } catch (error) {
+            
+        }
+    };
+
     const handleShowSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
         setSnackbar({ open: true, message, severity });
     };
@@ -210,7 +235,7 @@ const RightSideCart = () => {
                         size={{
                             xs:12,
                             sm:12,
-                            md:7.5
+                            md:8
                         }}
                         sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
                     >
@@ -432,6 +457,7 @@ const RightSideCart = () => {
                                                                 address={address}
                                                                 selected={selectedAddressId === address._id}
                                                                 onSelect={() => setSelectedAddressId(address._id??null)}
+                                                                isPickup={false}
                                                             />
                                                         </Grid>  
                                                     ))
@@ -456,6 +482,7 @@ const RightSideCart = () => {
                                                 }}
                                                 selected={selectedAddressId === 'pickup'}
                                                 onSelect={() => setSelectedAddressId('pickup')}
+                                                isPickup
                                             />
                                         </Grid>
                                     )}
@@ -477,9 +504,9 @@ const RightSideCart = () => {
                                         variant="contained"
                                         fullWidth
                                         color="primary"
-                                        onClick={() => {/* lógica de pago en la web */}}
+                                        onClick={handleContinueByWebPay}
                                     >
-                                        Pagar con tarjeta (Web)
+                                        Pago Web
                                     </Button>
                                 </Box>
                             )
@@ -489,12 +516,12 @@ const RightSideCart = () => {
                     <Grid size={{
                         xs:12,
                         sm:12,
-                        md:4.5
+                        md:4
                     }}
                     sx={{ paddingX:2, backgroundColor:'white',borderRadius: 2, paddingTop:2 }}
                     >
                         <Box sx={{display:'flex', justifyContent:'center', mb: 4}}>
-                            <Typography variant='h6'>
+                            <Typography variant='h7'>
                                 DETALLES DE LA COMPRA
                             </Typography>
                         </Box>
@@ -504,8 +531,8 @@ const RightSideCart = () => {
                                 carrito.length > 0 && (
                                     <>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body1" fontWeight="medium">Subtotal</Typography>
-                                            <Typography variant="body1">
+                                            <Typography variant="h7" >Subtotal</Typography>
+                                            <Typography variant="h7">
                                                 S/ {
                                                 carrito.reduce((sum, item) => {
                                                     const precioUnitario = item.product.descuento
@@ -518,8 +545,8 @@ const RightSideCart = () => {
                                         </Box>
 
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="body1" fontWeight="medium">Descuentos</Typography>
-                                            <Typography variant="body1" color="error">
+                                            <Typography variant="h7">Descuentos</Typography>
+                                            <Typography variant="h7" color="error">
                                                 - S/ {
                                                 carrito.reduce((sum, item) => {
                                                     if (item.product.descuento) {
@@ -533,8 +560,8 @@ const RightSideCart = () => {
                                         </Box>
 
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
-                                            <Typography variant="h6">Total</Typography>
-                                            <Typography variant="h6">
+                                            <Typography variant="h7">Total</Typography>
+                                            <Typography variant="h7">
                                                 S/ {
                                                 carrito.reduce((sum, item) => {
                                                     const descuento = item.product.descuento
@@ -545,16 +572,38 @@ const RightSideCart = () => {
                                                 }
                                             </Typography>
                                         </Box>
+                                        {
+                                            etapa!==2?(
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
+                                                    onClick={handleChangeEtapa}
+                                                >
+                                                    <Typography variant="h7">
+                                                        Continuar compra
+                                                    </Typography>
+                                                </Button>
+                                            ):(
+                                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent:'center', alignItems:'center', gap: 2, mt:2 }}>
+                                                    <Button onClick={handleContinueByWebPay}>
+                                                        <Image
+                                                            src={'https://imgs.search.brave.com/cIm__eRvkfQK61DHoU-3aq9ad9EArvbEjpIjw1z1_k4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYXJr/ZXRpbmctcGVydS5i/ZWdsb2JhbC5iaXov/d3AtY29udGVudC91/cGxvYWRzL2VsZW1l/bnRvci90aHVtYnMv/eWFwZS1sb2dvLWZv/bmRvLXRyYW5zcGFy/ZW50ZS1yMHl3aW9r/MXV6N2N3bXh6bWpp/bDdjbDdydWRpNHpp/Y2d1eHlwcWpubHcu/cG5n'}
+                                                            alt='yapeLogo'
+                                                            width={50}
+                                                            height={50}
+                                                            style={{ objectFit: 'contain', borderRadius:4, marginBottom: 10 }}
+                                                        />
+                                                        <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
+                                                            Ahora puedes pagar con Yape. Haz Click aquí!
+                                                        </Typography>
+                                                    </Button> 
+                                                </Box>
+                                            )
+                                        }
 
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            fullWidth
-                                            sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
-                                            onClick={handleChangeEtapa}
-                                        >
-                                            Continuar compra
-                                        </Button>
+                                        
                                     </>
                                 )
                             }
@@ -563,6 +612,37 @@ const RightSideCart = () => {
                     </Grid>
                 </>
             </Grid>
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={showModalWebPay}
+                onClose={()=>setShowModalWebPay(false)}
+                closeAfterTransition
+                slots={{ backdrop: Backdrop }}
+                slotProps={{
+                backdrop: {
+                    timeout: 500,
+                },
+                }}
+            >
+                <Fade in={showModalWebPay}>
+                <Box sx={style}>
+                    <Typography id="transition-modal-title" variant="h6" component="h2">
+                        Pasos para realizar tu compra
+                    </Typography>
+                    <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                        1. Scanea el codigo QR.
+                        <br />
+                        2. Confirma el pago con el monto S/ {carrito.reduce((sum, item) => {
+                                                    const descuento = item.product.descuento
+                                                    ? (item.product.price * item.product.descuento) / 100
+                                                    : 0;
+                                                    return sum + (item.product.price - descuento) * item.quantity;
+                                                }, 0).toFixed(2)} en la app de Yape.
+                    </Typography>
+                </Box>
+                </Fade>
+            </Modal>
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}

@@ -34,6 +34,7 @@ const theme = createTheme({
     reseniasDetail: { fontSize: 13, fontWeight: 500 },
     priceDetail: { fontSize: 19, fontWeight: 500 },
     navbar: { fontSize: 14, fontWeight: 600, lineHeight: 1 },
+    leftside: { fontSize: 16, fontWeight: 600, lineHeight: 1 },
   },
   breakpoints: {
     values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },

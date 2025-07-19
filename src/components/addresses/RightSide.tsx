@@ -17,6 +17,7 @@ import { IAddress } from '@/interfaces/Address';
 import AddressForm from './AddressForm';
 import AddressCard from './AddressCard';
 import AddIcon from '@mui/icons-material/Add';
+import { useAuth } from '@clerk/nextjs';
 
 
 const RightSideAddress = () => {
@@ -29,11 +30,13 @@ const RightSideAddress = () => {
     message: '',
     severity: 'success' as 'success' | 'error',
   });
+  const { getToken } = useAuth()
 
   const fetchAddresses = async () => {
     try {
       setLoading(true);
-      const data = await UserService.getAddresses();
+      const token = await getToken()
+      const data = await UserService.getAddresses(token as string);
       setAddresses(data);
     } catch (error) {
       console.error('Error al obtener direcciones:', error);
@@ -64,7 +67,8 @@ const RightSideAddress = () => {
   const handleDeleteAddress = async (addressId: string) => {
     try {
       setLoading(true);
-      await UserService.deleteAddress(addressId);
+      const token = await getToken();
+      await UserService.deleteAddress(token as string,addressId);
       setSnackbar({
         open: true,
         message: 'Dirección eliminada correctamente',
@@ -108,15 +112,16 @@ const RightSideAddress = () => {
   const handleFormSubmit = async (address: Omit<IAddress, '_id'>) => {
     try {
       setLoading(true);
+      const token = await getToken();
       if (editingAddress) {
-        await UserService.updateAddress(editingAddress._id as string, address);
+        await UserService.updateAddress(token as string, editingAddress._id as string, address);
         setSnackbar({
           open: true,
           message: 'Dirección actualizada correctamente',
           severity: 'success',
         });
       } else {
-        await UserService.addAddress(address);
+        await UserService.addAddress(token as string,address);
         setSnackbar({
           open: true,
           message: 'Dirección agregada correctamente',

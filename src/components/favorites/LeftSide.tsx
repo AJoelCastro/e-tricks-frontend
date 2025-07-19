@@ -1,9 +1,24 @@
+'use client';
+
 import theme from '@/theme/create-theme';
 import { useUser } from '@clerk/nextjs';
-import { Box, Divider, List, ListItem, styled, Typography  } from '@mui/material'
+import {
+  Box,
+  Divider,
+  List,
+  ListItem,
+  styled,
+  Typography,
+  useMediaQuery,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
+} from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react'
+import React from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 const style = {
   p: 0,
   width: '100%',
@@ -12,97 +27,85 @@ const style = {
   borderColor: 'divider',
   backgroundColor: 'background.paper',
 };
+
 const StyledNavItem = styled(Link, {
-  shouldForwardProp: prop =>  prop !== 'isActive'
-})(({
-  isActive
-}) => ({
+  shouldForwardProp: (prop) => prop !== 'isActive'
+})(({ isActive }: { isActive: boolean }) => ({
   color: theme.palette.text.secondary,
   transition: 'color 300ms',
   ':hover': {
-    color: '#5D2C8D'
+    color: '#5D2C8D',
   },
   ...(isActive && {
-    color: '#5D2C8D'
-  })
+    color: '#5D2C8D',
+  }),
 }));
 
-type Props={
-    title:string
-}
+type Props = {
+  title: string;
+};
 
-const LeftSide:React.FC<Props> = ({title}) => {
+const LeftSide: React.FC<Props> = ({ title }) => {
+  const { user } = useUser();
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path;
+  const isMobile = useMediaQuery('(max-width:600px)');
 
-    const { user } = useUser();
-    const pathname = usePathname();
-    const isActive = (path: string) => pathname === path;
-    console.log("left side")
-    return (
-        <Box sx={{width: '100%'}}>
-            {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 4, marginY: 1 }} >
-                <Typography variant='h4' sx={{fontFamily:'monospace'}}>
-                    {title.toUpperCase()}
-                </Typography>
-            </Box> */}
-            <Box sx={{ paddingX: 6, paddingY: 3, backgroundColor:'white', borderRadius: 2, marginX: 4, marginBottom: 4, marginTop:2 }} >
+  const links = [
+    { href: '/favorites', label: 'MIS FAVORITOS' },
+    { href: '/cart', label: 'MI CARRITO' },
+    { href: '/compras', label: 'MIS COMPRAS' },
+    { href: '/addresses', label: 'MIS DIRECCIONES' },
+    { href: '/spam', label: 'METODOS DE PAGO' },
+    { href: '/spam', label: 'MIS PUNTOS' },
+  ];
 
-                <Typography variant='h6' sx={{fontFamily:'revert', fontWeight:'bold'}}>
-                    HOLA, {user?.firstName?.toUpperCase()}
-                </Typography>
-            </Box>
-            <Box sx={{ paddingX: 4, marginBottom: 8 }}>
-                <List sx={style} aria-label="mailbox folders">
-                    <ListItem>
-                        <StyledNavItem href="/favorites" isActive={isActive('/favorites')}>
-                            <Typography>
-                                MIS FAVORITOS
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                    <Divider component="li" />
-                    <ListItem>
-                        <StyledNavItem href="/cart" isActive={isActive('/cart')}>
-                            <Typography>
-                                MI CARRITO
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                    <Divider component="li" />
-                    <ListItem>
-                        <StyledNavItem href="/compras" isActive={isActive('/compras')}>
-                            <Typography>
-                                MIS COMPRAS
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                    <Divider component="li" />
-                    <ListItem>
-                        <StyledNavItem href="/addresses" isActive={isActive('/addresses')}>
-                            <Typography>
-                                DIRECCIONES
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                    <Divider component="li" />
-                    <ListItem>
-                        <StyledNavItem href="/spam" isActive={isActive('/spam')}>
-                            <Typography>
-                                METODOS DE PAGO
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                    <Divider component="li" />
-                    <ListItem>
-                        <StyledNavItem href="/spam" isActive={isActive('/spam')}>
-                            <Typography>
-                                MIS PUNTOS
-                            </Typography>
-                        </StyledNavItem>
-                    </ListItem>
-                </List>
-            </Box>
-        </Box>
-    )
-}
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center',paddingX: 6, paddingY: 3, backgroundColor: 'white', borderRadius: 2, marginX: 2,  marginTop: 3, marginBottom:2 }}>
+        <Typography variant="leftside">
+          HOLA, {user?.firstName?.toUpperCase()}
+        </Typography>
+      </Box>
 
-export default LeftSide
+      <Box sx={{ paddingX: 2}}>
+        {isMobile ? (
+          <Accordion elevation={1} sx={{ borderRadius: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="priceCard">Menú de navegación</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List sx={style}>
+                {links.map((link, i) => (
+                  <React.Fragment key={i}>
+                    <ListItem>
+                      <StyledNavItem href={link.href} isActive={isActive(link.href)}>
+                        <Typography variant="navbar">{link.label}</Typography>
+                      </StyledNavItem>
+                    </ListItem>
+                    {i < links.length - 1 && <Divider component="li" />}
+                  </React.Fragment>
+                ))}
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        ) : (
+          <List sx={style}>
+            {links.map((link, i) => (
+              <React.Fragment key={i}>
+                <ListItem>
+                  <StyledNavItem href={link.href} isActive={isActive(link.href)}>
+                    <Typography variant="navbar">{link.label}</Typography>
+                  </StyledNavItem>
+                </ListItem>
+                {i < links.length - 1 && <Divider component="li" />}
+              </React.Fragment>
+            ))}
+          </List>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+export default LeftSide;

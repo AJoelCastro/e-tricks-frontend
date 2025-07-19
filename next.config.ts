@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'media.falabella.com.pe'
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgs.search.brave.com',
       }
     ],
   },

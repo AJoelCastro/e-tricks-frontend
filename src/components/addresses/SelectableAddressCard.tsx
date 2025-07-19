@@ -10,14 +10,16 @@ import {
 } from '@mui/material';
 import { IAddress } from '@/interfaces/Address';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import StoreIcon from '@mui/icons-material/Store';
 
 type Props = {
   address: IAddress;
   selected: boolean;
   onSelect: () => void;
+  isPickup?: boolean; // <- nueva prop
 };
 
-const SelectableAddressCard: React.FC<Props> = ({ address, selected, onSelect }) => {
+const SelectableAddressCard: React.FC<Props> = ({ address, selected, onSelect, isPickup = false }) => {
   return (
     <Card
       onClick={onSelect}
@@ -32,11 +34,16 @@ const SelectableAddressCard: React.FC<Props> = ({ address, selected, onSelect })
           boxShadow: 4,
         },
         p: 1,
+        backgroundColor: isPickup ? '#fbfbfbff' : 'white', // azul suave si es pickup
       }}
     >
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <LocationOnIcon color="primary" />
+          {isPickup ? (
+            <StoreIcon sx={{ color: '#1976d2' }} />
+          ) : (
+            <LocationOnIcon color="primary" />
+          )}
           <Typography variant="h6" component="div">
             {address.name}
           </Typography>
@@ -56,9 +63,12 @@ const SelectableAddressCard: React.FC<Props> = ({ address, selected, onSelect })
         <Typography variant="body2" color="text.secondary" gutterBottom>
           {address.country}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Tel: {address.phone}
-        </Typography>
+
+        {!isPickup && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Tel: {address.phone}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
