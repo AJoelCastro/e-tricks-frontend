@@ -118,7 +118,9 @@ const ProductsPanel = () => {
       console.error('Error al crear el producto:', error);
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Error al crear el producto',
+        message:
+          (error && typeof error === 'object' && 'response' in error && (error as any).response?.data?.message)
+            || 'Error al crear el producto',
         severity: 'error',
       });
     } finally {
