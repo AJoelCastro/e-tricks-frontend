@@ -29,7 +29,8 @@ export const primary = {
   700: '#4317CA',
   800: '#33129C',
   900: '#240C6E',
-  main: '#7950f2'
+  main: '#7950f2',
+  subtitleMain: '#333333'
 };
 export const success = {
   25: '#F1FEF5',

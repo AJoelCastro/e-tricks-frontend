@@ -37,7 +37,7 @@ const theme = createTheme({
     leftside: { fontSize: 16, fontWeight: 600, lineHeight: 1 },
     yapeSteps: { fontSize: 14, fontWeight: 500 },
     yapeTitle: { fontSize: 17, fontWeight: 600 },
-    subtitleMain: { fontSize: 32, fontWeight: 200, lineHeight: 1 },
+    subtitleMain: { fontSize: 28, fontWeight: 700, lineHeight: 1 },
   },
   breakpoints: {
     values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },

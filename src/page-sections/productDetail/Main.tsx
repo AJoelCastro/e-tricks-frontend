@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ProductService from '@/services/ProductService';
-import { Box, Button, CircularProgress, Grid, Rating, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Grid, IconButton, Rating, Typography } from '@mui/material';
 import { IProduct } from '@/interfaces/Product';
 import Link from 'next/link';
 import { Zap, TruckElectric, Store } from 'lucide-react';
@@ -19,8 +19,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import UserService from '@/services/UserService';
 import { primary } from '@/theme/colors';
 import Image from 'next/image';
-import { useAuth } from '@clerk/nextjs';
-
+import { SignInButton, useAuth } from '@clerk/nextjs';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { fi } from 'date-fns/locale';
 type Props = {
     id: string;
 };
@@ -39,6 +40,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const [isZoomed, setIsZoomed] = useState(false);
     const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({});
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [favoriteIds, setFavoriteIds] = useState<Array<string>>([]);
     const [quantity, setQuantity] = useState<number>(1);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
@@ -47,7 +49,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     }>({ open: false, message: '', severity: 'info' });
     const [openModal, setOpenModal] = useState(false);
     const [lastAddedProduct, setLastAddedProduct] = useState<IProduct | null>(null);
-    const { getToken } = useAuth();
+    const { getToken, isSignedIn } = useAuth();
     const promedio =
         product?.resenias && product?.resenias.length
         ? product?.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / product?.resenias.length
@@ -79,14 +81,27 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
             setProduct(dataProduct);
             setImages(dataProduct?.images || []);
             setSelectedImage(dataProduct?.images[0]);
-            setLoading(false);
         } catch (error) {
-            setLoading(false);
             handleShowSnackbar(`${error}`,'error');
+        }finally {
+            setLoading(false);
         }
     };
-
+    const getFavorites = async () => {
+        try {
+            if (!isSignedIn) return;
+            setLoading(true);
+            const token = await getToken();
+            const data = await UserService.getFavoriteIds(token as string);
+            setFavoriteIds(data);
+        } catch (error) {
+            handleShowSnackbar(`${error}`, 'error');
+        }finally {
+            setLoading(false);
+        }
+    }
     useEffect(() => {
+        getFavorites();
         getProduct();
     }, []);
     useEffect(() => {
@@ -115,20 +130,27 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
         setSnackbar(prev => ({ ...prev, open: false }));
     };
 
-    // const handleAddFav = React.useCallback(
-    //     async () => {
-    //     handleAddFavorite?.(product!._id);
-    //     },
-    //     [handleAddFavorite, product!._id],
-    // )
+    const handleRemoveFavorite = async () => {
+        try {
+            const token = await getToken();
+            await UserService.removeFavorite(token as string,id)
+            getFavorites();
+        } catch (error) {
+            throw error
+        }
+    }
 
-    // const handleRemoveFav = React.useCallback(
-    //     async () => {
-    //     handleRemoveFavorite?.(product!._id);
-    //     },
-    //     [handleRemoveFavorite, product!._id],
-    // )
 
+    const handleAddFavorite = async() => {
+        try {
+            const token = await getToken();
+            await UserService.addFavorite(token as string,id)
+            getFavorites();
+        } catch (error) {
+            throw error
+        }
+    }
+        
     if(loading){
         return(
             <Grid size={{
@@ -204,6 +226,43 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                             {product?.marca}
                                         </Typography>
                                     </Link>
+                                    <Box >
+                                        {
+                                            isSignedIn ? (
+                                            <IconButton aria-label="add to favorites" onClick={()=>{
+                                                if (favoriteIds.includes(id)) {
+                                                    handleRemoveFavorite();
+                                                } else {
+                                                    handleAddFavorite();
+                                                }
+                                            }}>
+                                                <FavoriteBorderIcon
+                                                sx={{
+                                                    color: favoriteIds.includes(id) ? 'red' : 'inherit',
+                                                    '&:hover': {
+                                                    color: 'red',
+                                                    cursor: 'pointer',
+                                                    },
+                                                }}
+                                                />
+                                            </IconButton>
+                                            ) : (
+                                            <SignInButton mode='modal'>
+                                                <button className='px-2'>
+                                                <FavoriteBorderIcon
+                                                    sx={{
+                                                    color: markedFavorite ? 'red' : 'inherit',
+                                                    '&:hover': {
+                                                        color: 'red',
+                                                        cursor: 'pointer',
+                                                    },
+                                                    }}
+                                                />
+                                                </button>
+                                            </SignInButton>
+                                            )
+                                        }
+                                        </Box>
                                 </Box>
                                 <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
                                     <Grid>

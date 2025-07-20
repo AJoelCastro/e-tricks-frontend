@@ -13,9 +13,10 @@ type Props = {
   markedFavorite?: boolean;
   handleRemoveFavorite?: (idProduct: string) => Promise<void>;
   handleAddFavorite?: (idProduct: string) => Promise<void>;
+  show: boolean;
 };
 
-const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFavorite, handleAddFavorite }) => {
+const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFavorite, handleAddFavorite, show }) => {
 
   const promedio =
     products.resenias && products.resenias.length
@@ -54,29 +55,18 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
           },
         }}
       >
-        <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-            {
-              isSignedIn ? (
-                <IconButton aria-label="add to favorites" onClick={()=>{
-                  if (markedFavorite) {
-                    handleRemoveFav();
-                  } else {
-                    handleAddFav();
-                  }
-                }}>
-                  <FavoriteBorderIcon
-                    sx={{
-                      color: markedFavorite ? 'red' : 'inherit',
-                      '&:hover': {
-                        color: 'red',
-                        cursor: 'pointer',
-                      },
-                    }}
-                  />
-                </IconButton>
-              ) : (
-                <SignInButton mode='modal'>
-                  <button className='px-2'>
+        {
+          show && (
+            <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
+              {
+                isSignedIn ? (
+                  <IconButton aria-label="add to favorites" onClick={()=>{
+                    if (markedFavorite) {
+                      handleRemoveFav();
+                    } else {
+                      handleAddFav();
+                    }
+                  }}>
                     <FavoriteBorderIcon
                       sx={{
                         color: markedFavorite ? 'red' : 'inherit',
@@ -86,11 +76,27 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
                         },
                       }}
                     />
-                  </button>
-                </SignInButton>
-              )
-            }
-        </Box>
+                  </IconButton>
+                ) : (
+                  <SignInButton mode='modal'>
+                    <button className='px-2'>
+                      <FavoriteBorderIcon
+                        sx={{
+                          color: markedFavorite ? 'red' : 'inherit',
+                          '&:hover': {
+                            color: 'red',
+                            cursor: 'pointer',
+                          },
+                        }}
+                      />
+                    </button>
+                  </SignInButton>
+                )
+              }
+            </Box>
+          )
+        }
+        
         <Link href={`/product/${products._id}`}>
         <CardMedia
           component="img"

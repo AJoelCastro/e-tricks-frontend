@@ -14,11 +14,13 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { primary } from '@/theme/colors';
+import { IProduct } from '@/interfaces/Product';
 
 const MainComponent = () => {
   const { isSignedIn, getToken } = useAuth();
-  const [dataProducts, setDataProducts] = useState([]);
-  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [dataProducts, setDataProducts] = useState<Array<IProduct>>([]);
+  const [favoriteIds, setFavoriteIds] = useState<Array<string>>([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const getProducts = async () => {
@@ -82,11 +84,7 @@ const MainComponent = () => {
               <MainCarouselComponent images={['https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80', 'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80']}/>
             </Grid>
         </Grid>
-        <Box sx={{display:'flex', flexDirection:'column', marginY:3, marginLeft:2}}>
-          <Typography variant='subtitleMain' sx={{ marginY:2}}>
-            DESCUENTOS
-          </Typography>
-        </Box>
+        <Box sx={{height: 16}}></Box>
         {
           isMobile ? (
             <Box>
@@ -105,7 +103,7 @@ const MainComponent = () => {
               </Swiper>
             </Box>
           ) : (
-            <Grid container spacing={2} sx={{ px: 2 }}>
+            <Grid container>
               {imagesPrueba.map((image, index) => (
                 <Grid size={{xs:12, sm:6, md:4}} key={index}>
                   <ThreeImages image={image} />
@@ -114,9 +112,9 @@ const MainComponent = () => {
             </Grid>
           )
         }
-        <Box sx={{display:'flex', flexDirection:'column', marginY:3, marginLeft:2}}>
-          <Typography variant='subtitleMain' sx={{ marginY:2}}>
-            NOVEDADES
+        <Box sx={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', marginY:3}}>
+          <Typography variant='subtitleMain' sx={{ marginY:2, color: primary.subtitleMain}}>
+            Novedades
           </Typography>
         </Box>
         {isMobile ? (
@@ -128,7 +126,7 @@ const MainComponent = () => {
             >
               {dataProducts.map((product, index) => (
                 <SwiperSlide key={index}>
-                  <ProductCard products={product} />
+                  <ProductCard products={product} show={false}/>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -137,7 +135,7 @@ const MainComponent = () => {
           <Grid container size={12} spacing={2} padding={2}>
             {dataProducts.map((product, index) => (
               <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
-                <ProductCard products={product} />
+                <ProductCard products={product} show markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
               </Grid>
             ))}
           </Grid>
