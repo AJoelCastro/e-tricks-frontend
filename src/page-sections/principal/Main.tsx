@@ -9,13 +9,18 @@ import UserService from '@/services/UserService';
 import { Box, Grid, Typography } from '@mui/material';
 import NavbarComponent from '@/components/NavbarComponent';
 import FooterComponent from '@/components/FooterComponent';
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Pagination } from 'swiper/modules';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const MainComponent = () => {
   const { isSignedIn, getToken } = useAuth();
   const [dataProducts, setDataProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const getProducts = async () => {
     try{
       const data = await ProductService.GetProducts();
@@ -82,27 +87,61 @@ const MainComponent = () => {
             DESCUENTOS
           </Typography>
         </Box>
-        <Grid container size={12} spacing={2} padding={2}>
-          {
-            imagesPrueba.map((image, index) => (
-              <Grid key={index} size={{xs:12, sm:6, md:4}} sx={{marginX:'auto'}}>
-                <ThreeImages image={image}/>
-              </Grid>
-            ))
-          }
-        </Grid>
+        {
+          isMobile ? (
+            <Box>
+              <Swiper
+                spaceBetween={16}
+                slidesPerView={1.2}
+                pagination={{ clickable: true }}
+                modules={[Pagination]}
+                style={{ paddingBottom: '2rem' }}
+              >
+                {imagesPrueba.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <ThreeImages image={image} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </Box>
+          ) : (
+            <Grid container spacing={2} sx={{ px: 2 }}>
+              {imagesPrueba.map((image, index) => (
+                <Grid size={{xs:12, sm:6, md:4}} key={index}>
+                  <ThreeImages image={image} />
+                </Grid>
+              ))}
+            </Grid>
+          )
+        }
         <Box sx={{display:'flex', flexDirection:'column', marginY:3, marginLeft:2}}>
           <Typography variant='subtitleMain' sx={{ marginY:2}}>
             NOVEDADES
           </Typography>
         </Box>
-        <Grid container size={12} spacing={2} padding={2}>
+        {isMobile ? (
+          <Box>
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={1.2}
+              style={{ paddingBottom: '2rem' }}
+            >
+              {dataProducts.map((product, index) => (
+                <SwiperSlide key={index}>
+                  <ProductCard products={product} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </Box>
+        ) : (
+          <Grid container size={12} spacing={2} padding={2}>
             {dataProducts.map((product, index) => (
               <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
                 <ProductCard products={product} />
               </Grid>
             ))}
-        </Grid>
+          </Grid>
+        )}
       </Box>
       <FooterComponent/>
     </>

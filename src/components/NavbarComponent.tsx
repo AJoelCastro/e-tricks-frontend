@@ -115,11 +115,11 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center">
                 <Image
-                  src={`${main?showWhiteBackground?'/tricks_logo_black.svg':'/tricks_logo_white.svg':'/tricks_logo_black.svg'}`}
+                  src={`${main?showWhiteBackground?'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg':'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_transparente.svg':'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg'}`}
                   alt="Logo"
                   width={32}
                   height={32}
-                  className="h-24 w-auto"
+                  className="h-36 w-auto"
                 />
               </Link>
             </div>
