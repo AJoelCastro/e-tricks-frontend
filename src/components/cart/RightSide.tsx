@@ -521,7 +521,7 @@ const RightSideCart = () => {
                                     <Box sx={{ textAlign: "center", mt: 2 }}>
                                         <Button variant="outlined">Agregar tarjeta o Gift Card</Button>
                                     </Box>
-                                    <Box sx={{ mt: 4 }}>
+                                    <Box sx={{ mt: 4, mb: 2 }}>
                                         <Typography variant="leftside" >Otros medios de pago</Typography>
                                     </Box>
                                     
