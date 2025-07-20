@@ -17,7 +17,7 @@ type Props = {
 };
 
 const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFavorite, handleAddFavorite, show }) => {
-
+  const [isHovered, setIsHovered] = React.useState(false);
   const promedio =
     products.resenias && products.resenias.length
       ? products.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / products.resenias.length
@@ -101,9 +101,11 @@ const ProductCard: React.FC<Props> = ({ products, markedFavorite, handleRemoveFa
         <CardMedia
           component="img"
           height="194"
-          image={products.images[0]}
+          image={isHovered && products.images[1] ? products.images[1] : products.images[0]}
           alt={products.name}
-          sx={{ objectFit: 'contain' }}
+          sx={{ objectFit: 'contain',transition: 'opacity 0.3s ease-in-out'}}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         />
         </Link>
         <CardContent sx={{ paddingBottom: '60px' }}> 
