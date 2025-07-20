@@ -27,6 +27,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'sodastereobucket.s3.us-east-2.amazonaws.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'tricks-bucket.s3.us-east-2.amazonaws.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.icons8.com'
       }
     ],
   },

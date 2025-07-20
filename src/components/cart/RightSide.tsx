@@ -13,6 +13,8 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
+import SavedCard from './SavedCard';
+import YapeCard from './YapeCard';
 
 
 const style = {
@@ -78,6 +80,9 @@ const RightSideCart = () => {
     }>({ open: false, message: '', severity: 'info' });
     const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
     const [showModalWebPay, setShowModalWebPay] = useState<boolean>(false);
+    const [selectedCardId, setSelectedCardId] = useState<string| null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
+
     const { getToken } = useAuth();
 
     const getCartItems = async()=>{
@@ -501,42 +506,29 @@ const RightSideCart = () => {
                             ):(
                                 <Box>
                                     <Box sx={{ mb: 2 }}>
-                                        <Typography variant="leftside" >Finalizar transacción</Typography>
+                                        <Typography variant="leftside" >Tarjetas guardadas</Typography>
                                     </Box>
-                                    <Box sx={{ mt:2 }}>
-                                        <Button onClick={handleContinueByWebPay} fullWidth>
-                                            <Box sx={{gap:2, display:'flex', flexDirection:'row', justifyContent:'center', alignItems:'center', paddingY:1}}>
-                                                <Image
-                                                    src={'https://imgs.search.brave.com/cIm__eRvkfQK61DHoU-3aq9ad9EArvbEjpIjw1z1_k4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYXJr/ZXRpbmctcGVydS5i/ZWdsb2JhbC5iaXov/d3AtY29udGVudC91/cGxvYWRzL2VsZW1l/bnRvci90aHVtYnMv/eWFwZS1sb2dvLWZv/bmRvLXRyYW5zcGFy/ZW50ZS1yMHl3aW9r/MXV6N2N3bXh6bWpp/bDdjbDdydWRpNHpp/Y2d1eHlwcWpubHcu/cG5n'}
-                                                    alt='yapeLogo'
-                                                    width={50}
-                                                    height={50}
-                                                    style={{ objectFit: 'contain', borderRadius:4}}
-                                                />
-                                                <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
-                                                    Ahora puedes pagar con Yape. Haz Click aquí!
-                                                </Typography>
-                                            </Box>
-                                            
-                                        </Button> 
+                                    <SavedCard
+                                        last4="4406"
+                                        brandLogoUrl="https://img.icons8.com/color/48/000000/mastercard-logo.png"
+                                        selected={paymentMethod === 'card' && selectedCardId === 'card_4406'}
+                                        onSelect={() => {
+                                            setSelectedCardId('card_4406');
+                                            setPaymentMethod('card');
+                                        }}
+                                        onRemove={() => console.log("Eliminar tarjeta")}
+                                    />
+                                    <Box sx={{ textAlign: "center", mt: 2 }}>
+                                        <Button variant="outlined">Agregar tarjeta o Gift Card</Button>
                                     </Box>
-
-                                    <Box sx={{  mt:2 }}>
-                                        <Button onClick={handleContinueByWebPay} fullWidth >
-                                            <Box sx={{gap:2, display:'flex', flexDirection:'row', justifyContent:'center', alignItems:'center', paddingY:1}}>
-                                                <Image
-                                                    src={'https://imgs.search.brave.com/Dt8okQ7-bTX_Ky5usRJDnspYL_M-1Ka8HvhGZnU4Jmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/ZGl4LmNvbS9sb2dv/Lzc4MzkxLnBuZw'}
-                                                    alt='yapeLogo'
-                                                    width={100}
-                                                    height={80}
-                                                    style={{ objectFit: 'contain', borderRadius:4}}
-                                                />
-                                                <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
-                                                    Tarjeta de crédito o débito
-                                                </Typography>
-                                            </Box>
-                                        </Button> 
+                                    <Box sx={{ mt: 4 }}>
+                                        <Typography variant="leftside" >Otros medios de pago</Typography>
                                     </Box>
+                                    
+                                    <YapeCard
+                                        selected={paymentMethod === 'yape'}
+                                        onSelect={() => setPaymentMethod('yape')}
+                                    />
                                 </Box>
                             )
                         }
@@ -615,20 +607,41 @@ const RightSideCart = () => {
                                                     </Typography>
                                                 </Button>
                                             ):(
-                                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent:'center', alignItems:'center', gap: 2, mt:2 }}>
-                                                    <Button onClick={handleContinueByWebPay}>
-                                                        <Image
-                                                            src={'https://imgs.search.brave.com/cIm__eRvkfQK61DHoU-3aq9ad9EArvbEjpIjw1z1_k4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYXJr/ZXRpbmctcGVydS5i/ZWdsb2JhbC5iaXov/d3AtY29udGVudC91/cGxvYWRzL2VsZW1l/bnRvci90aHVtYnMv/eWFwZS1sb2dvLWZv/bmRvLXRyYW5zcGFy/ZW50ZS1yMHl3aW9r/MXV6N2N3bXh6bWpp/bDdjbDdydWRpNHpp/Y2d1eHlwcWpubHcu/cG5n'}
-                                                            alt='yapeLogo'
-                                                            width={50}
-                                                            height={50}
-                                                            style={{ objectFit: 'contain', borderRadius:4, marginBottom: 10 }}
-                                                        />
-                                                        <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
-                                                            Ahora puedes pagar con Yape. Haz Click aquí!
+                                                <>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        fullWidth
+                                                        sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
+                                                        onClick={() => {
+                                                            if (paymentMethod === 'card') {
+                                                            // lógica de pago con tarjeta
+                                                            } else if (paymentMethod === 'yape') {
+                                                                setShowModalWebPay(true);
+                                                            } else {
+                                                                handleShowSnackbar("Selecciona un método de pago", "warning");
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Typography variant="h7">
+                                                            Pagar
                                                         </Typography>
-                                                    </Button> 
-                                                </Box>
+                                                    </Button>
+                                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent:'center', alignItems:'center', gap: 2, mt:2 }}>
+                                                        <Button onClick={handleContinueByWhatsApp}>
+                                                            <Image
+                                                                src={'https://imgs.search.brave.com/1tdHoO38OZcsoto1OsdOQfaJT5yvjTWjmNDMNjfcpis/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/cy13b3JsZC5uZXQv/d3AtY29udGVudC91/cGxvYWRzLzIwMjAv/MDUvTG9nby1XaGF0/c0FwcC03MDB4Mzk0/LnBuZw'}
+                                                                alt='whatsappLogo'
+                                                                width={50}
+                                                                height={50}
+                                                                style={{ objectFit: 'contain', borderRadius:4, marginBottom: 10 }}
+                                                            />
+                                                            <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
+                                                                Continuar atención vía WhatsApp.
+                                                            </Typography>
+                                                        </Button> 
+                                                    </Box>
+                                                </>
                                             )
                                         }
 
