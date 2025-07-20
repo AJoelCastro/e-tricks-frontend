@@ -249,15 +249,15 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                             ) : (
                                             <SignInButton mode='modal'>
                                                 <button className='px-2'>
-                                                <FavoriteBorderIcon
-                                                    sx={{
-                                                    color: markedFavorite ? 'red' : 'inherit',
-                                                    '&:hover': {
-                                                        color: 'red',
-                                                        cursor: 'pointer',
-                                                    },
-                                                    }}
-                                                />
+                                                    <FavoriteBorderIcon
+                                                        sx={{
+                                                        color: favoriteIds.includes(id) ? 'red' : 'inherit',
+                                                        '&:hover': {
+                                                            color: 'red',
+                                                            cursor: 'pointer',
+                                                        },
+                                                        }}
+                                                    />
                                                 </button>
                                             </SignInButton>
                                             )
