@@ -156,9 +156,9 @@ const ProductCard: React.FC<Props> = ({
           />
         </Link>
         <CardContent sx={{ paddingBottom: '60px' }}>
-          <Link href={`/marcas/${products.marca.toLowerCase()}`}>
+          <Link href={`/marcas/${products.brand.name.toLowerCase()}`}>
             <Typography variant="marcaCard" sx={{ color: 'text.primary' }}>
-              {products.marca}
+              {products.brand.name}
             </Typography>
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
@@ -300,7 +300,7 @@ const ProductCard: React.FC<Props> = ({
           </IconButton>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4}}>
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -322,10 +322,10 @@ const ProductCard: React.FC<Props> = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={8}>
+            <Grid size={{ xs: 12, sm: 8 }}>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
-                  {products.marca}
+                  {products.brand.name}
                 </Typography>
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {products.name}
@@ -345,8 +345,8 @@ const ProductCard: React.FC<Props> = ({
                   Tallas
                 </Typography>
                 <Grid container spacing={1}>
-                  {products.size?.map((size) => (
-                    <Grid item key={size}>
+                  {products.stockPorTalla && Object.keys(products.stockPorTalla).map((size) => (
+                    <Grid key={size}>
                       <Button
                         variant={selectedSize === size ? 'contained' : 'outlined'}
                         onClick={() => setSelectedSize(size)}

@@ -4,13 +4,24 @@ export interface IProduct {
   description: string;
   images: string[];
   price: number;
-  size: string[];
-  stock: number;
-  category: string;
+  stockPorTalla: { talla: number; stock: number }[];
+  category: {
+    _id: string;
+    name: string;
+  };
+  material: {
+    _id: string;
+    name: string;
+  };
+  brand: {
+    _id: string;
+    name: string;
+  };
   descuento?: number;
-  marca: string;
   resenias?: Resenia[];
+  createdAt?: string;
 }
+
 interface Resenia {
   cliente: string;
   valoracion: number;
