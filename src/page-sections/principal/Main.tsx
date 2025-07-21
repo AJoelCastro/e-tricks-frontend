@@ -117,29 +117,27 @@ const MainComponent = () => {
             Novedades
           </Typography>
         </Box>
-        {isMobile ? (
-          <Box>
-            <Swiper
-              spaceBetween={16}
-              slidesPerView={1.2}
-              style={{ paddingBottom: '2rem' }}
-            >
-              {dataProducts.map((product, index) => (
-                <SwiperSlide key={index}>
-                  <ProductCard products={product} show={false}/>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </Box>
-        ) : (
-          <Grid container size={12} spacing={2} padding={2}>
+        <Box>
+          <Swiper
+            spaceBetween={16}
+            slidesPerView={isMobile ? 1.2 : 4} // o ajusta a 3.2 si quieres más margen
+            style={{ paddingBottom: '2rem' }}
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+          >
             {dataProducts.map((product, index) => (
-              <Grid key={index} size={{xs:6, sm:4, md:3}} sx={{marginX:'auto'}}>
-                <ProductCard products={product} show markedFavorite={isSignedIn && favoriteIds.includes(product._id)} handleRemoveFavorite={handleRemoveFavorite} handleAddFavorite={handleAddFavorite}/>
-              </Grid>
+              <SwiperSlide key={index}>
+                <ProductCard
+                  products={product}
+                  show
+                  markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
+                  handleRemoveFavorite={handleRemoveFavorite}
+                  handleAddFavorite={handleAddFavorite}
+                />
+              </SwiperSlide>
             ))}
-          </Grid>
-        )}
+          </Swiper>
+        </Box>
       </Box>
       <FooterComponent/>
     </>
