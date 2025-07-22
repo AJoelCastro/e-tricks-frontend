@@ -15,6 +15,7 @@ import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
 import SavedCard from '../../SavedCard';
 import YapeCard from '../../YapeCard';
+import { useCart } from '../../CartContext';
 
 
 const style = {
@@ -52,7 +53,7 @@ const RightSideCart = () => {
 
     const handleMenuItemClick = async () => {
         try {
-            setIsLoading(true);
+            setIsRemoving(true);
             if (!menuAnchor.itemId) return;
             const token = await getToken()
             await UserService.removeCartItem(token as string,menuAnchor.itemId);
@@ -62,61 +63,23 @@ const RightSideCart = () => {
         } catch (error) {
             handleShowSnackbar(`${error}`, 'error');
         }finally{
-            setIsLoading(false);
+            setIsRemoving(false);
         }
     };
 
 
     //datos propios
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [etapa, setEtapa] = useState<number>(0);
-    const [carrito, setCarrito] = useState<Array<ICartItem>>([]);
+    const [isRemoving, setIsRemoving] = useState<boolean>(false);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
-    const [showModalWebPay, setShowModalWebPay] = useState<boolean>(false);
 
+    const { carrito, setCarrito, getCartItems, isLoading } = useCart();
     const { getToken } = useAuth();
-
-    const getCartItems = async()=>{
-        try {
-            setIsLoading(true)
-            const token = await getToken();
-            const rawCart = await UserService.getCartItems(token as string); // tu array original
-            const cartWithProducts = await Promise.all(
-            rawCart.map(async (item:ICartItem ) => {
-                const product = await ProductService.GetProductById(item.productId);
-                return {
-                    ...item,
-                    product,
-                };
-            })
-            );
-            setCarrito(cartWithProducts); // carrito con datos completos
-        } catch (error) {
-            throw error
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-
-    useEffect(() => {
-        getCartItems()
-    }, [])
    
-    // const handleRemoveFavorite = useCallback(
-    //   async (id:string) => {
-    //     try {
-            
-    //     } catch (error) {
-    //         throw error
-    //     }
-    //   },
-    //   [],
-    // )
     const handleChangeQuantity = (index: number, newQuantity: number) => {
         if (newQuantity < 1 || newQuantity > 12) return;
 
@@ -146,14 +109,6 @@ const RightSideCart = () => {
 
     const handleCloseSnackbar = () => {
         setSnackbar(prev => ({ ...prev, open: false }));
-    };
-
-    const handleUploadComprobante = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            // Aquí subes a tu backend o cloud yape
-            console.log('Comprobante subido:', file.name);
-        }
     };
 
     if(isLoading){
@@ -419,71 +374,6 @@ const RightSideCart = () => {
                     </Grid>
                 </>
             </Grid>
-            <Modal
-                aria-labelledby="transition-modal-title"
-                aria-describedby="transition-modal-description"
-                open={showModalWebPay}
-                onClose={()=>setShowModalWebPay(false)}
-                closeAfterTransition
-                slots={{ backdrop: Backdrop }}
-                slotProps={{
-                backdrop: {
-                    timeout: 500,
-                },
-                }}
-            >
-                <Fade in={showModalWebPay}>
-                    <Box sx={style}>
-                        <Typography id="transition-modal-title" variant="yapeTitle">
-                            Pasos para realizar tu compra vía Yape
-                        </Typography>
-
-                        <Typography variant="yapeSteps" id="transition-modal-description" sx={{ mt: 2 }}>
-                            1. Escanea el código QR con tu app de Yape.
-                            <br />
-                            2. Ingresa el monto exacto: <strong>S/ {carrito.reduce((sum, item) => {
-                            const descuento = item.product.descuento
-                                ? (item.product.price * item.product.descuento) / 100
-                                : 0;
-                            return sum + (item.product.price - descuento) * item.quantity;
-                            }, 0).toFixed(2)}</strong>
-                            <br />
-                            3. En el mensaje de Yape, escribe tu nombre o número de pedido si lo tienes.
-                            <br />
-                            4. Realiza el pago y toma una captura del comprobante.
-                            <br />
-                            5. Luego de pagar, presiona el botón <strong>Subir Comprobante</strong> para cargar la imagen.
-                        </Typography>
-
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <Image
-                                src={'https://sodastereobucket.s3.us-east-2.amazonaws.com/qryape.jpg'}
-                                alt='Código QR de Yape'
-                                width={300}
-                                height={300}
-                                style={{ borderRadius: 12 }}
-                            />
-                        </Box>
-
-                        <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="caption" color="text.secondary">
-                                Recuerda subir el comprobante para confirmar tu compra.
-                            </Typography>
-
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                component="label"
-                                sx={{ borderRadius: 2, textTransform: 'none' }}
-                            >
-                                Subir Comprobante
-                                <input hidden accept="image/*" type="file" onChange={handleUploadComprobante} />
-                            </Button>
-
-                        </Box>
-                    </Box>
-                </Fade>
-            </Modal>
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}

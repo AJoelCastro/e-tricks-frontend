@@ -16,25 +16,36 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { getToken } = useAuth();
 
   const getCartItems = async () => {
-    const token = await getToken();
-    const rawCart = await UserService.getCartItems(token as string);
-    const cartWithProducts = await Promise.all(
-      rawCart.map(async item => {
-        const product = await ProductService.GetProductById(item.productId);
-        return { ...item, product };
-      })
-    );
-    setCarrito(cartWithProducts);
+    setIsLoading(true);
+    try {
+      const token = await getToken();
+      const rawCart = await UserService.getCartItems(token as string);
+      const cartWithProducts = await Promise.all(
+        rawCart.map(async item => {
+          const product = await ProductService.GetProductById(item.productId);
+          return { ...item, product };
+        })
+      );
+      setCarrito(cartWithProducts);
+    } catch (error) {
+      throw error
+    } finally {
+      setIsLoading(false); // ⬅️ termina la carga
+    }
   };
 
   const getAddresses = async () => {
-    const token = await getToken();
-    const data = await UserService.getAddresses(token as string);
-    setAddresses(data);
+    try {
+      const token = await getToken();
+      const data = await UserService.getAddresses(token as string);
+      setAddresses(data);
+    } catch (error) {
+      throw error
+    }
   };
 
   useEffect(() => {
@@ -57,6 +68,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         paymentMethod,
         setPaymentMethod,
         getCartItems,
+        isLoading,
       }}
     >
       {children}

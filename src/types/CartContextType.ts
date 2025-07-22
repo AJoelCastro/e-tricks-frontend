@@ -15,4 +15,5 @@ export interface CartContextType {
   paymentMethod: 'card' | 'yape' | null;
   setPaymentMethod: React.Dispatch<React.SetStateAction<'card' | 'yape' | null>>;
   getCartItems: () => Promise<void>;
+  isLoading: boolean;
 }
