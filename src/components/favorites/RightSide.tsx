@@ -29,8 +29,7 @@ const RightSide = () => {
       async (id:string) => {
         try {
             const token = await getToken();
-            const dataRemove = await UserService.removeFavorite(token as string,id)
-            console.log("data r", dataRemove)
+            await UserService.removeFavorite(token as string,id)
             getFavorites()
         } catch (error) {
             throw error

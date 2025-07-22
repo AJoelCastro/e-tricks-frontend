@@ -42,7 +42,6 @@ const ProductCard: React.FC<Props> = ({
       : 0;
 
   const { isSignedIn } = useUser();
-
   const handleAddFav = React.useCallback(
     async () => {
       handleAddFavorite?.(products._id);
