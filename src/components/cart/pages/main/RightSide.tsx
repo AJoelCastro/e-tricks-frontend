@@ -1,20 +1,20 @@
 import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
-import CartProgress from './Stepper';
+import CartProgress from '../../Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
 import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IAddress } from '@/interfaces/Address';
-import SelectableAddressCard from '../addresses/SelectableAddressCard';
+import SelectableAddressCard from '../../../addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
-import SavedCard from './SavedCard';
-import YapeCard from './YapeCard';
+import SavedCard from '../../SavedCard';
+import YapeCard from '../../YapeCard';
 
 
 const style = {
@@ -297,9 +297,9 @@ const RightSideCart = () => {
                                             </Grid>
                                             <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
                                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Link href={`/marcas/${item.product.marca.toLowerCase()}`}>
+                                                    <Link href={`/marcas/${item.product.brand.name.toLowerCase()}`}>
                                                         <Typography variant='marcaCard'  sx={{ color: 'text.primary'}}>
-                                                            {item.product.marca}
+                                                            {item.product.brand.name}
                                                         </Typography>
                                                     </Link>
                                                     <Link href={`/product/${item.product._id}`}>

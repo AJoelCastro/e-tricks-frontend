@@ -20,28 +20,30 @@ const FooterComponent = () => {
 
         <Grid  size={{xs:12, sm:6, md:4}}>
           <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
                 <Image
-                    src="/tricks_logo_black.svg"
+                    src="https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg"
                     alt="Tricks Logo"
                     width={150}
-                    height={30}
+                    height={20}
                     priority
                 />
+                <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                  ¡Te esperan muchos beneficios y sorpresas!
+                  Regístrate, acumula puntos y úsalos en todas tus compras.
+                </Typography>
             </Box>
-            <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
-              ¡Te esperan muchos beneficios y sorpresas!
-              Regístrate, acumula puntos y úsalos en todas tus compras.
-            </Typography>
+            
             <Button
               variant="outlined"
+              color='secondary'
               sx={{
                 mt: 2,
-                borderColor: '#111',
-                color: '#111',
+                borderColor: 'primary.main',
+                color: 'primary.main',
                 ':hover': {
-                  backgroundColor: '#111',
-                  color: '#fff',
+                  backgroundColor: 'primary.main',
+                  color: 'white',
                 },
               }}
               fullWidth

@@ -1,14 +1,17 @@
 'use client';
-import MainCart from '@/page-sections/cart/Main'
+import MainCart from '@/components/cart/pages/main/Main'
 import FooterComponent from '@/components/FooterComponent'
 import NavbarComponent from '@/components/NavbarComponent'
 import React from 'react'
+import { CartProvider } from '@/components/cart/CartContext';
 
 const CartPage = () => {
   return (
     <>
       <NavbarComponent/>
-      <MainCart/>
+        <CartProvider>
+          <MainCart/>
+        </CartProvider>
       <FooterComponent/>
     </>
   )

@@ -5,9 +5,9 @@ import { IAddress } from '@/interfaces/Address';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const UserService = {
-    verifyUser: async(token: string, idClerk: string )=>{
+    verifyUser: async(token: string, userId: string )=>{
         try {
-            const response = await axios.get(`${API_URL}/user/verifyUser/${idClerk}`,{
+            const response = await axios.get(`${API_URL}/user/verifyUser/${userId}`,{
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

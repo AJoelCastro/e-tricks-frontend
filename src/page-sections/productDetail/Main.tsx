@@ -221,9 +221,9 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                         <FormProvider methods={methods} onSubmit={handleSubmitForm}>
                             <Grid size={{xs:12, sm:12, md:12}} sx={{backgroundColor:'white'}}>
                                 <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between',  paddingRight:4}}>
-                                    <Link href={`/marcas/${product?.marca.toLowerCase()}`}>
+                                    <Link href={`/marcas/${product?.brand.name.toLowerCase()}`}>
                                         <Typography variant="marcaDetail" sx={{ color: 'text.primary' }}>
-                                            {product?.marca}
+                                            {product?.brand.name}
                                         </Typography>
                                     </Link>
                                     <Box >
@@ -290,9 +290,9 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     marginBottom:1
                                 }}
                             >
-                                {product?.size.map((s) => (
+                                {product?.stockPorTalla.map((s) => (
                                     <Box
-                                    key={s}
+                                    key={s.talla}
                                     sx={{
                                         display: 'flex',
                                         alignItems: 'center',
@@ -300,9 +300,9 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     }}
                                     >
                                     <Button
-                                        onClick={() => setSelectedSize(s)}
-                                        variant={selectedSize === s ? 'contained' : 'text'}
-                                        color={selectedSize === s ? 'primary' : 'inherit'}
+                                        onClick={() => setSelectedSize(s.talla.toString())}
+                                        variant={selectedSize === s.talla.toString() ? 'contained' : 'text'}
+                                        color={selectedSize === s.talla.toString() ? 'primary' : 'inherit'}
                                         sx={{
                                         boxShadow: 3, // 👈 sombra
                                         minWidth: 80,
@@ -310,11 +310,11 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     >
                                         <Typography
                                             sx={{
-                                                color: selectedSize === s ? 'white' : 'text.primary',
+                                                color: selectedSize === s.talla.toString() ? 'white' : 'text.primary',
                                                 fontSize: 12,
                                             }}
                                         >
-                                            {s} US
+                                            {s.talla} US
                                         </Typography>
                                     </Button>
                                     </Box>
