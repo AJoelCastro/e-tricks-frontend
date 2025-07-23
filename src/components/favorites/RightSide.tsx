@@ -12,9 +12,14 @@ import ProductCard from '../cards/Products';
 import { useAuth } from '@clerk/nextjs';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTheme } from '@mui/material/styles';
+import { set } from 'react-hook-form';
+import { se } from 'date-fns/locale';
+import { IProduct } from '@/interfaces/Product';
 const RightSide = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [favorites, setFavorites] = useState([]);
+    const [filterBy, setFilterBy] = useState<string>('');
+    const [filteredFavorites, setFilteredFavorites] = useState([]);
     const { getToken } = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -24,6 +29,7 @@ const RightSide = () => {
             setIsLoading(true)
             const token = await getToken();
             const dataFavorites = await UserService.getFavorites(token as string)
+            console.log("data favorites",dataFavorites)
             setFavorites(dataFavorites)
         } catch (error) {
             throw error
@@ -47,6 +53,35 @@ const RightSide = () => {
       },
       [],
     )
+
+    const applyFilter = useCallback(() => {
+        if (!filterBy) return setFilteredFavorites([...favorites]);
+
+        const sorted = [...favorites].sort((a: IProduct, b: IProduct) => {
+            switch (filterBy) {
+                case 'nombre':
+                    return a.name.localeCompare(b.name);
+                case 'precio':
+                    return a.price - b.price;
+                case 'marca':
+                    return a.brand.name.localeCompare(b.brand.name);
+                case 'categoria':
+                    return a.category.name.localeCompare(b.category.name);
+                // case 'temporada':
+                //     return a.season.localeCompare(b.season);
+                default:
+                    return 0;
+                }
+        });
+
+        setFilteredFavorites(sorted);
+    }, [filterBy, favorites]);
+
+    useEffect(() => {
+        applyFilter();
+    }, [filterBy, favorites, applyFilter]);
+
+
     if(isLoading){
         return(
             <Grid size={{
@@ -78,11 +113,11 @@ const RightSide = () => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <List sx={{ width: '100%' }}>
-                                    <ListItem><Button fullWidth><Typography variant="reseniasCard">NOMBRE</Typography></Button></ListItem>
-                                    <ListItem><Button fullWidth><Typography variant="reseniasCard">PRECIO</Typography></Button></ListItem>
-                                    <ListItem><Button fullWidth><Typography variant="reseniasCard">MARCA</Typography></Button></ListItem>
-                                    <ListItem><Button fullWidth><Typography variant="reseniasCard">CATEGORÍA</Typography></Button></ListItem>
-                                    <ListItem><Button fullWidth><Typography variant="reseniasCard">TEMPORADA</Typography></Button></ListItem>
+                                    <ListItem><Button fullWidth onClick={()=>setFilterBy('nombre')}><Typography variant="reseniasCard">NOMBRE</Typography></Button></ListItem>
+                                    <ListItem><Button fullWidth onClick={()=>setFilterBy('precio')}><Typography variant="reseniasCard">PRECIO</Typography></Button></ListItem>
+                                    <ListItem><Button fullWidth onClick={()=>setFilterBy('marca')}><Typography variant="reseniasCard">MARCA</Typography></Button></ListItem>
+                                    <ListItem><Button fullWidth onClick={()=>setFilterBy('categoria')}><Typography variant="reseniasCard">CATEGORÍA</Typography></Button></ListItem>
+                                    <ListItem><Button fullWidth onClick={()=>setFilterBy('temporada')}><Typography variant="reseniasCard">TEMPORADA</Typography></Button></ListItem>
                                 </List>
                             </AccordionDetails>
                         </Accordion>
@@ -97,11 +132,11 @@ const RightSide = () => {
                             paddingY:1,
                         }}>
                                 <Typography variant='reseniasCard'>FILTRAR POR</Typography>
-                                <Button onClick={()=>{}}><Typography variant='reseniasCard'>NOMBRE</Typography></Button>
-                                <Button onClick={()=>{}}><Typography variant='reseniasCard'>PRECIO</Typography></Button>
-                                <Button onClick={()=>{}}><Typography variant='reseniasCard'>MARCA</Typography></Button>
-                                <Button onClick={()=>{}}><Typography variant='reseniasCard'>CATEGORÍA</Typography></Button>
-                                <Button onClick={()=>{}}><Typography variant='reseniasCard'>TEMPORADA</Typography></Button>
+                                <Button onClick={()=>setFilterBy('nombre')}><Typography variant='reseniasCard'>NOMBRE</Typography></Button>
+                                <Button onClick={()=>setFilterBy('precio')}><Typography variant='reseniasCard'>PRECIO</Typography></Button>
+                                <Button onClick={()=>setFilterBy('marca')}><Typography variant='reseniasCard'>MARCA</Typography></Button>
+                                <Button onClick={()=>setFilterBy('categoria')}><Typography variant='reseniasCard'>CATEGORÍA</Typography></Button>
+                                <Button onClick={()=>setFilterBy('temporada')}><Typography variant='reseniasCard'>TEMPORADA</Typography></Button>
                         </Box>
                     )}
                 </Grid>
@@ -123,7 +158,7 @@ const RightSide = () => {
                             </Typography>
                         </Grid>
                     ) : (
-                        favorites.map((favorite, idx) => (
+                        filteredFavorites.map((favorite, idx) => (
                             <Grid
                                 key={idx}
                                 size={{
