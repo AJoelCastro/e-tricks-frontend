@@ -6,11 +6,14 @@ import { IAddress } from '@/interfaces/Address';
 import UserService from '@/services/UserService';
 import ProductService from '@/services/ProductService';
 import { useAuth } from '@clerk/nextjs';
+import { IPickUp } from '@/interfaces/PickUp';
+import PickUpService from '@/services/PickUpService';
 
 export const CartContext = createContext<CartContextType | null>(null); // ✅ con tipo
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [carrito, setCarrito] = useState<ICartItem[]>([]);
+  const [pickUps, setPickUps] = useState<IPickUp[]>([]);
   const [addresses, setAddresses] = useState<IAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
@@ -39,6 +42,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const getPickUps = async () => {
+    try {
+      const data = await PickUpService.getPickUps();
+      setPickUps(data);
+    } catch (error) {
+      throw error
+    }
+  }
+
   const getAddresses = async () => {
     try {
       const token = await getToken();
@@ -50,6 +62,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    getPickUps();
     getCartItems();
     getAddresses();
   }, []);
@@ -71,7 +84,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         getCartItems,
         isLoading,
         etapa,
-        setEtapa
+        setEtapa,
+        pickUps
       }}
     >
       {children}

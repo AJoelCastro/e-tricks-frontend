@@ -1,5 +1,5 @@
 'use client';
-import { Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Radio, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
@@ -11,7 +11,9 @@ import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
 import { useCart } from '../../CartContext';
 import { useRouter } from 'next/navigation';
-import { ro } from 'date-fns/locale';
+import StoreIcon from '@mui/icons-material/Store';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import SelectablePickUpCard from '@/components/addresses/SelectablePickUpCard';
 
 const RightSideDelivery = () => {
     //datos propios
@@ -24,8 +26,9 @@ const RightSideDelivery = () => {
     const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
 
     const { getToken } = useAuth();
-    const { carrito, addresses, isLoading, etapa, setEtapa } = useCart();
+    const { carrito, addresses, isLoading, etapa, setEtapa, pickUps } = useCart();
     const router = useRouter();
+
     const handleChangeEtapa = async()=>{
         try {
             if (selectedAddressId) {
@@ -83,85 +86,84 @@ const RightSideDelivery = () => {
                                     </Typography>
                                 </Grid>
                                 <Grid container spacing={2}>
-                                    <Grid size={{xs:12, sm:12, md:6}}>
-                                        <Button
-                                            fullWidth
-                                            variant={deliveryType === 'pickup' ? 'contained' : 'outlined'}
-                                            color="primary"
-                                            onClick={() => {
-                                                setDeliveryType('pickup');
-                                                setSelectedAddressId('pickup');
-                                            }}
+                                    <Grid size={{xs:12, sm:12, md:12}}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, border: deliveryType === 'pickup' ? '2px solid #7950f2' : '1px solid #e0e0e0',borderRadius: 2,p: 2,cursor: 'pointer', }}
+                                        onClick={() => setDeliveryType('pickup')}
                                         >
-                                            Recojo en tienda
-                                        </Button>
+                                            <Radio
+                                                checked={deliveryType === 'pickup'}
+                                                onChange={() => setDeliveryType('pickup')}
+                                                color="primary"
+                                            />
+                                            <StoreIcon sx={{ color: '#7c3aed', fontSize: 32 }} />
+                                            <Typography
+                                            >
+                                                Recojo en tienda
+                                            </Typography>
+                                        </Box>
+                                        {deliveryType === 'pickup' && (
+                                            <Grid container spacing={1} sx={{ mt: 1 }}>
+                                                {pickUps.map((pickup) => (
+                                                    <Grid key={pickup._id} size={{xs:12, sm:12, md:6}}>
+                                                        <SelectablePickUpCard
+                                                            address={pickup}
+                                                            selected={selectedAddressId === pickup._id}
+                                                            onSelect={() => setSelectedAddressId(pickup._id??null)}
+                                                            isPickup
+                                                        />
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        )}
                                     </Grid>
-                                    <Grid size={{xs:12, sm:12, md:6}}>
-                                        <Button
-                                            fullWidth
-                                            variant={deliveryType === 'address' ? 'contained' : 'outlined'}
-                                            color="primary"
-                                            onClick={() => {
-                                                setDeliveryType('address');
-                                                setSelectedAddressId(null); // reset para obligar selección
-                                            }}
+                                    <Grid size={{xs:12, sm:12, md:12}}>
+                                        <Box 
+                                            sx={{ display: 'flex', alignItems: 'center', gap: 2, border: deliveryType === 'address' ? '2px solid #7950f2' : '1px solid #e0e0e0',borderRadius: 2,p: 2,cursor: 'pointer', }}
+                                            onClick={() => setDeliveryType('address')}
                                         >
-                                            Entrega a domicilio
-                                        </Button>
+                                            <Radio
+                                                checked={deliveryType === 'address'}
+                                                onChange={() => setDeliveryType('address')}
+                                                color="primary"
+                                            />
+                                            <LocalShippingIcon sx={{ color: '#7c3aed', fontSize: 32 }} />
+                                            <Typography>
+                                                Enviar a domicilio
+                                            </Typography>
+                                        </Box>
+                                        {deliveryType === 'address' && (
+                                            <Grid container spacing={1} sx={{ mt: 1 }}>
+                                                {addresses.length === 0 ? 
+                                                    (
+                                                        <Grid size={12}>
+                                                            <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+                                                                🙁 Aún no tienes direcciones guardadas.
+                                                                <br />
+                                                                Puedes agregar una desde tu{' '}
+                                                                <Link href="/addresses" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                                                    sección de direcciones
+                                                                </Link>{' '}
+                                                                en tu perfil.
+                                                            </Typography>
+                                                        </Grid>
+                                                    ) : (
+                                                        addresses.map((address)=>(
+                                                            <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
+                                                                <SelectableAddressCard
+                                                                    address={address}
+                                                                    selected={selectedAddressId === address._id}
+                                                                    onSelect={() => setSelectedAddressId(address._id??null)}
+                                                                    isPickup={false}
+                                                                />
+                                                            </Grid>  
+                                                        ))
+                                                    )
+                                                }
+                                            </Grid>
+                                        )}
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            {deliveryType === 'address' && (
-                                <>
-                                    {addresses.length === 0 ? 
-                                        (
-                                            <Grid size={12}>
-                                                <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
-                                                    🙁 Aún no tienes direcciones guardadas.
-                                                    <br />
-                                                    Puedes agregar una desde tu{' '}
-                                                    <Link href="/addresses" style={{ color: '#1976d2', textDecoration: 'underline' }}>
-                                                        sección de direcciones
-                                                    </Link>{' '}
-                                                    en tu perfil.
-                                                </Typography>
-                                            </Grid>
-                                        ) : (
-                                            addresses.map((address)=>(
-                                                <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
-                                                    <SelectableAddressCard
-                                                        address={address}
-                                                        selected={selectedAddressId === address._id}
-                                                        onSelect={() => setSelectedAddressId(address._id??null)}
-                                                        isPickup={false}
-                                                    />
-                                                </Grid>  
-                                            ))
-                                        )
-                                    }
-                                </>
-                            )}
-                            {/* Recojo en tienda */}
-                            {deliveryType === 'pickup' && (
-                                <Grid size={{xs:12, sm:12, md:6}}>
-                                    <SelectableAddressCard
-                                        address={{
-                                            _id: 'pickup',
-                                            name: 'Recojo en tienda',
-                                            street: 'Av. Principal',
-                                            number: '123',
-                                            city: 'Trujillo',
-                                            state: 'La Libertad',
-                                            zipCode: '13001',
-                                            country: 'Perú',
-                                            phone: '000000000',
-                                        }}
-                                        selected={selectedAddressId === 'pickup'}
-                                        onSelect={() => setSelectedAddressId('pickup')}
-                                        isPickup
-                                    />
-                                </Grid>
-                            )}
                         </Grid>  
                             
                     </Grid>

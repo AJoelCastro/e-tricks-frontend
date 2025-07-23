@@ -1,6 +1,7 @@
 // types/CartContextType.ts
 import { ICartItem } from "@/interfaces/CartItem";
 import { IAddress } from "@/interfaces/Address";
+import { IPickUp } from "@/interfaces/PickUp";
 
 export interface CartContextType {
   carrito: ICartItem[];
@@ -18,4 +19,5 @@ export interface CartContextType {
   isLoading: boolean;
   etapa: number;
   setEtapa: React.Dispatch<React.SetStateAction<number>>;
+  pickUps: IPickUp[];
 }
