@@ -2,11 +2,11 @@
 import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
-import CartProgress from '../../Stepper';
+import CartProgress from '../../../../components/cart/Stepper';
 import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SelectableAddressard from '../../../addresses/SelectableAddressCard';
+import SelectableAddressard from '../../../../components/addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';

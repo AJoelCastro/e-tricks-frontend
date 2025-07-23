@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material'
 import React from 'react'
 import RightSidePayment from './RightSide'
-import NavBarCart from '../../NavBarCart'
+import NavBarCart from '../../../../components/cart/NavBarCart'
 
 const MainPayment = () => {
   return (

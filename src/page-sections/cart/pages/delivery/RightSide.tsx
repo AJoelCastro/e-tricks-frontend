@@ -1,11 +1,11 @@
 'use client';
 import { Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
-import CartProgress from '../../Stepper';
+import CartProgress from '../../../../components/cart/Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
 import Link from 'next/link';
 import { IAddress } from '@/interfaces/Address';
-import SelectableAddressCard from '../../../addresses/SelectableAddressCard';
+import SelectableAddressCard from '../../../../components/addresses/SelectableAddressCard';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';

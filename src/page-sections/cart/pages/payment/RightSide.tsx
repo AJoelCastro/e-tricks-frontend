@@ -1,20 +1,23 @@
+'use client';
 import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
-import CartProgress from '../../Stepper';
+import CartProgress from '../../../../components/cart/Stepper';
 import { ICartItem } from '@/interfaces/CartItem';
 import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IAddress } from '@/interfaces/Address';
-import SelectableAddressCard from '../../../addresses/SelectableAddressCard';
+import SelectableAddressCard from '../../../../components/addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
-import SavedCard from '../../SavedCard';
-import YapeCard from '../../YapeCard';
+import SavedCard from '../../../../components/cart/SavedCard';
+import YapeCard from '../../../../components/cart/YapeCard';
+import { useCart } from '../../CartContext';
+import { useRouter } from 'next/navigation';
 
 
 const style = {
@@ -34,9 +37,6 @@ const RightSidePayment = () => {
 
 
     //datos propios
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [etapa, setEtapa] = useState<number>(0);
-    const [carrito, setCarrito] = useState<Array<ICartItem>>([]);
     const [addresses, setAddresses] = useState<Array<IAddress>>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [snackbar, setSnackbar] = useState<{
@@ -50,7 +50,8 @@ const RightSidePayment = () => {
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
 
     const { getToken } = useAuth();
-
+    const { carrito, isLoading } = useCart();
+    const router = useRouter();
     const handleContinueByWhatsApp = () => {
         const carritoTexto = carrito.map((item, index) => {
             const nombre = item.product.name;
@@ -130,6 +131,9 @@ const RightSidePayment = () => {
                     }}
                     sx={{ paddingX:2, backgroundColor:'white',borderRadius: 2, paddingTop:2 }}
                     >
+                        <IconButton onClick={() => router.back()}  sx={{ mb: 1 }}>
+                            <LucideArrowLeft color='#7950f2'/>
+                        </IconButton>
                         <CartProgress activeStep={2} />
                         <Box>
                             <Box sx={{ mb: 2 }}>

@@ -1,4 +1,4 @@
-import RightSideCart from '@/components/cart/pages/main/RightSide'
+import RightSideCart from '@/page-sections/cart/pages/main/RightSide'
 import LeftSide from '@/components/favorites/LeftSide'
 import { Grid } from '@mui/material'
 import React from 'react'

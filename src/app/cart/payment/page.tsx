@@ -1,6 +1,6 @@
 'use client';
-import { CartProvider } from '@/components/cart/CartContext'
-import MainPayment from '@/components/cart/pages/payment/Payment';
+import { CartProvider } from '@/page-sections/cart/CartContext'
+import MainPayment from '@/page-sections/cart/pages/payment/Payment';
 import React from 'react'
 
 const PaymentPage = () => {
