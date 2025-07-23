@@ -29,6 +29,7 @@ const theme = createTheme({
     nameCard: { fontSize: 20, fontWeight: 500 },
     reseniasCard: { fontSize: 13, fontWeight: 500 },
     priceCard: { fontSize: 17, fontWeight: 500 },
+    sideBarSubCategories: { fontSize: 16, fontWeight: 500 },
     marcaDetail: { fontSize: 13, fontWeight: 600 },
     nameDetail: { fontSize: 22, fontWeight: 500 },
     reseniasDetail: { fontSize: 13, fontWeight: 500 },

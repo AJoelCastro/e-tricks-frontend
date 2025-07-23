@@ -84,7 +84,7 @@ const SidebarCategory = ({
         {/* Main sidebar container - left half */}
         <div
           ref={sidebarRef}
-          className="fixed top-0 left-0 z-50 w-1/2 h-full bg-white shadow-xl"
+          className="fixed top-0 left-0 z-50 w-3/4 h-full bg-white shadow-xl"
         >
           {/* Close button */}
           <button
@@ -123,7 +123,7 @@ const SidebarCategory = ({
           {/* Desktop Content area */}
           <div className="flex h-full pt-16">
             {/* Subcategories - Left Column */}
-            <div className="w-1/3 border-r border-gray-200 overflow-y-auto p-4 mt-2">
+            <div className="w-1/4 border-r border-gray-200 overflow-y-auto p-4 mt-2">
               <ul className="space-y-2">
                 {[staticTrendsSection, ...(activeGroup.subcategories || [])].map((subcategory) => (
                   <li key={`subcat-${subcategory._id}`}>
@@ -134,7 +134,9 @@ const SidebarCategory = ({
                         }`}
                       onMouseEnter={() => setSelectedSubCategory(subcategory)}
                     >
-                      {subcategory.name} ➤
+                      <Typography variant='navbar'>
+                        {subcategory.name} ➤
+                      </Typography>
                     </button>
                   </li>
                 ))}
@@ -183,7 +185,7 @@ const SidebarCategory = ({
             {/* Product Categories - Middle Column */}
             <div className="w-1/3 p-4 flex flex-col">
               <div className="flex-1 overflow-hidden mt-2">
-                <Typography variant="h6" className="font-bold mb-4 text-gray-800">
+                <Typography variant="nameCard" >
                   {selectedSubCategory?.name === 'Nuevas Tendencias' ? 'Tendencias' : 'Productos'}
                 </Typography>
                 {selectedSubCategory ? (
@@ -196,10 +198,12 @@ const SidebarCategory = ({
                               ? `/tendencias/${category._id}`
                               : `/products?category=${category._id}`
                           }
-                          className="block w-full p-2 text-gray-800 hover:text-[#7950f2] transition-colors"
+                          className="block w-full p-2  hover:text-[#7950f2] transition-colors"
                           onClick={onClose}
                         >
-                          {category.name}
+                          <Typography variant="reseniasCard">
+                            {category.name}
+                          </Typography>
                         </Link>
                       </li>
                     ))}
@@ -217,12 +221,12 @@ const SidebarCategory = ({
             {/* Image - Right Column */}
             <div className="w-1/3 p-4">
               {selectedSubCategory && (
-                <div className="mt-4 h-64 relative">
+                <div className="mt-4 h-[80vh] relative">
                   <Image
                     src={selectedSubCategory.image || '/default-subcategory.jpg'}
                     alt={selectedSubCategory.name}
                     fill
-                    className="object-cover"
+                    style={{ objectFit: 'cover' }}
                     priority
                     unoptimized={selectedSubCategory.image?.startsWith('http')}
                   />
@@ -267,19 +271,23 @@ const SidebarCategory = ({
               <>
                 {/* Group Categories Section */}
                 <div className="border-b border-gray-200 p-4">
-                  <h3 className="font-bold text-lg mb-3 text-gray-800">Categorías</h3>
-                  <div className="grid grid-cols-2 gap-2">
+                  <Typography variant="nameCard">
+                    Categorias
+                  </Typography>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
                     {groupCategories.map((group) => (
                       <button
                         key={`mobile-group-${group._id}`}
                         onClick={() => handleMobileGroupClick(group)}
-                        className={`p-3 text-center border rounded-lg transition-colors ${
+                        className={`py-3 px-1 text-center border rounded-lg transition-colors ${
                           mobileActiveGroup._id === group._id
                             ? 'bg-[#7950f2] text-white'
                             : 'bg-gray-50 text-gray-800 hover:bg-gray-100'
                         }`}
                       >
-                        {group.name}
+                        <Typography variant="priceCard" >
+                          {group.name}
+                        </Typography>
                       </button>
                     ))}
                   </div>
@@ -306,7 +314,7 @@ const SidebarCategory = ({
                             onClick={() => handleMobileSubcategoryClick(subcategory)}
                             className="w-full text-left p-3 text-gray-800 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
                           >
-                            <span>{subcategory.name}</span>
+                            <Typography variant="sideBarSubCategories">{subcategory.name}</Typography>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="m9 18 6-6-6-6"/>
                             </svg>
@@ -392,10 +400,10 @@ const SidebarCategory = ({
                                 ? `/tendencias/${category._id}`
                                 : `/products?category=${category._id}`
                             }
-                            className="block w-full p-3 text-gray-800 hover:text-[#7950f2] hover:bg-gray-50 transition-colors rounded-lg border border-gray-200"
+                            className="block w-full p-3 rounded-lg border border-gray-200"
                             onClick={onClose}
                           >
-                            {category.name}
+                            <Typography variant="h7" sx={{color: '#707071ff',":hover": {color: "#7950f2"}}}>{category.name}</Typography>
                           </Link>
                         </li>
                       ))}
@@ -409,7 +417,7 @@ const SidebarCategory = ({
 
                 {/* Subcategory image */}
                 <div className="p-4">
-                  <div className="h-48 relative rounded-lg overflow-hidden">
+                  <div className="h-[50vh] bg-red-500 p-2 relative rounded-lg overflow-hidden">
                     <Image
                       src={selectedSubCategory.image || '/default-subcategory.jpg'}
                       alt={selectedSubCategory.name}
@@ -419,7 +427,7 @@ const SidebarCategory = ({
                       unoptimized={selectedSubCategory.image?.startsWith('http')}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <Typography variant="h6" className="font-bold text-white">
+                      <Typography variant="h5" color='white'>
                         {selectedSubCategory.name}
                       </Typography>
                     </div>

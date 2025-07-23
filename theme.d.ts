@@ -19,6 +19,7 @@ declare module '@mui/material/styles' {
     subtitleMain: React.CSSProperties;
     hEspecial: React.CSSProperties;
     h7: React.CSSProperties;
+    sideBarSubCategories: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
@@ -37,6 +38,7 @@ declare module '@mui/material/styles' {
     subtitleMain?: React.CSSProperties;
     hEspecial?: React.CSSProperties;
     h7?: React.CSSProperties;
+    sideBarSubCategories?: React.CSSProperties;
   }
 }
 
@@ -57,5 +59,6 @@ declare module '@mui/material/Typography' {
     subtitleMain: true;
     hEspecial: true;
     h7: true;
+    sideBarSubCategories: true;
   }
 }
