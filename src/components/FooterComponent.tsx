@@ -55,9 +55,9 @@ const FooterComponent = () => {
         <Grid size={{xs:12, sm:6, md:8}}>
           <Grid container spacing={4}>
             {[
-              { title: 'ACERCA DE', items: ['About Us', 'Contact Us', 'Careers', 'Blog'] },
-              { title: 'TÉRMINOS Y CONDICIONES', items: ['Help Center', 'Terms of Service', 'Privacy Policy', 'Legal'] },
-              { title: 'LEGAL', items: ['Help Center', 'Terms of Service', 'Privacy Policy', 'Legal'] }
+              { title: 'ACERCA DE', items: ['Nosotros', 'Contactanos'] },
+              { title: 'TÉRMINOS Y CONDICIONES', items: ['Terminos del Servicio', 'Politica de Privacidad'] },
+              { title: 'TE AYUDAMOS', items: ['Compras y/o Envíos', 'Preguntas Frecuentes'] }
             ].map((section, index) => (
               <Grid size={{xs:12, sm:6, md:4}} key={index}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
@@ -91,7 +91,7 @@ const FooterComponent = () => {
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid size={{xs:12, sm:6, md:6}}>
           <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' }, color: 'text.secondary' }}>
-            © {new Date().getFullYear()} Tricks. All rights reserved.
+            © {new Date().getFullYear()} Tricks S.A.C. All rights reserved.
           </Typography>
         </Grid>
         <Grid size={{xs:12, sm:6, md:6}}>

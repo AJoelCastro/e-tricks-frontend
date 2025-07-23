@@ -67,7 +67,7 @@ const LeftSide= () => {
 
       <Box sx={{ paddingX: 2}}>
         {isMobile ? (
-          <Accordion elevation={1} sx={{ borderRadius: 2 }}>
+          <Accordion elevation={1} sx={{ borderRadius: 2, paddingY:1 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="priceCard">Menú de navegación</Typography>
             </AccordionSummary>
