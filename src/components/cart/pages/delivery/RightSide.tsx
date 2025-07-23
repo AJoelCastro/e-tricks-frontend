@@ -1,3 +1,4 @@
+'use client';
 import { Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
 import CartProgress from '../../Stepper';
@@ -8,13 +9,12 @@ import SelectableAddressCard from '../../../addresses/SelectableAddressCard';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
+import { useCart } from '../../CartContext';
+import { useRouter } from 'next/navigation';
+import { ro } from 'date-fns/locale';
 
 const RightSideDelivery = () => {
     //datos propios
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [etapa, setEtapa] = useState<number>(0);
-    const [carrito, setCarrito] = useState<Array<ICartItem>>([]);
-    const [addresses, setAddresses] = useState<Array<IAddress>>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
@@ -24,11 +24,12 @@ const RightSideDelivery = () => {
     const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
 
     const { getToken } = useAuth();
-
+    const { carrito, addresses, isLoading, etapa, setEtapa } = useCart();
+    const router = useRouter();
     const handleChangeEtapa = async()=>{
         try {
             if (selectedAddressId) {
-                setEtapa(etapa + 1);
+                router.push('/cart/payment');
             }else{
                 handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
                 return;
@@ -70,10 +71,10 @@ const RightSideDelivery = () => {
                         }}
                         sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
                     >
-                        <IconButton onClick={() => setEtapa(etapa - 1)} disabled={etapa === 0} sx={{ mb: 1 }}>
+                        <IconButton onClick={() => router.back()}  sx={{ mb: 1 }}>
                             <LucideArrowLeft color='#7950f2'/>
                         </IconButton>
-                        <CartProgress activeStep={etapa}/>
+                        <CartProgress activeStep={1}/>
                         <Grid container spacing={1}>
                             <Grid size={{xs:12, sm:12, md:12}}>
                                 <Grid sx={{mb:2}}>

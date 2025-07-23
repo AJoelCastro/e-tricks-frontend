@@ -32,40 +32,6 @@ const style = {
 };
 const RightSidePayment = () => {
 
-    //datos del menu list 
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [menuAnchor, setMenuAnchor] = useState<{
-        anchor: HTMLElement | null;
-        itemId: string | null;
-    }>({ anchor: null, itemId: null });
-    const open = Boolean(anchorEl);
-    const handleClickListItem = (event: React.MouseEvent<HTMLElement>, itemId: string) => {
-        setMenuAnchor({
-            anchor: event.currentTarget,
-            itemId,
-        });
-    };
-
-    const handleClose = () => {
-        setMenuAnchor({ anchor: null, itemId: null });
-    };
-
-    const handleMenuItemClick = async () => {
-        try {
-            setIsLoading(true);
-            if (!menuAnchor.itemId) return;
-            const token = await getToken()
-            await UserService.removeCartItem(token as string,menuAnchor.itemId);
-            await getCartItems();
-            handleShowSnackbar("Producto eliminado del carrito", 'success');
-            handleClose();
-        } catch (error) {
-            handleShowSnackbar(`${error}`, 'error');
-        }finally{
-            setIsLoading(false);
-        }
-    };
-
 
     //datos propios
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -84,94 +50,6 @@ const RightSidePayment = () => {
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
 
     const { getToken } = useAuth();
-
-    const getCartItems = async()=>{
-        try {
-            setIsLoading(true)
-            const token = await getToken();
-            const rawCart = await UserService.getCartItems(token as string); // tu array original
-            const cartWithProducts = await Promise.all(
-            rawCart.map(async (item:ICartItem ) => {
-                const product = await ProductService.GetProductById(item.productId);
-                return {
-                    ...item,
-                    product,
-                };
-            })
-            );
-            setCarrito(cartWithProducts); // carrito con datos completos
-        } catch (error) {
-            throw error
-        } finally {
-            setIsLoading(false);
-        }
-    }
-    const getAddresses = async()=>{
-        try {
-            const token = await getToken();
-            const dataAddresses = await UserService.getAddresses(token as string)
-            setAddresses(dataAddresses)
-        } catch (error) {
-            throw error
-        }
-    }
-
-    useEffect(() => {
-        getCartItems()
-        getAddresses()
-    }, [])
-   
-    // const handleRemoveFavorite = useCallback(
-    //   async (id:string) => {
-    //     try {
-            
-    //     } catch (error) {
-    //         throw error
-    //     }
-    //   },
-    //   [],
-    // )
-    const handleChangeQuantity = (index: number, newQuantity: number) => {
-        if (newQuantity < 1 || newQuantity > 12) return;
-
-        setCarrito(prev => {
-            const updated = [...prev];
-            updated[index] = {
-            ...updated[index],
-            quantity: newQuantity,
-            };
-            return updated;
-        });
-
-        // Si quieres persistirlo en la base de datos también:
-        // await UserService.updateCartItemQuantity(itemId, newQuantity);
-    };
-    const handleChangeEtapa = async()=>{
-        try {
-            switch (etapa) {
-                case 0:
-                    if (carrito.length !== 0) {
-                        setEtapa(etapa + 1);
-                    } 
-                    break;
-                case 1:
-                    if (selectedAddressId) {
-                        setEtapa(etapa + 1);
-                    }else{
-                        handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
-                        return;
-                    }
-                    break;
-                case 2:
-                    // aqui va la logica de pago
-                    break;
-                default:
-                    break;
-            }
-        } catch (error) {
-            throw error
-        }
-    }
 
     const handleContinueByWhatsApp = () => {
         const carritoTexto = carrito.map((item, index) => {
@@ -252,7 +130,7 @@ const RightSidePayment = () => {
                     }}
                     sx={{ paddingX:2, backgroundColor:'white',borderRadius: 2, paddingTop:2 }}
                     >
-                        <CartProgress activeStep={etapa} />
+                        <CartProgress activeStep={2} />
                         <Box>
                             <Box sx={{ mb: 2 }}>
                                 <Typography variant="leftside" >Tarjetas guardadas</Typography>
@@ -339,59 +217,39 @@ const RightSidePayment = () => {
                                                 }
                                             </Typography>
                                         </Box>
-                                        {
-                                            etapa!==2?(
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    fullWidth
-                                                    sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
-                                                    onClick={handleChangeEtapa}
-                                                >
-                                                    <Typography variant="h7">
-                                                        Continuar compra
-                                                    </Typography>
-                                                </Button>
-                                            ):(
-                                                <>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
-                                                        fullWidth
-                                                        sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
-                                                        onClick={() => {
-                                                            if (paymentMethod === 'card') {
-                                                            // lógica de pago con tarjeta
-                                                            } else if (paymentMethod === 'yape') {
-                                                                setShowModalWebPay(true);
-                                                            } else {
-                                                                handleShowSnackbar("Selecciona un método de pago", "warning");
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Typography variant="h7">
-                                                            Pagar
-                                                        </Typography>
-                                                    </Button>
-                                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent:'center', alignItems:'center', gap: 2, mt:2 }}>
-                                                        <Button onClick={handleContinueByWhatsApp}>
-                                                            <Image
-                                                                src={'https://imgs.search.brave.com/1tdHoO38OZcsoto1OsdOQfaJT5yvjTWjmNDMNjfcpis/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/cy13b3JsZC5uZXQv/d3AtY29udGVudC91/cGxvYWRzLzIwMjAv/MDUvTG9nby1XaGF0/c0FwcC03MDB4Mzk0/LnBuZw'}
-                                                                alt='whatsappLogo'
-                                                                width={50}
-                                                                height={50}
-                                                                style={{ objectFit: 'contain', borderRadius:4, marginBottom: 10 }}
-                                                            />
-                                                            <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
-                                                                Continuar atención vía WhatsApp.
-                                                            </Typography>
-                                                        </Button> 
-                                                    </Box>
-                                                </>
-                                            )
-                                        }
-
-                                        
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
+                                            onClick={() => {
+                                                if (paymentMethod === 'card') {
+                                                // lógica de pago con tarjeta
+                                                } else if (paymentMethod === 'yape') {
+                                                    setShowModalWebPay(true);
+                                                } else {
+                                                    handleShowSnackbar("Selecciona un método de pago", "warning");
+                                                }
+                                            }}
+                                        >
+                                            <Typography variant="h7">
+                                                Pagar
+                                            </Typography>
+                                        </Button>
+                                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent:'center', alignItems:'center', gap: 2, mt:2 }}>
+                                            <Button onClick={handleContinueByWhatsApp}>
+                                                <Image
+                                                    src={'https://imgs.search.brave.com/1tdHoO38OZcsoto1OsdOQfaJT5yvjTWjmNDMNjfcpis/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/cy13b3JsZC5uZXQv/d3AtY29udGVudC91/cGxvYWRzLzIwMjAv/MDUvTG9nby1XaGF0/c0FwcC03MDB4Mzk0/LnBuZw'}
+                                                    alt='whatsappLogo'
+                                                    width={50}
+                                                    height={50}
+                                                    style={{ objectFit: 'contain', borderRadius:4, marginBottom: 10 }}
+                                                />
+                                                <Typography variant='marcaCard' sx={{ color: 'text.secondary' }}>
+                                                    Continuar atención vía WhatsApp.
+                                                </Typography>
+                                            </Button> 
+                                        </Box>
                                     </>
                                 )
                             }

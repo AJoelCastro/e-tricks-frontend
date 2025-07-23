@@ -83,7 +83,6 @@ const RightSideCart = () => {
                 handleShowSnackbar("Tu carrito está vacío", 'error');
                 return;
             }
-            setEtapa(etapa + 1);
             router.push('/cart/delivery');
         } catch (error) {
             setSnackbar({ open: true, message: `${error}`, severity: 'error' });
@@ -122,10 +121,7 @@ const RightSideCart = () => {
                         }}
                         sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
                     >
-                        <IconButton onClick={() => setEtapa(etapa - 1)} disabled={etapa === 0} sx={{ mb: 1 }}>
-                            <LucideArrowLeft color='#7950f2'/>
-                        </IconButton>
-                        <CartProgress activeStep={etapa}/>
+                        <CartProgress activeStep={0}/>
                         {
                             !carrito || carrito.length === 0 ?(
                                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  height: '100%' }}>
