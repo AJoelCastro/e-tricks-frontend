@@ -111,7 +111,9 @@ const SidebarCategory = ({
                       ? 'text-gray-900 hover:text-[#7950f2]'
                       : 'text-gray-900 hover:text-[#7950f2]'
                     }`}>
-                    {group.name}
+                    <Typography variant='navbar'>
+                      {group.name}
+                    </Typography>
                   </button>
                 </div>
               ))}

@@ -17,7 +17,6 @@ type Props = {
 }
 
 const NavbarComponent: React.FC<Props> = ({ main }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -89,25 +88,20 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
                   className="relative group"
                   onMouseEnter={() => handleGroupHover(group)}
                 >
-                  <button className={`px-3 py-2 text-lg font-medium transition-colors ${
+                  <button className={`px-3 py-2 transition-colors ${
                     showWhiteBackground 
                       ? 'text-gray-900 hover:text-[#7950f2]' 
                       : `text-${main ? 'white' : 'gray-900'} hover:text-[#7950f2]`
                   }`}>
-                    {group.name}
+                    <Typography variant='navbar'>
+                      {group.name}
+                    </Typography>
                   </button>
                   
                 
                 </div>
               ))}
               
-              <Link href="/tendencias" className={`px-3 py-2 text-lg font-medium transition-colors ${
-                showWhiteBackground 
-                  ? 'text-gray-900 hover:text-[#7950f2]' 
-                  : `text-${main ? 'white' : 'gray-900'} hover:text-[#7950f2]`
-              }`}>
-                Tendencias
-              </Link>
             </div>
 
             {/* Logo */}
@@ -179,7 +173,9 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => {
+                  setActiveGroup(groupCategories[0]); 
+                }}
                 className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-100'
@@ -187,59 +183,11 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
                 }`}
               >
                 <span className="sr-only">Open main menu</span>
-                {isMenuOpen ? (
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                )}
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden ${showWhiteBackground ? 'bg-white' : 'bg-gray-900'}`}>
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {groupCategories.map((group) => (
-              <button
-                key={group._id}
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setActiveGroup(group);
-                }}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                  showWhiteBackground
-                    ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
-                    : 'text-white hover:text-gray-300 hover:bg-gray-800'
-                }`}
-              >
-                {group.name}
-              </button>
-            ))}
-            <Link
-              href="/marcas"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              Marcas
-            </Link>
-            <Link
-              href="/tendencias"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              Tendencias
-            </Link>
           </div>
         </div>
       </nav>
@@ -247,12 +195,12 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
       {/* Category Modal */}
       {activeGroup && (
          <SidebarCategory
-    activeGroup={activeGroup}
-    groupCategories={groupCategories}
-    onClose={handleCloseModal}
-    onGroupHover={handleGroupHover}
-    showWhiteBackground={showWhiteBackground}
-  />
+            activeGroup={activeGroup}
+            groupCategories={groupCategories}
+            onClose={handleCloseModal}
+            onGroupHover={handleGroupHover}
+            showWhiteBackground={showWhiteBackground}
+          />
       )}
 
       <SearchSidebar
