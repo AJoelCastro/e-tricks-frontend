@@ -148,23 +148,23 @@ const ProductCard: React.FC<Props> = ({
             component="img"
             height="194"
             image={isHovered && products.images[1] ? products.images[1] : products.images[0]}
-            alt={products.name}
+            alt={products.name ?? 'NA'}
             sx={{ objectFit: 'contain', transition: 'opacity 0.3s ease-in-out' }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           />
         </Link>
         <CardContent sx={{ paddingBottom: '60px' }}>
-          <Link href={`/marcas/${products.brand.name.toLowerCase()}`}>
+          <Link href={`/marcas/${products.brand.name.toLowerCase() ?? 'NA'}`}>
             <Typography variant="marcaCard" sx={{ color: 'text.primary' }}>
-              {products.brand.name}
+              {products.brand.name ?? 'NA'}
             </Typography>
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Grid >
               <Link href={`/product/${products._id}`}>
                 <Typography variant="nameCard" sx={{ color: 'text.primary' }}>
-                  {products.name}
+                  {products.name ?? 'NA'}
                 </Typography>
               </Link>
             </Grid>

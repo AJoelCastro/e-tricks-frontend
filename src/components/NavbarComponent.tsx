@@ -1,43 +1,50 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { User, Heart, ShoppingBag, Search } from "lucide-react";
 import SearchSidebar from './modal/SearchSidebar';
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import theme from '@/theme/create-theme';
 import { Typography } from '@mui/material';
-
+import GroupCategoryService from '@/services/GroupCategoryService';
+import { IGroupCategory } from '@/interfaces/GroupCategory';
+import SidebarCategory from './modal/SidebarCategory';
 
 type Props = {
   main?: boolean
 }
-const NavbarComponent:React.FC<Props> = ({main}) => {
+
+const NavbarComponent: React.FC<Props> = ({ main }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  // Eliminamos el estado isDarkMode
+  const [groupCategories, setGroupCategories] = useState<IGroupCategory[]>([]);
+  const [activeGroup, setActiveGroup] = useState<IGroupCategory | null>(null);
+  const navbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const fetchGroupCategories = async () => {
+      try {
+        const data = await GroupCategoryService.getGroupCategories();
+        setGroupCategories(data.filter(g => ['Mujer', 'Marcas'].includes(g.name)));
+      } catch (error) {
+        console.error('Error fetching group categories:', error);
+      }
+    };
+
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 50);
+      setIsScrolled(window.scrollY > 50);
     };
 
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    // Eliminamos la detección del modo oscuro
-
+    fetchGroupCategories();
     handleResize();
 
     window.addEventListener('scroll', handleScroll);
@@ -46,76 +53,71 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
-      // Eliminamos el listener del modo oscuro
     };
   }, []);
 
   const shouldShowWhiteBackground = isScrolled || isHovered;
   const showWhiteBackground = shouldShowWhiteBackground || isMobile;
 
+  const handleGroupHover = (group: IGroupCategory) => {
+    setActiveGroup(group);
+    setIsHovered(true);
+  };
+
+  const handleCloseModal = () => {
+    setActiveGroup(null);
+    setIsHovered(false);
+  };
 
   return (
     <>
       <nav
-        className={`w-full z-50 transition-all duration-300 ease-in-out fixed  ${
-          showWhiteBackground
-            ? 'bg-white shadow-lg'
-            : 'bg-transparent'
+        ref={navbarRef}
+        className={`w-full z-50 fixed transition-all duration-300 ${
+          showWhiteBackground ? 'bg-white shadow-lg' : 'bg-transparent'
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex justify-between h-16">
-            
-            {/* Links de navegación izquierda */}
-            <div className="hidden md:flex items-center space-x-4 ">
-
-              <Link
-                href="/women"
-                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
-                  showWhiteBackground
-                    ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
-                }`}
-              >
-                <Typography variant='navbar'>
-                  Mujer
-                </Typography>
-              </Link>
-              <Link
-                href="/marcas"
-                className={`px-3 py-2 transition-colors duration-300 ${
-                  showWhiteBackground
-                    ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
-                }`}
-              >
-                <Typography variant='navbar'>
-                  Marcas
-                </Typography>
-              </Link>
-              <Link
-                href="/tendencias"
-                className={`px-3 py-2  transition-colors duration-300 ${
-                  showWhiteBackground
-                    ? 'text-gray-900 hover:text-[#7950f2]'
-                    : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
-                }`}
-              >
-                <Typography variant='navbar'>
-                  Tendencias
-                </Typography>
-              </Link>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            {/* Group Categories */}
+            <div className="hidden md:flex items-center space-x-6">
+              {groupCategories.map((group) => (
+                <div
+                  key={group._id}
+                  className="relative group"
+                  onMouseEnter={() => handleGroupHover(group)}
+                >
+                  <button className={`px-3 py-2 text-lg font-medium transition-colors ${
+                    showWhiteBackground 
+                      ? 'text-gray-900 hover:text-[#7950f2]' 
+                      : `text-${main ? 'white' : 'gray-900'} hover:text-[#7950f2]`
+                  }`}>
+                    {group.name}
+                  </button>
+                  
+                
+                </div>
+              ))}
               
+              <Link href="/tendencias" className={`px-3 py-2 text-lg font-medium transition-colors ${
+                showWhiteBackground 
+                  ? 'text-gray-900 hover:text-[#7950f2]' 
+                  : `text-${main ? 'white' : 'gray-900'} hover:text-[#7950f2]`
+              }`}>
+                Tendencias
+              </Link>
             </div>
 
-            {/* Logo centrado */}
+            {/* Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center">
                 <Image
-                  src={`${main?showWhiteBackground?'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg':'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_transparente.svg':'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg'}`}
+                  src={main ? (showWhiteBackground ? 
+                    'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg' : 
+                    'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_transparente.svg') : 
+                    'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg'}
                   alt="Logo"
                   width={32}
                   height={32}
@@ -123,12 +125,12 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
                 />
               </Link>
             </div>
-            {/* Iconos de la derecha */}
-            <div className="items-center space-x-4 flex ">
-              {/* Botón de búsqueda */}
+
+            {/* Right Icons */}
+            <div className="items-center space-x-4 flex">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
@@ -138,7 +140,7 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
               </button>
               <Link
                 href="/favorites"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
@@ -148,7 +150,7 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
               </Link>
               <Link
                 href="/cart"
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
@@ -162,7 +164,7 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
               <SignedOut>
                 <SignInButton mode='modal'>
                   <button
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
+                    className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                       showWhiteBackground
                         ? 'text-gray-900 hover:text-[#7950f2]'
                         : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
@@ -173,71 +175,86 @@ const NavbarComponent:React.FC<Props> = ({main}) => {
                 </SignInButton>
               </SignedOut>
             </div>
-            {/* Botón de menú móvil */}
+
+            {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-300 ${
+                className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition-colors duration-300 ${
                   showWhiteBackground
-                    ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-100'
+                    ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-100'
                     : 'text-white hover:text-gray-300 hover:bg-gray-800'
                 }`}
               >
-                <span className="sr-only">Abrir menú principal</span>
-                <svg
-                  className={`${isMenuOpen ? 'hidden' : 'block'} h-6 w-6`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <svg
-                  className={`${isMenuOpen ? 'block' : 'hidden'} h-6 w-6`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <span className="sr-only">Open main menu</span>
+                {isMenuOpen ? (
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
               </button>
             </div>
-            
           </div>
         </div>
 
-        {/* Menú móvil */}
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden transition-all duration-300 ${
-          showWhiteBackground ? 'bg-white' : 'bg-gray-900'
-        }`}>
+        {/* Mobile Menu */}
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden ${showWhiteBackground ? 'bg-white' : 'bg-gray-900'}`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {groupCategories.map((group) => (
+              <button
+                key={group._id}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setActiveGroup(group);
+                }}
+                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                  showWhiteBackground
+                    ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
+                    : 'text-white hover:text-gray-300 hover:bg-gray-800'
+                }`}
+              >
+                {group.name}
+              </button>
+            ))}
             <Link
-              href="/women"
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
+              href="/marcas"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
                 showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
-                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
-              }`}
-            >
-              Mujer
-            </Link>
-            <Link
-              href="/Marcas"
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300 ${
-                showWhiteBackground
-                  ? 'text-gray-900 hover:text-blue-600 hover:bg-gray-50'
+                  ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
                   : 'text-white hover:text-gray-300 hover:bg-gray-800'
               }`}
             >
               Marcas
             </Link>
+            <Link
+              href="/tendencias"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                showWhiteBackground
+                  ? 'text-gray-900 hover:text-[#7950f2] hover:bg-gray-50'
+                  : 'text-white hover:text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              Tendencias
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* Sidebar de Búsqueda */}
+      {/* Category Modal */}
+      {activeGroup && (
+         <SidebarCategory
+    activeGroup={activeGroup}
+    groupCategories={groupCategories}
+    onClose={handleCloseModal}
+    onGroupHover={handleGroupHover}
+    showWhiteBackground={showWhiteBackground}
+  />
+      )}
+
       <SearchSidebar
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
