@@ -16,4 +16,6 @@ export interface CartContextType {
   setPaymentMethod: React.Dispatch<React.SetStateAction<'card' | 'yape' | null>>;
   getCartItems: () => Promise<void>;
   isLoading: boolean;
+  etapa: number;
+  setEtapa: React.Dispatch<React.SetStateAction<number>>;
 }

@@ -17,6 +17,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [etapa, setEtapa] = useState<number>(0);
   const { getToken } = useAuth();
 
   const getCartItems = async () => {
@@ -69,6 +70,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setPaymentMethod,
         getCartItems,
         isLoading,
+        etapa,
+        setEtapa
       }}
     >
       {children}

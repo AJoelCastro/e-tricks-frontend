@@ -1,36 +1,19 @@
+'use client';
 import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
 import React, {  useEffect, useState } from 'react'
 import CartProgress from '../../Stepper';
-import { ICartItem } from '@/interfaces/CartItem';
-import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { IAddress } from '@/interfaces/Address';
-import SelectableAddressCard from '../../../addresses/SelectableAddressCard';
+import SelectableAddressard from '../../../addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
-import SavedCard from '../../SavedCard';
-import YapeCard from '../../YapeCard';
 import { useCart } from '../../CartContext';
+import { useRouter } from 'next/navigation';
 
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  borderRadius:2,
-  width: { xs: '90%', sm: '70%', md: '50%' },
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  display:'flex',
-  flexDirection: 'column',
-  p: 4,
-};
 const RightSideCart = () => {
 
     //datos del menu list 
@@ -69,15 +52,14 @@ const RightSideCart = () => {
 
 
     //datos propios
-    const [etapa, setEtapa] = useState<number>(0);
     const [isRemoving, setIsRemoving] = useState<boolean>(false);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
-
-    const { carrito, setCarrito, getCartItems, isLoading } = useCart();
+    const router = useRouter();
+    const { carrito, setCarrito, getCartItems, isLoading, etapa, setEtapa } = useCart();
     const { getToken } = useAuth();
    
     const handleChangeQuantity = (index: number, newQuantity: number) => {
@@ -97,7 +79,12 @@ const RightSideCart = () => {
     };
     const handleChangeEtapa = async()=>{
         try {
-            
+            if (carrito.length === 0) {
+                handleShowSnackbar("Tu carrito está vacío", 'error');
+                return;
+            }
+            setEtapa(etapa + 1);
+            router.push('/cart/delivery');
         } catch (error) {
             setSnackbar({ open: true, message: `${error}`, severity: 'error' });
         }
