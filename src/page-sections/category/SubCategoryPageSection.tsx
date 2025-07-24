@@ -10,13 +10,16 @@ import { IProduct } from '@/interfaces/Product';
 import { IProductCategory } from '@/interfaces/ProductCategory';
 import { useDispatch } from 'react-redux';
 import { setProductCategoryId } from '@/store/slices/categorySelectionSlice';
+import ProductService from '@/services/ProductService';
+import ProductCard from '@/components/cards/Products';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {
-  id: string;
+  groupId: string;
+  subId: string;
 }
-const SubCategoryPageSection: React.FC<Props> = ({id}) => {
+const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [productCategories, setProductCategories] = useState<IProductCategory[]>([]);
@@ -26,18 +29,10 @@ const SubCategoryPageSection: React.FC<Props> = ({id}) => {
   const dispatch = useDispatch();
   const categoria = capitalize(segments[0] || '');
   const subcategoria = capitalize(segments[1] || '');
-  const getProductsBySubCategory = async () => {
-    try {
-      const data = await SubCategoryService.getProductsBySubCategory(id);
-      setProducts(data.data);
-    } catch (error) {
-      throw error;
-    }
-  }
   const getProductCategories = async () => {
     try {
       setIsLoading(true);
-      const data = await SubCategoryService.getCategoriesFromGroup(id);
+      const data = await SubCategoryService.getCategoriesFromGroup(subId);
       setProductCategories(data.data);
     } catch (error) {
       throw error;
@@ -45,9 +40,20 @@ const SubCategoryPageSection: React.FC<Props> = ({id}) => {
       setIsLoading(false);
     }
   }
+  const getProducts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await ProductService.GetProductsByIdGroupAndIdSubCategory(groupId, subId);
+      setProducts(data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
   useEffect(() => {
-    getProductsBySubCategory();
     getProductCategories();
+    getProducts();
   }, [])
   
   if (isLoading) {
@@ -119,6 +125,23 @@ const SubCategoryPageSection: React.FC<Props> = ({id}) => {
               }
             </Box>
           </Box>
+          <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
+            {
+              products.map((product: IProduct) => (
+                <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
+                  <ProductCard products={product} show/>
+                </Grid>
+              ))
+            }
+          </Grid>
+          {
+            products.length === 0 &&
+            <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
+              <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
+                No se encontraron productos
+              </Typography>
+            </Box>
+          }
         </Box>
     </>
   )

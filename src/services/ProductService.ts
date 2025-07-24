@@ -48,6 +48,24 @@ const ProductService = {
             console.error(error);
             throw error;
         }
-    }
+    },
+    GetProductsByIdGroupAndIdSubCategory : async (idGroup : string,idSubCategory : string) => {
+        try {
+            const response = await axios.get(`${API_URL}/product/${idGroup}/${idSubCategory}/products`);
+            return response.data;
+        }catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+    GetProductsByIdGroupAndIdSubCategoryAndIdCategory : async (idGroup : string,idSubCategory : string, idCategory : string) => {
+        try {
+            const response = await axios.get(`${API_URL}/product/${idGroup}/${idSubCategory}/${idCategory}/products`);
+            return response.data;
+        }catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
 }
 export default ProductService;
