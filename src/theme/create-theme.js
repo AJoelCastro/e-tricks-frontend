@@ -34,7 +34,7 @@ const theme = createTheme({
     nameDetail: { fontSize: 22, fontWeight: 500 },
     reseniasDetail: { fontSize: 13, fontWeight: 500 },
     priceDetail: { fontSize: 19, fontWeight: 500 },
-    navbar: { fontSize: 14, fontWeight: 600, lineHeight: 1 },
+    navbar: { fontSize: 15, fontWeight: 600, lineHeight: 1 },
     leftside: { fontSize: 16, fontWeight: 600, lineHeight: 1 },
     yapeSteps: { fontSize: 14, fontWeight: 500 },
     yapeTitle: { fontSize: 17, fontWeight: 600 },
