@@ -134,7 +134,7 @@ const SidebarCategory = ({
                         }`}
                       onMouseEnter={() => setSelectedSubCategory(subcategory)}
                     >
-                      <Link href={subcategory._id === 'trends' ? `/${activeGroup.routeLink}/trends` : `/${activeGroup.routeLink}/${subcategory.routeLink}`}>
+                      <Link href={subcategory._id === 'tendencias' ? `/${activeGroup.routeLink}/tendencias` : `/${activeGroup.routeLink}/${subcategory.routeLink}`}>
                         <Typography variant='navbar'>
                           {subcategory.name}
                         </Typography>
@@ -149,7 +149,7 @@ const SidebarCategory = ({
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <Link href="/stores" className="text-gray-800 hover:text-[#7950f2]">
+                    <Link href="/tiendas" className="text-gray-800 hover:text-[#7950f2]">
                       Tiendas
                     </Link>
                   </li>
@@ -157,7 +157,7 @@ const SidebarCategory = ({
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <Link href="/contact" className="text-gray-800 hover:text-[#7950f2]">
+                    <Link href="/contacto" className="text-gray-800 hover:text-[#7950f2]">
                       Contáctanos
                     </Link>
                   </li>
@@ -176,7 +176,7 @@ const SidebarCategory = ({
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    <Link href="/contact" className="text-gray-800 hover:text-[#7950f2]">
+                    <Link href="/favoritos" className="text-gray-800 hover:text-[#7950f2]">
                       Favoritos
                     </Link>
                   </li>
@@ -334,7 +334,7 @@ const SidebarCategory = ({
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
-                      <Link href="/stores" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
+                      <Link href="/tiendas" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
                         Tiendas
                       </Link>
                     </li>
@@ -342,7 +342,7 @@ const SidebarCategory = ({
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <Link href="/contact" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
+                      <Link href="/contacto" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
                         Contáctanos
                       </Link>
                     </li>
@@ -361,7 +361,7 @@ const SidebarCategory = ({
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
-                      <Link href="/favorites" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
+                      <Link href="/favoritos" className="text-gray-800 hover:text-[#7950f2]" onClick={onClose}>
                         Favoritos
                       </Link>
                     </li>
