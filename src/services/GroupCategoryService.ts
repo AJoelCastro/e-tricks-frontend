@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const GroupCategoryService = {
     getGroupCategories: async (activeOnly: boolean = true) => {
         try {
-            const response = await axios.get(`${API_URL}/groupcategory/get`, {
+            const response = await axios.get(`${API_URL}/groupCategory/get`, {
                 params: { activeOnly }
             });
             return response.data;
@@ -17,7 +17,7 @@ const GroupCategoryService = {
 
     getGroupCategoryById: async (id: string) => {
         try {
-            const response = await axios.get(`${API_URL}/groupcategory/${id}/get`);
+            const response = await axios.get(`${API_URL}/groupCategory/${id}/get`);
             return response.data;
         } catch (error) {
             console.error('Error fetching group category:', error);
@@ -27,7 +27,7 @@ const GroupCategoryService = {
 
     getSubCategoriesFromGroup: async (groupId: string) => {
         try {
-            const response = await axios.get(`${API_URL}/groupcategory/${groupId}/subcategories`);
+            const response = await axios.get(`${API_URL}/groupCategory/${groupId}/subcategories`);
             return response.data;
         } catch (error) {
             console.error('Error fetching subcategories from group:', error);
@@ -43,7 +43,7 @@ const GroupCategoryService = {
         brands: string[];
     }) => {
         try {
-            const response = await axios.post(`${API_URL}/groupcategory/create`, data, {
+            const response = await axios.post(`${API_URL}/groupCategory/create`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -58,7 +58,7 @@ const GroupCategoryService = {
 
     updateGroupCategory: async (token: string, id: string, data: any) => {
         try {
-            const response = await axios.put(`${API_URL}/groupcategory/${id}/update`, data, {
+            const response = await axios.put(`${API_URL}/groupCategory/${id}/update`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ const GroupCategoryService = {
 
     toggleGroupCategoryStatus: async (token: string, id: string) => {
         try {
-            const response = await axios.patch(`${API_URL}/groupcategory/${id}/toggle-status`, {}, {
+            const response = await axios.patch(`${API_URL}/groupCategory/${id}/toggle-status`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -87,7 +87,7 @@ const GroupCategoryService = {
 
     deleteGroupCategory: async (token: string, id: string) => {
         try {
-            const response = await axios.delete(`${API_URL}/groupcategory/${id}/delete`, {
+            const response = await axios.delete(`${API_URL}/groupCategory/${id}/delete`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

@@ -1,19 +1,69 @@
 'use client';
-import React from 'react'
-import { Box, Grid, IconButton, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Box, Button, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-
+import Image from 'next/image';
+import SubCategoryService from '@/services/SubCategoryService';
+import { IProduct } from '@/interfaces/Product';
+import { IProductCategory } from '@/interfaces/ProductCategory';
+import { useDispatch } from 'react-redux';
+import { setProductCategoryId } from '@/store/slices/categorySelectionSlice';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-const SubCategoryPageSection = () => {
+
+type Props = {
+  id: string;
+}
+const SubCategoryPageSection: React.FC<Props> = ({id}) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [productCategories, setProductCategories] = useState<IProductCategory[]>([]);
   const pathname = usePathname();
   const router = useRouter();
   const segments = pathname.split('/').filter(Boolean);
-
+  const dispatch = useDispatch();
   const categoria = capitalize(segments[0] || '');
   const subcategoria = capitalize(segments[1] || '');
+  const getProductsBySubCategory = async () => {
+    try {
+      const data = await SubCategoryService.getProductsBySubCategory(id);
+      setProducts(data.data);
+    } catch (error) {
+      throw error;
+    }
+  }
+  const getProductCategories = async () => {
+    try {
+      setIsLoading(true);
+      const data = await SubCategoryService.getCategoriesFromGroup(id);
+      setProductCategories(data.data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  useEffect(() => {
+    getProductsBySubCategory();
+    getProductCategories();
+  }, [])
+  
+  if (isLoading) {
+    return (
+      <>
+        <div className='h-16'></div>
+        <Box sx={{minHeight: '100vh'}}>
+          <Grid size={12} 
+            sx={{ textAlign: 'center', mt: 4 }}
+          >
+            <CircularProgress/>
+          </Grid>
+        </Box>
+      </>
+    )
+  }
   return (
     <>
         <div className='h-16'></div>
@@ -31,6 +81,43 @@ const SubCategoryPageSection = () => {
             <Typography variant='sideBarSubCategories' sx={{color: '#7c3aed'}}>
               {subcategoria}
             </Typography>
+          </Box>
+          {/* Banner section */}
+          <Box sx={{width: '100%', height: {md:'225px', sm:'150px', xs:'100px'}, position: 'relative'}}>
+            <Image
+              src={'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dw22bade2c/Menu/POWER06.05.jpg?sw=1777&q=80'}
+              alt='banner'
+              fill
+              style={{ objectFit: 'cover' }} 
+            />
+          </Box>
+          {/* Productos */}
+          <Box sx={{ paddingX: 3, paddingY: 4, backgroundColor: 'white'}}>
+            <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+              <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
+                {subcategoria}
+              </Typography>
+              <Typography variant='h6' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
+                [{products.length}]
+              </Typography>
+            </Box>
+            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2}}>
+              {
+                productCategories.map((productCategory: IProductCategory) => (
+                  <Button
+                    key={productCategory._id}
+                    onClick={() => {
+                      dispatch(setProductCategoryId(productCategory._id));
+                      router.push(`/${categoria.toLowerCase()}/${subcategoria.toLowerCase()}/${productCategory.routeLink}`)
+                    }}
+                    sx={{color: 'black', ":hover": {borderColor: '#7c3aed', color:'#7c3aed'}, borderColor:'black'}}
+                    variant='outlined'
+                  >
+                    {productCategory.name}
+                  </Button>
+                ))
+              }
+            </Box>
           </Box>
         </Box>
     </>

@@ -1,13 +1,44 @@
+'use client';
 import FooterComponent from '@/components/FooterComponent'
 import NavbarComponent from '@/components/NavbarComponent'
+import { SplashScreen } from '@/components/splash-screen';
 import SubCategoryPageSection from '@/page-sections/category/SubCategoryPageSection'
-import React from 'react'
+import GroupCategoryService from '@/services/GroupCategoryService';
+import { usePathname } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { setCategoryId, setSubcategoryId } from '@/store/slices/categorySelectionSlice';
+import { IGroupCategory } from '@/interfaces/GroupCategory';
+import { ISubCategory } from '@/interfaces/SubCategory';
 
 const SubCategoryPage = () => {
+  const [id, setId] = useState<string>('');
+  const pathname = usePathname()
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const segments = pathname.split('/').filter(Boolean);
+    const categoria = segments[0];
+    const subcategoria = segments[1];
+    const getIdsSubCaterory = async () => {
+      try{
+        const data = await GroupCategoryService.getGroupCategories();
+        const category = data.find((group:IGroupCategory) => group.routeLink === categoria)?._id;
+        dispatch(setCategoryId(category!));
+        const subcategoryId = data.find((group:IGroupCategory) => group.routeLink === categoria)?.subcategories.find((sub:ISubCategory) => sub.routeLink === subcategoria)?._id;
+        dispatch(setSubcategoryId(subcategoryId!));
+        setId(subcategoryId!);
+      }catch(error){
+        throw error
+      }
+    }
+    getIdsSubCaterory();
+  }, [])
+  if (!id) return <SplashScreen/>;
+  
   return (
     <>
       <NavbarComponent/>
-      <SubCategoryPageSection/>
+      <SubCategoryPageSection id={id!}/>
       <FooterComponent/>
     </>
   )
