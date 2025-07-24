@@ -134,7 +134,7 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
                 <Search/>
               </button>
               <Link
-                href="/favorites"
+                href="/favoritos"
                 className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
@@ -144,7 +144,7 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
                 <Heart/>
               </Link>
               <Link
-                href="/cart"
+                href="/carrito"
                 className={`px-3 py-2 rounded-md transition-colors duration-300 ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
