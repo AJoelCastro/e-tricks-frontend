@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { setProductCategoryId } from '@/store/slices/categorySelectionSlice';
 import ProductService from '@/services/ProductService';
 import ProductCard from '@/components/cards/Products';
+import NoProductsFound from '@/components/NoProductsFound';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -125,22 +126,20 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
               }
             </Box>
           </Box>
-          <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
-            {
-              products.map((product: IProduct) => (
-                <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
-                  <ProductCard products={product} show/>
-                </Grid>
-              ))
-            }
-          </Grid>
           {
-            products.length === 0 &&
-            <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
-              <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
-                No se encontraron productos
-              </Typography>
-            </Box>
+            products.length === 0 ? 
+              <NoProductsFound/>:
+            (
+              <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
+                {
+                  products.map((product: IProduct) => (
+                    <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
+                      <ProductCard products={product} show/>
+                    </Grid>
+                  ))
+                }
+              </Grid>
+            )
           }
         </Box>
     </>

@@ -15,6 +15,7 @@ import { useTheme } from '@mui/material/styles';
 import { set } from 'react-hook-form';
 import { se } from 'date-fns/locale';
 import { IProduct } from '@/interfaces/Product';
+import NoFavoritesFound from '../NoFavoritesFound';
 const RightSide = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [favorites, setFavorites] = useState([]);
@@ -145,18 +146,7 @@ const RightSide = () => {
             <Grid container sx={{ marginX: 4, marginBottom: 4 }} spacing={3}>
                 {
                     favorites.length === 0 ? (
-                        <Grid size={{
-                                    xs: 12, sm: 12, md: 12
-                            }} 
-                            sx={{ textAlign: 'center', mt: 4 }}
-                        >
-                            <Typography variant="h4" sx={{ color: 'text.secondary' }}>
-                                Tu lista de favoritos está vacía 💔
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
-                                Agrega productos a favoritos y aparecerán aquí.
-                            </Typography>
-                        </Grid>
+                        <NoFavoritesFound/>
                     ) : (
                         filteredFavorites.map((favorite, idx) => (
                             <Grid
