@@ -5,25 +5,30 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { User, Heart, ShoppingBag, Search } from "lucide-react";
 import SearchSidebar from './modal/SearchSidebar';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignInButton, SignedIn, SignedOut, UserButton, useAuth } from '@clerk/nextjs';
 import theme from '@/theme/create-theme';
-import { Typography } from '@mui/material';
+import { Typography, Badge, Box } from '@mui/material';
 import GroupCategoryService from '@/services/GroupCategoryService';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
 import SidebarCategory from './modal/SidebarCategory';
+import UserService from '@/services/UserService';
 
 type Props = {
-  main?: boolean
+  main?: boolean;
+  cartItemsCount?: number; // Nueva prop opcional
 }
 
-const NavbarComponent: React.FC<Props> = ({ main }) => {
+const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [groupCategories, setGroupCategories] = useState<IGroupCategory[]>([]);
   const [activeGroup, setActiveGroup] = useState<IGroupCategory | null>(null);
+  const [localCartCount, setLocalCartCount] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
+
+  const { isSignedIn, getToken } = useAuth();
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -53,6 +58,50 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
+  }, []);
+
+  // Función para obtener el conteo del carrito
+  const fetchCartCount = async () => {
+    if (!isSignedIn) {
+      setLocalCartCount(0);
+      return;
+    }
+
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      const cartItems = await UserService.getCartItems(token);
+      const count = cartItems?.length || 0;
+      setLocalCartCount(count);
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+      setLocalCartCount(0);
+    }
+  };
+
+  // Cargar conteo del carrito al iniciar y cuando cambie el estado de autenticación
+  useEffect(() => {
+    fetchCartCount();
+  }, [isSignedIn]);
+
+  // Actualizar conteo cuando se pase como prop (desde el componente padre)
+  useEffect(() => {
+    if (typeof cartItemsCount === 'number') {
+      setLocalCartCount(cartItemsCount);
+    }
+  }, [cartItemsCount]);
+
+  // Función para refrescar el conteo (puede ser llamada desde componentes hijos)
+  const refreshCartCount = () => {
+    fetchCartCount();
+  };
+
+  // Exponer la función de refresh globalmente para que otros componentes puedan usarla
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).refreshNavbarCartCount = refreshCartCount;
+    }
   }, []);
 
   const shouldShowWhiteBackground = isScrolled || isHovered;
@@ -144,13 +193,29 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
               </Link>
               <Link
                 href="/carrito"
-                className={`px-3 py-2 rounded-md transition-colors duration-300 ${
+                className={`px-3 py-2 rounded-md transition-colors duration-300 relative ${
                   showWhiteBackground
                     ? 'text-gray-900 hover:text-[#7950f2]'
                     : `text-${main?'white':theme.palette.text.primary} hover:text-gray-300`
                 }`}
               >
-                <ShoppingBag/>
+                <Badge
+                  badgeContent={localCartCount}
+                  color="error"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontSize: '0.65rem',
+                      height: '18px',
+                      minWidth: '18px',
+                      backgroundColor: '#ff4444',
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }
+                  }}
+                  invisible={localCartCount === 0}
+                >
+                  <ShoppingBag />
+                </Badge>
               </Link>
               <SignedIn>
                 <UserButton />

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   Box, Card, CardContent, CardMedia, Typography, IconButton,
-  Grid, Rating, Modal, Button, Select, MenuItem, FormControl, InputLabel,
+  Grid, Rating, Modal, Button, Snackbar, Alert, Chip
 } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { SignInButton, useUser } from '@clerk/nextjs';
@@ -10,6 +10,7 @@ import { IProduct } from '@/interfaces/Product';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 type Props = {
   products: IProduct;
@@ -34,40 +35,76 @@ const ProductCard: React.FC<Props> = ({
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [openModal, setOpenModal] = React.useState(false);
-  const [selectedSize, setSelectedSize] = React.useState('');
+  const [selectedSize, setSelectedSize] = React.useState<number | null>(null);
   const [quantity, setQuantity] = React.useState(1);
-  const promedio =
-    products.resenias && products.resenias.length
-      ? products.resenias.map(r => r.valoracion).reduce((a, b) => a + b, 0) / products.resenias.length
-      : 0;
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
+  const [confirmationOpen, setConfirmationOpen] = React.useState(false);
+
+  const promedio = products.resenias?.length
+    ? products.resenias.reduce((sum, r) => sum + r.valoracion, 0) / products.resenias.length
+    : 0;
 
   const { isSignedIn } = useUser();
-  const handleAddFav = React.useCallback(
-    async () => {
-      handleAddFavorite?.(products._id);
-    },
-    [handleAddFavorite, products._id],
-  );
 
-  const handleRemoveFav = React.useCallback(
-    async () => {
-      handleRemoveFavorite?.(products._id);
-    },
-    [handleRemoveFavorite, products._id],
-  );
+  const showSnackbar = (message: string, severity: 'success' | 'error') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const showConfirmation = () => {
+    setConfirmationOpen(true);
+    setTimeout(() => setConfirmationOpen(false), 4000);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleAddFav = async () => {
+    try {
+      await handleAddFavorite?.(products._id);
+      //   showSnackbar('Producto agregado a favoritos', 'success');
+    } catch (error) {
+      showSnackbar('Error al agregar a favoritos', 'error');
+    }
+  };
+
+  const handleRemoveFav = async () => {
+    try {
+      await handleRemoveFavorite?.(products._id);
+      //   showSnackbar('Producto removido de favoritos', 'success');
+    } catch (error) {
+      showSnackbar('Error al remover de favoritos', 'error');
+    }
+  };
 
   const handleOpenModal = () => {
+    // Verificar si handleAddToCart está disponible antes de abrir el modal
+    if (!handleAddToCart) {
+      showSnackbar('Función de carrito no disponible', 'error');
+      return;
+    }
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedSize('');
+    setSelectedSize(null);
     setQuantity(1);
   };
 
   const handleIncreaseQuantity = () => {
-    setQuantity(prev => prev + 1);
+    if (selectedSize !== null && products.stockPorTalla) {
+      const sizeStock = products.stockPorTalla.find(item => item.talla === selectedSize);
+      if (sizeStock && quantity < sizeStock.stock) {
+        setQuantity(prev => prev + 1);
+      } else {
+        showSnackbar('No puedes agregar más de lo disponible en stock', 'error');
+      }
+    }
   };
 
   const handleDecreaseQuantity = () => {
@@ -77,20 +114,55 @@ const ProductCard: React.FC<Props> = ({
   };
 
   const handleAddToCartClick = async () => {
-    if (selectedSize && handleAddToCart) {
-      await handleAddToCart(products._id, selectedSize, quantity);
+    if (selectedSize === null) {
+      showSnackbar('Por favor selecciona una talla', 'error');
+      return;
+    }
+
+    const sizeStock = products.stockPorTalla?.find(item => item.talla === selectedSize);
+    if (!sizeStock || sizeStock.stock <= 0) {
+      showSnackbar('Talla no disponible', 'error');
+      return;
+    }
+
+    if (quantity <= 0 || quantity > sizeStock.stock) {
+      showSnackbar('Cantidad no válida', 'error');
+      return;
+    }
+
+    if (!handleAddToCart) {
+      showSnackbar('Función de carrito no disponible', 'error');
+      return;
+    }
+
+    try {
+      await handleAddToCart(products._id, selectedSize.toString(), quantity);
+      // showConfirmation();
       handleCloseModal();
+    } catch (error) {
+      console.error('Error al agregar al carrito:', error);
+      showSnackbar('Error al agregar al carrito', 'error');
     }
   };
 
   const handleRemoveFromCartClick = async () => {
-    if (handleRemoveFromCart) {
+    if (!handleRemoveFromCart) return;
+
+    try {
       await handleRemoveFromCart(products._id);
+      showSnackbar('Producto removido del carrito', 'success');
+    } catch (error) {
+      showSnackbar('Error al remover del carrito', 'error');
     }
   };
 
+  const hasStock = products.stockPorTalla?.some(item => item.stock > 0);
+  const selectedSizeStock = selectedSize ? products.stockPorTalla?.find(item => item.talla === selectedSize)?.stock || 0 : 0;
+
   return (
-    <Box sx={{ height: '100%'}}>
+    <Box sx={{ height: '100%' }}>
+
+
       <Card
         sx={{
           position: 'relative',
@@ -101,80 +173,70 @@ const ProductCard: React.FC<Props> = ({
           },
         }}
       >
-        {
-          show && (
-            <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-              {
-                isSignedIn ? (
-                  <IconButton aria-label="add to favorites" onClick={() => {
-                    if (markedFavorite) {
-                      handleRemoveFav();
-                    } else {
-                      handleAddFav();
-                    }
-                  }}>
-                    <FavoriteBorderIcon
-                      sx={{
-                        color: markedFavorite ? 'red' : 'inherit',
-                        '&:hover': {
-                          color: 'red',
-                          cursor: 'pointer',
-                        },
-                      }}
-                    />
-                  </IconButton>
-                ) : (
-                  <SignInButton mode='modal'>
-                    <button className='px-2'>
-                      <FavoriteBorderIcon
-                        sx={{
-                          color: markedFavorite ? 'red' : 'inherit',
-                          '&:hover': {
-                            color: 'red',
-                            cursor: 'pointer',
-                          },
-                        }}
-                      />
-                    </button>
-                  </SignInButton>
-                )
-              }
-            </Box>
-          )
-        }
+        {show && (
+          <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
+            {isSignedIn ? (
+              <IconButton
+                aria-label="add to favorites"
+                onClick={markedFavorite ? handleRemoveFav : handleAddFav}
+              >
+                <FavoriteBorderIcon
+                  sx={{
+                    color: markedFavorite ? 'red' : 'inherit',
+                    '&:hover': { color: 'red', cursor: 'pointer' },
+                  }}
+                />
+              </IconButton>
+            ) : (
+              <SignInButton mode='modal'>
+                <IconButton aria-label="add to favorites">
+                  <FavoriteBorderIcon
+                    sx={{
+                      color: markedFavorite ? 'red' : 'inherit',
+                      '&:hover': { color: 'red', cursor: 'pointer' },
+                    }}
+                  />
+                </IconButton>
+              </SignInButton>
+            )}
+          </Box>
+        )}
 
-        <Link href={`/producto/${products._id}`}>
+        <Link href={`/producto/${products._id}`} passHref>
           <CardMedia
             component="img"
             height="194"
             image={isHovered && products.images[1] ? products.images[1] : products.images[0]}
-            alt={products.name ?? 'NA'}
+            alt={products.name}
             sx={{ objectFit: 'contain', transition: 'opacity 0.3s ease-in-out' }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           />
         </Link>
+
         <CardContent sx={{ paddingBottom: '60px' }}>
-          <Link href={`/marcas/${products.brand.name.toLowerCase() ?? 'NA'}`}>
-            <Typography variant="marcaCard" sx={{ color: 'text.primary' }}>
-              {products.brand.name ?? 'NA'}
+          <Link href={`/marcas/${products.brand.name.toLowerCase()}`} passHref>
+            <Typography variant="subtitle1" sx={{ color: 'text.primary', cursor: 'pointer' }}>
+              {products.brand.name}
             </Typography>
           </Link>
+
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-            <Grid >
-              <Link href={`/producto/${products._id}`}>
-                <Typography variant="nameCard" sx={{ color: 'text.primary' }}>
-                  {products.name ?? 'NA'}
+            <Grid item>
+              <Link href={`/producto/${products._id}`} passHref>
+                <Typography variant="h6" sx={{ color: 'text.primary', cursor: 'pointer' }}>
+                  {products.name}
                 </Typography>
               </Link>
             </Grid>
           </Grid>
+
           <Grid container spacing={1} sx={{ alignItems: 'center', mt: 1 }}>
-            <Grid >
+            <Grid item>
               <Rating precision={0.5} value={promedio} readOnly />
             </Grid>
-            <Grid >
-              <Typography variant="reseniasCard" color="text.secondary" >
+            <Grid item>
+              <Typography variant="body2" color="text.secondary">
                 {products.resenias?.length ?? 0} reseñas
               </Typography>
             </Grid>
@@ -183,34 +245,28 @@ const ProductCard: React.FC<Props> = ({
           {products.descuento ? (
             <Box mt={2}>
               <Grid container spacing={1} alignItems="center">
-                <Grid >
-                  <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
+                <Grid item>
+                  <Typography variant="h6" sx={{ color: 'text.primary' }}>
                     S/ {products.price}
                   </Typography>
                 </Grid>
-                <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                <Grid item sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
                   <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
                     -{products.descuento}%
                   </Typography>
                 </Grid>
               </Grid>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: 'text.secondary',
-                  textDecoration: 'line-through',
-                  fontSize: '12px',
-                }}
-              >
-                S/ {products.price + (products.price * products.descuento) / 100}
+              <Typography variant="body2" sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
+                S/ {(products.price + (products.price * products.descuento) / 100).toFixed(2)}
               </Typography>
             </Box>
           ) : (
-            <Typography variant="body1" sx={{ color: 'text.primary', mt: 2 }}>
+            <Typography variant="h6" sx={{ color: 'text.primary', mt: 2 }}>
               S/ {products.price}
             </Typography>
           )}
         </CardContent>
+
         <Box
           className="add-to-cart-container"
           sx={{
@@ -227,51 +283,43 @@ const ProductCard: React.FC<Props> = ({
             textAlign: 'center'
           }}
         >
-          <button
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px 16px',
-              backgroundColor: isInCart ? '#f44336' : '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              gap: '8px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = isInCart ? '#d32f2f' : '#3d8b40';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isInCart ? '#f44336' : '#4CAF50';
-            }}
+          <Button
+            variant="contained"
+            color={isInCart ? 'error' : 'primary'}
             onClick={isInCart ? handleRemoveFromCartClick : handleOpenModal}
+            disabled={!hasStock || (!handleAddToCart && !isInCart)}
+            startIcon={
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            }
+            sx={{
+              textTransform: 'none',
+              fontWeight: 'medium',
+              backgroundColor: isInCart ? undefined : '#7950f2',
+              '&:hover': {
+                backgroundColor: isInCart ? undefined : '#6a40e0'
+              },
+              '&.Mui-disabled': {
+                backgroundColor: '#e0e0e0',
+                color: '#9e9e9e'
+              }
+            }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              style={{ marginRight: '8px' }}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {isInCart ? 'Quitar del carro' : 'Añadir al carro'}
-          </button>
+            {!hasStock ? 'Agotado' : isInCart ? 'Quitar del carro' : 'Añadir al carro'}
+          </Button>
         </Box>
       </Card>
 
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="size-selection-modal"
-      >
+      {/* Modal mejorado y responsive */}
+      <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{
           position: 'absolute',
           top: '50%',
@@ -281,10 +329,10 @@ const ProductCard: React.FC<Props> = ({
           maxWidth: '650px',
           bgcolor: 'background.paper',
           boxShadow: 24,
-          borderRadius: '8px',
+          borderRadius: '12px',
           maxHeight: '90vh',
           overflowY: 'auto',
-          p: 3
+          p: { xs: 2, sm: 3 }
         }}>
           <IconButton
             onClick={handleCloseModal}
@@ -292,129 +340,128 @@ const ProductCard: React.FC<Props> = ({
               position: 'absolute',
               top: 8,
               right: 8,
-              color: 'text.primary'
+              color: 'text.primary',
+              zIndex: 1
             }}
           >
             <CloseIcon />
           </IconButton>
 
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 12, sm: 4}}>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12} sm={4}>
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100%'
+                height: { xs: '200px', sm: '100%' }
               }}>
                 <CardMedia
                   component="img"
                   image={products.images[0]}
                   alt={products.name}
                   sx={{
-                    maxHeight: '180px',
+                    maxHeight: { xs: '180px', sm: '200px' },
                     width: 'auto',
                     maxWidth: '100%',
                     objectFit: 'contain',
-                    borderRadius: '4px'
+                    borderRadius: '8px'
                   }}
                 />
               </Box>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 8 }}>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+            <Grid item xs={12} sm={8}>
+              <Box sx={{ mb: 2, pr: { xs: 0, sm: 4 } }}>
+                <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                   {products.brand.name}
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                   {products.name}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                   S/ {products.price}
                 </Typography>
               </Box>
 
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{
-                  fontWeight: 'bold',
-                  mb: 1.5,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  Tallas
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  Selecciona tu talla
                 </Typography>
                 <Grid container spacing={1}>
-                  {products.stockPorTalla && Object.keys(products.stockPorTalla).map((size) => (
-                    <Grid key={size}>
+                  {products.stockPorTalla?.map(({ talla, stock }) => (
+                    <Grid item key={talla} xs={4} sm={3}>
                       <Button
-                        variant={selectedSize === size ? 'contained' : 'outlined'}
-                        onClick={() => setSelectedSize(size)}
+                        variant={selectedSize === talla ? 'contained' : 'outlined'}
+                        onClick={() => {
+                          setSelectedSize(talla);
+                          setQuantity(1);
+                        }}
+                        disabled={stock <= 0}
                         sx={{
-                          minWidth: 0,
-                          width: '70px',
-                          py: 1,
-                          borderRadius: '4px',
-                          border: '1px solid',
-                          borderColor: selectedSize === size ? 'primary.main' : 'divider',
-                          color: selectedSize === size ? 'white' : 'text.primary',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                          }
+                          width: '100%',
+                          height: { xs: '45px', sm: '50px' },
+                          position: 'relative',
+                          fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 0.5
                         }}
                       >
-                        {size}
+                        <span>{talla}</span>
+                        {stock > 0 && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                              color: selectedSize === talla ? 'white' : 'text.secondary',
+                              lineHeight: 1
+                            }}
+                          >
+                            Stock: {stock}
+                          </Typography>
+                        )}
                       </Button>
                     </Grid>
                   ))}
                 </Grid>
+
+                {selectedSize && (
+                  <Box sx={{ mt: 1 }}>
+                    <Chip
+                      label={`Stock disponible: ${selectedSizeStock} unidades`}
+                      color="info"
+                      size="small"
+                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                    />
+                  </Box>
+                )}
               </Box>
 
-  
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                mb: 3,
-                justifyContent: 'space-between',
-                maxWidth: '200px'
-              }}>
-                <Typography variant="subtitle2" sx={{
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  Cantidad
+              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  Cantidad:
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                   <IconButton
                     size="small"
                     onClick={handleDecreaseQuantity}
                     disabled={quantity <= 1}
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '4px 0 0 4px'
-                    }}
+                    sx={{ p: { xs: 0.5, sm: 1 } }}
                   >
                     <RemoveIcon fontSize="small" />
                   </IconButton>
-                  <Typography sx={{
-                    px: 2,
-                    borderTop: '1px solid',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    minWidth: '40px',
-                    textAlign: 'center'
-                  }}>
+                  <Typography sx={{ mx: { xs: 1, sm: 2 }, minWidth: '30px', textAlign: 'center', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                     {quantity}
                   </Typography>
                   <IconButton
                     size="small"
                     onClick={handleIncreaseQuantity}
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '0 4px 4px 0'
-                    }}
+                    disabled={
+                      selectedSize === null ||
+                      !products.stockPorTalla ||
+                      quantity >= selectedSizeStock
+                    }
+                    sx={{ p: { xs: 0.5, sm: 1 } }}
                   >
                     <AddIcon fontSize="small" />
                   </IconButton>
@@ -426,26 +473,36 @@ const ProductCard: React.FC<Props> = ({
                 variant="contained"
                 size="large"
                 onClick={handleAddToCartClick}
-                disabled={!selectedSize}
+                disabled={
+                  selectedSize === null ||
+                  !products.stockPorTalla ||
+                  quantity <= 0 ||
+                  quantity > selectedSizeStock ||
+                  !handleAddToCart
+                }
                 sx={{
-                  py: 1.5,
-                  fontWeight: 'bold',
-                  backgroundColor: '#4CAF50',
-                  '&:hover': {
-                    backgroundColor: '#3d8b40',
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#e0e0e0',
-                    color: '#9e9e9e'
-                  }
+                  py: { xs: 1, sm: 1.5 },
+                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                  fontWeight: 'bold'
                 }}
               >
-                Añadir al carro - S/ {(products.price * quantity).toFixed(2)}
+                Añadir al carrito
               </Button>
             </Grid>
           </Grid>
         </Box>
       </Modal>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

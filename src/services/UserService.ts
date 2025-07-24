@@ -14,6 +14,7 @@ const UserService = {
             })
             return response.data
         } catch (error) {
+            console.error('Error in verifyUser:', error);
             throw error
         }
     },
@@ -31,9 +32,11 @@ const UserService = {
             })
             return response.data
         } catch (error) {
+            console.error('Error in getFavorites:', error);
             throw error
         }
     },
+
     getCartItems: async (token: string)=>{
         const { userId} = store.getState().auth;
         if (!userId || !token) {
@@ -47,9 +50,11 @@ const UserService = {
             })
             return response.data
         } catch (error) {
+            console.error('Error in getCartItems:', error);
             throw error
         }
     },
+
     getFavoriteIds: async (token: string)=>{
         const { userId} = store.getState().auth;
         if (!userId || !token) {
@@ -63,6 +68,7 @@ const UserService = {
             })
             return response.data
         } catch (error) {
+            console.error('Error in getFavoriteIds:', error);
             throw error
         }
     },
@@ -83,6 +89,7 @@ const UserService = {
             })
             return response.data
         } catch (error) {
+            console.error('Error in addFavorite:', error);
             throw error
         }
     },
@@ -103,28 +110,49 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in removeFavorite:', error);
             throw error;
         }
     },
+
+    // Función corregida para agregar al carrito
     addCartItem: async (token: string, idProduct: string, quantity: number, size: string)=>{
         const { userId} = store.getState().auth;
 
         if (!userId || !token) {
             throw new Error('Faltan credenciales del usuario');
         }
+
+        if (!idProduct || !quantity || !size) {
+            throw new Error('Faltan datos del producto');
+        }
+
         try {
+            console.log('Adding to cart:', { userId, idProduct, quantity, size });
+            
             const response = await axios.post(`${API_URL}/user/addCartItem/${userId}`,{
-                idProduct, quantity, size
+                idProduct, 
+                quantity, 
+                size
             },{
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             })
+            
+            console.log('Cart item added successfully:', response.data);
             return response.data
         } catch (error) {
+            console.error('Error in addCartItem:', error);
+            if (axios.isAxiosError(error)) {
+                console.error('Response data:', error.response?.data);
+                console.error('Response status:', error.response?.status);
+            }
             throw error
         }
     },
+
     removeCartItem: async (token: string,idCartItem: string) => {
         const { userId} = store.getState().auth;
 
@@ -141,9 +169,11 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in removeCartItem:', error);
             throw error;
         }
     },
+
     getAddresses: async (token: string) => {
         const { userId } = store.getState().auth;
 
@@ -159,6 +189,7 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in getAddresses:', error);
             throw error;
         }
     },
@@ -180,6 +211,7 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in addAddress:', error);
             throw error;
         }
     },
@@ -199,6 +231,7 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in updateAddress:', error);
             throw error;
         }
     },
@@ -218,28 +251,10 @@ const UserService = {
             });
             return response.data;
         } catch (error) {
+            console.error('Error in deleteAddress:', error);
             throw error;
         }
     },
-
-    // setDefaultAddress: async (addressId: string) => {
-    //     const { userId, token } = store.getState().auth;
-
-    //     if (!userId || !token) {
-    //         throw new Error('Faltan credenciales del usuario');
-    //     }
-
-    //     try {
-    //         const response = await axios.put(`${API_URL}/user/addresses/${userId}/${addressId}/default`, {}, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${token}`
-    //             }
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 };
 
 export default UserService;
