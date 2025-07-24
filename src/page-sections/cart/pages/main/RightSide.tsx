@@ -83,7 +83,7 @@ const RightSideCart = () => {
                 handleShowSnackbar("Tu carrito está vacío", 'error');
                 return;
             }
-            router.push('/cart/delivery');
+            router.push('/carrito/delivery');
         } catch (error) {
             setSnackbar({ open: true, message: `${error}`, severity: 'error' });
         }
@@ -166,7 +166,7 @@ const RightSideCart = () => {
                                                         {item.product.brand.name}
                                                     </Typography>
                                                 </Link>
-                                                <Link href={`/product/${item.product._id}`}>
+                                                <Link href={`/producto/${item.product._id}`}>
                                                     <Typography variant='nameCard' sx={{ color: 'text.primary'  }}>
                                                         {item.product.name }
                                                     </Typography>

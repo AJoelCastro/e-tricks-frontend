@@ -59,7 +59,7 @@ const RightSidePayment = () => {
             const talla = item.size;
             const precioFinal = (item.product.price - (item.product.price * (item.product.descuento || 0) / 100)).toFixed(2);
             const subtotal = (Number(precioFinal) * item.quantity).toFixed(2);
-            const linkProducto = `https://tusitioweb.com/product/${item.product._id}`;
+            const linkProducto = `https://tusitioweb.com/producto/${item.product._id}`;
             const imagen = item.product.images[0];
 
             return `🛍️ *${nombre}*\n🔗 ${linkProducto}\n📸 ${imagen}\n📏 Talla: ${talla} | Cant: ${cantidad}\n💵 Subtotal: S/ ${subtotal}\n`;

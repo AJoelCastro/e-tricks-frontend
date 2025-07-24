@@ -32,7 +32,7 @@ const RightSideDelivery = () => {
     const handleChangeEtapa = async()=>{
         try {
             if (selectedAddressId) {
-                router.push('/cart/payment');
+                router.push('/carrito/pagos');
             }else{
                 handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
                 return;
@@ -140,7 +140,7 @@ const RightSideDelivery = () => {
                                                                 🙁 Aún no tienes direcciones guardadas.
                                                                 <br />
                                                                 Puedes agregar una desde tu{' '}
-                                                                <Link href="/addresses" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                                                <Link href="/direcciones" style={{ color: '#1976d2', textDecoration: 'underline' }}>
                                                                     sección de direcciones
                                                                 </Link>{' '}
                                                                 en tu perfil.
