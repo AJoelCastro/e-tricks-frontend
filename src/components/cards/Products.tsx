@@ -143,7 +143,7 @@ const ProductCard: React.FC<Props> = ({
           )
         }
 
-        <Link href={`/product/${products._id}`}>
+        <Link href={`/producto/${products._id}`}>
           <CardMedia
             component="img"
             height="194"
@@ -162,7 +162,7 @@ const ProductCard: React.FC<Props> = ({
           </Link>
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
             <Grid >
-              <Link href={`/product/${products._id}`}>
+              <Link href={`/producto/${products._id}`}>
                 <Typography variant="nameCard" sx={{ color: 'text.primary' }}>
                   {products.name ?? 'NA'}
                 </Typography>

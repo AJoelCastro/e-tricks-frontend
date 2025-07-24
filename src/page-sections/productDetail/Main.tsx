@@ -513,7 +513,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     <Button onClick={() => setOpenModal(false)} variant="outlined" color="primary">
                         Seguir comprando
                     </Button>
-                    <Link href="/cart">
+                    <Link href="/carrito">
                         <Button variant="contained" sx={{ backgroundColor: 'black', color: 'white' }}>
                             Ir al carrito
                         </Button>

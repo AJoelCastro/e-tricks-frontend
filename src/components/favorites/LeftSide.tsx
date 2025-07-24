@@ -49,12 +49,12 @@ const LeftSide= () => {
   const isMobile = useMediaQuery('(max-width:600px)');
 
   const links = [
-    { href: '/favorites', label: 'MIS FAVORITOS' },
-    { href: '/cart', label: 'MI CARRITO' },
+    { href: '/favoritos', label: 'MIS FAVORITOS' },
+    { href: '/carrito', label: 'MI CARRITO' },
     { href: '/compras', label: 'MIS COMPRAS' },
-    { href: '/addresses', label: 'MIS DIRECCIONES' },
-    { href: '/spam', label: 'METODOS DE PAGO' },
-    { href: '/spam', label: 'MIS PUNTOS' },
+    { href: '/direcciones', label: 'MIS DIRECCIONES' },
+    { href: '/metodos-pago', label: 'METODOS DE PAGO' },
+    { href: '/club/mis-puntos', label: 'MIS PUNTOS' },
   ];
 
   return (
