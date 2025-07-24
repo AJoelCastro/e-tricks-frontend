@@ -134,9 +134,11 @@ const SidebarCategory = ({
                         }`}
                       onMouseEnter={() => setSelectedSubCategory(subcategory)}
                     >
-                      <Typography variant='navbar'>
-                        {subcategory.name} ➤
-                      </Typography>
+                      <Link href={subcategory._id === 'trends' ? `/${activeGroup.routeLink}/trends` : `/${activeGroup.routeLink}/${subcategory.routeLink}`}>
+                        <Typography variant='navbar'>
+                          {subcategory.name}
+                        </Typography>
+                      </Link>
                     </button>
                   </li>
                 ))}
@@ -186,7 +188,7 @@ const SidebarCategory = ({
             <div className="w-1/3 p-4 flex flex-col">
               <div className="flex-1 overflow-hidden mt-2">
                 <Typography variant="nameCard" >
-                  {selectedSubCategory?.name === 'Nuevas Tendencias' ? 'Tendencias' : 'Productos'}
+                  {selectedSubCategory?.name === 'Nuevas Tendencias' ? 'Tendencias' : 'Categorias'}
                 </Typography>
                 {selectedSubCategory ? (
                   <ul className="space-y-2">
@@ -196,7 +198,7 @@ const SidebarCategory = ({
                           href={
                             selectedSubCategory._id === 'trends'
                               ? `/tendencias/${category._id}`
-                              : `/products?category=${category._id}`
+                              : `/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${category.routeLink}`
                           }
                           className="block w-full p-2  hover:text-[#7950f2] transition-colors"
                           onClick={onClose}

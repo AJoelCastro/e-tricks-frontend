@@ -9,5 +9,6 @@ export interface IGroupCategory {
   active?: boolean;
   subcategories?: ISubCategory[];
   brands?:IBrand[];
+  routeLink?: string;
   createdAt?: string;
 }

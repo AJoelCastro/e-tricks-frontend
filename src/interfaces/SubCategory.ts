@@ -7,5 +7,6 @@ export interface ISubCategory {
   image: string;
   active?: boolean;
   productcategories?: IProductCategory[];
+  routeLink?: string;
   createdAt?: string;
 }

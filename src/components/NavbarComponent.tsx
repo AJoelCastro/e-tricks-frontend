@@ -29,6 +29,7 @@ const NavbarComponent: React.FC<Props> = ({ main }) => {
     const fetchGroupCategories = async () => {
       try {
         const data = await GroupCategoryService.getGroupCategories();
+        console.log("navbar",data)
         setGroupCategories(data.filter(g => ['Mujer', 'Marcas'].includes(g.name)));
       } catch (error) {
         console.error('Error fetching group categories:', error);
