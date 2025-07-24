@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react'
-import { Box, Grid, IconButton, Typography } from '@mui/material'
+import { Box, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ type Props = {
   idProduct: string
 }
 const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}) => {
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([])
   const pathname = usePathname();
   const router = useRouter();
@@ -32,17 +32,33 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
 
   const getProducts = async () => {
     try {
+      setIsLoading(true);
       const data = await ProductService.GetProductsByIdGroupAndIdSubCategoryAndIdCategory(idGroup, idSub, idProduct);
       setProducts(data);
     } catch (error) {
       throw error;
+    }finally {
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
     getProducts();
   }, [])
-  
+  if (isLoading) {
+    return (
+      <>
+        <div className='h-16'></div>
+        <Box sx={{minHeight: '100vh'}}>
+          <Grid size={12} 
+            sx={{ textAlign: 'center', mt: 4 }}
+          >
+            <CircularProgress/>
+          </Grid>
+        </Box>
+      </>
+    )
+  }
 
   return (
     <>
