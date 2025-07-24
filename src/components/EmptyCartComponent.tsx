@@ -25,7 +25,7 @@ const EmptyCartComponent = ({ onReset }: { onReset?: () => void }) => {
       />
 
       <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#3f3f40ff' }}>
-        No se productos en el carrito
+        Aún no tienes productos en el carrito
       </Typography>
       <Link href={'/'}>
         <Typography variant="body1" sx={{ mt: 1, color: '#666', maxWidth: 400 }}>
