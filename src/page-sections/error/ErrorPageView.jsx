@@ -13,10 +13,10 @@ export default function ErrorPageView() {
   return <GradientBackground>
       <Container>
         <MainContent>
-          <SectionTitle centered title="Page Not Found!" />
+          <SectionTitle centered title="Pagina no encontrada!" />
 
           <Typography variant="body1" fontSize={18} color="text.secondary">
-            Whoops! It seems like we&apos;sve unplugged this page by accident. 🔌🙈
+            Oops! Parece que la p&aacute;gina que est&aacute;s buscando no existe 🔌🙈
             <br />
             <br /> <strong>#404NotFound</strong>
           </Typography>
@@ -26,7 +26,7 @@ export default function ErrorPageView() {
           </div>
 
           <Button size="large" LinkComponent={Link} href="/">
-            Go Home
+            Ir a inicio
           </Button>
         </MainContent>
       </Container>
