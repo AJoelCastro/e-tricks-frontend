@@ -13,6 +13,7 @@ import { Snackbar, Alert } from '@mui/material';
 import { useAuth } from '@clerk/nextjs';
 import { useCart } from '../../CartContext';
 import { useRouter } from 'next/navigation';
+import EmptyCartComponent from '@/components/EmptyCartComponent';
 
 const RightSideCart = () => {
 
@@ -124,25 +125,7 @@ const RightSideCart = () => {
                         <CartProgress activeStep={0}/>
                         {
                             !carrito || carrito.length === 0 ?(
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center',  height: '100%' }}>
-                                        <Box sx={{ textAlign: 'center', py: 3 }}>
-                                            <ShoppingCartOutlinedIcon sx={{ fontSize: 64, color: 'grey.500', mb: 2 }} />
-                                            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                ¡Tu carrito está vacío!
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Aún no has agregado ningún producto. Explora nuestras categorías y descubre lo que tenemos para ti.
-                                            </Typography>
-                                        </Box>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            component={Link}
-                                            href="/"
-                                        >
-                                            Ir a comprar
-                                        </Button>
-                                    </Box>
+                                    <EmptyCartComponent/>
                             ):(
                                 carrito.map((item, index) => (
                                     <Grid
