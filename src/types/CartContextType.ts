@@ -16,6 +16,10 @@ export interface CartContextType {
   paymentMethod: 'card' | 'yape' | null;
   setPaymentMethod: React.Dispatch<React.SetStateAction<'card' | 'yape' | null>>;
   getCartItems: () => Promise<void>;
+  selectedAddress:IAddress;
+  setSelectedAddress:React.Dispatch<React.SetStateAction<IAddress>>;
+  selectedPickup:IPickUp;
+  setSelectedPickup:React.Dispatch<React.SetStateAction<IPickUp>>;
   isLoading: boolean;
   etapa: number;
   setEtapa: React.Dispatch<React.SetStateAction<number>>;

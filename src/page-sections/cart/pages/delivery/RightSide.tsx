@@ -23,10 +23,10 @@ const RightSideDelivery = () => {
         message: string;
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
-    const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
+   // const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
 
     const { getToken } = useAuth();
-    const { carrito, addresses, isLoading, etapa, setEtapa, pickUps } = useCart();
+    const { carrito, addresses, isLoading, etapa,pickUps, setEtapa, setSelectedAddress,selectedAddress,setSelectedPickup,selectedPickup, deliveryType,setDeliveryType} = useCart();
     const router = useRouter();
 
     const handleChangeEtapa = async()=>{
@@ -108,7 +108,9 @@ const RightSideDelivery = () => {
                                                         <SelectablePickUpCard
                                                             address={pickup}
                                                             selected={selectedAddressId === pickup._id}
-                                                            onSelect={() => setSelectedAddressId(pickup._id??null)}
+                                                            onSelect={() => {
+                                                                     setSelectedPickup(pickup)
+                                                                    setSelectedAddressId(pickup._id??null)}}
                                                             isPickup
                                                         />
                                                     </Grid>
@@ -152,7 +154,9 @@ const RightSideDelivery = () => {
                                                                 <SelectableAddressCard
                                                                     address={address}
                                                                     selected={selectedAddressId === address._id}
-                                                                    onSelect={() => setSelectedAddressId(address._id??null)}
+                                                                    onSelect={() => {
+                                                                        setSelectedAddress(address)
+                                                                        setSelectedAddressId(address._id??null)}}
                                                                     isPickup={false}
                                                                 />
                                                             </Grid>  

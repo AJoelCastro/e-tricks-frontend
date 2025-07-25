@@ -1,13 +1,27 @@
 
 
+export interface IOrderItem {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
+    size: string;
+}
+
 export interface IOrder extends Document {
     userId: string;
+    items: IOrderItem[];
+    subtotalAmount: number;
     totalAmount: number;
+    discountAmount: number;
+    couponCode?: string;
     addressId: string;
-    status: string;
+    status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed' | 'rejected' | 'refunded';
     paymentId: string;
-    paymentStatus: boolean;
+    paymentStatus: string;
     paymentMethod: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    mercadoPagoPreferenceId?: string;
+    mercadoPagoMerchantOrderId?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

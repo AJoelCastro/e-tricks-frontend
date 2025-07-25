@@ -22,6 +22,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [etapa, setEtapa] = useState<number>(0);
   const { getToken } = useAuth();
+  const [selectedAddress,setSelectedAddress] = useState<IAddress | null>(null);
+  const [selectedPickup,setSelectedPickup] = useState<IPickUp | null>(null);
 
   const getCartItems = async () => {
     setIsLoading(true);
@@ -82,6 +84,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         paymentMethod,
         setPaymentMethod,
         getCartItems,
+        selectedAddress,
+        setSelectedAddress,
+        selectedPickup,
+        setSelectedPickup,
         isLoading,
         etapa,
         setEtapa,
