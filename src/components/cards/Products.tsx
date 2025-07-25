@@ -216,15 +216,15 @@ const ProductCard: React.FC<Props> = ({
 
         <CardContent sx={{ paddingBottom: '60px' }}>
           <Link href={`/marcas/${products.brand.name.toLowerCase()}`} passHref>
-            <Typography variant="subtitle1" sx={{ color: 'text.primary', cursor: 'pointer' }}>
+            <Typography variant="marcaCard" sx={{ color: 'text.primary', cursor: 'pointer' }}>
               {products.brand.name}
             </Typography>
           </Link>
 
           <Grid container spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-            <Grid item>
+            <Grid >
               <Link href={`/producto/${products._id}`} passHref>
-                <Typography variant="h6" sx={{ color: 'text.primary', cursor: 'pointer' }}>
+                <Typography variant="nameCard" sx={{ color: 'text.primary', cursor: 'pointer' }}>
                   {products.name}
                 </Typography>
               </Link>
@@ -232,11 +232,11 @@ const ProductCard: React.FC<Props> = ({
           </Grid>
 
           <Grid container spacing={1} sx={{ alignItems: 'center', mt: 1 }}>
-            <Grid item>
+            <Grid >
               <Rating precision={0.5} value={promedio} readOnly />
             </Grid>
-            <Grid item>
-              <Typography variant="body2" color="text.secondary">
+            <Grid >
+              <Typography variant="reseniasCard" color="text.secondary">
                 {products.resenias?.length ?? 0} reseñas
               </Typography>
             </Grid>
@@ -245,13 +245,13 @@ const ProductCard: React.FC<Props> = ({
           {products.descuento ? (
             <Box mt={2}>
               <Grid container spacing={1} alignItems="center">
-                <Grid item>
-                  <Typography variant="h6" sx={{ color: 'text.primary' }}>
+                <Grid >
+                  <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
                     S/ {products.price}
                   </Typography>
                 </Grid>
-                <Grid item sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
-                  <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
+                <Grid  sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                  <Typography variant="marcaDetail" sx={{ color: 'white', fontWeight: 'bold' }}>
                     -{products.descuento}%
                   </Typography>
                 </Grid>
@@ -348,7 +348,7 @@ const ProductCard: React.FC<Props> = ({
           </IconButton>
 
           <Grid container spacing={{ xs: 2, sm: 3 }}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{xs:12, sm:4, md:4}}>
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -370,26 +370,48 @@ const ProductCard: React.FC<Props> = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={8}>
-              <Box sx={{ mb: 2, pr: { xs: 0, sm: 4 } }}>
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+            <Grid size={{xs:12, sm:8, md:8}} >
+              <Box sx={{ mb: 1, pr: { xs: 0, sm: 4 }, display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="marcaDetail" sx={{ fontWeight: 'bold' }}>
                   {products.brand.name}
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                <Typography variant="nameDetail" >
                   {products.name}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
-                  S/ {products.price}
-                </Typography>
+                {products.descuento ? (
+                  <Box >
+                    <Grid container spacing={1} alignItems="center">
+                      <Grid >
+                        <Typography variant="h6" sx={{ color: 'text.primary' }}>
+                          S/ {products.price}
+                        </Typography>
+                      </Grid>
+                      <Grid  sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
+                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
+                          -{products.descuento}%
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
+                      S/ {(products.price + (products.price * products.descuento) / 100).toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Typography variant="h6" sx={{ color: 'text.primary', mt: 2 }}>
+                    S/ {products.price}
+                  </Typography>
+                )}
               </Box>
 
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                  Selecciona tu talla
-                </Typography>
+              <Box sx={{ mb: 2}}>
+                <Box sx={{mb:1}}> 
+                  <Typography variant="navbar" sx={{ fontWeight: 'bold'}}>
+                    Selecciona tu talla
+                  </Typography>
+                </Box>
                 <Grid container spacing={1}>
                   {products.stockPorTalla?.map(({ talla, stock }) => (
-                    <Grid item key={talla} xs={4} sm={3}>
+                    <Grid  key={talla} size={{xs:4, sm:3, md:3}} >
                       <Button
                         variant={selectedSize === talla ? 'contained' : 'outlined'}
                         onClick={() => {
@@ -431,14 +453,14 @@ const ProductCard: React.FC<Props> = ({
                       label={`Stock disponible: ${selectedSizeStock} unidades`}
                       color="info"
                       size="small"
-                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' }, color:'white' }}
                     />
                   </Box>
                 )}
               </Box>
 
               <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                <Typography variant='yapeSteps' sx={{ fontWeight: 'bold' }}>
                   Cantidad:
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
@@ -446,11 +468,11 @@ const ProductCard: React.FC<Props> = ({
                     size="small"
                     onClick={handleDecreaseQuantity}
                     disabled={quantity <= 1}
-                    sx={{ p: { xs: 0.5, sm: 1 } }}
+                    sx={{ p: { xs: 0.5, sm: 0.75 } }}
                   >
                     <RemoveIcon fontSize="small" />
                   </IconButton>
-                  <Typography sx={{ mx: { xs: 1, sm: 2 }, minWidth: '30px', textAlign: 'center', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  <Typography variant='yapeSteps' sx={{ mx: { xs: 1, sm: 2 }, textAlign: 'center' }}>
                     {quantity}
                   </Typography>
                   <IconButton
@@ -461,7 +483,7 @@ const ProductCard: React.FC<Props> = ({
                       !products.stockPorTalla ||
                       quantity >= selectedSizeStock
                     }
-                    sx={{ p: { xs: 0.5, sm: 1 } }}
+                    sx={{ p: { xs: 0.5, sm: 0.75 } }}
                   >
                     <AddIcon fontSize="small" />
                   </IconButton>
@@ -480,11 +502,6 @@ const ProductCard: React.FC<Props> = ({
                   quantity > selectedSizeStock ||
                   !handleAddToCart
                 }
-                sx={{
-                  py: { xs: 1, sm: 1.5 },
-                  fontSize: { xs: '0.9rem', sm: '1rem' },
-                  fontWeight: 'bold'
-                }}
               >
                 Añadir al carrito
               </Button>
