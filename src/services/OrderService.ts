@@ -48,7 +48,7 @@ const OrderService = {
      */
     createOrder: async (token: string, data: CreateOrderData): Promise<CreateOrderResponse> => {
         try {
-            const response = await axios.post(`${API_URL}/orders/checkout`, data, {
+            const response = await axios.post(`${API_URL}/order/checkout`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ const OrderService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Error creating order:', error);
+            console.error('Error creating order in service:', error);
             throw error;
         }
     },
@@ -66,7 +66,7 @@ const OrderService = {
      */
     confirmPayment: async (token: string, data: ConfirmPaymentData) => {
         try {
-            const response = await axios.post(`${API_URL}/orders/checkout/payment/confirm`, 
+            const response = await axios.post(`${API_URL}/order/checkout/payment/confirm`, 
                 data, 
                 {
                     headers: {
@@ -87,7 +87,7 @@ const OrderService = {
      */
     getOrderDetails: async (token: string, orderId: string) => {
         try {
-            const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+            const response = await axios.get(`${API_URL}/order/${orderId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -104,7 +104,7 @@ const OrderService = {
      */
     getUserOrders: async (token: string, userId: string) => {
         try {
-            const response = await axios.get(`${API_URL}/orders/user/${userId}`, {
+            const response = await axios.get(`${API_URL}/order/user/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -121,7 +121,7 @@ const OrderService = {
      */
     cancelOrder: async (token: string, orderId: string) => {
         try {
-            const response = await axios.delete(`${API_URL}/orders/${orderId}`, {
+            const response = await axios.delete(`${API_URL}/order/${orderId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -138,7 +138,7 @@ const OrderService = {
      */
     checkPaymentStatus: async (token: string, orderId: string) => {
         try {
-            const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+            const response = await axios.get(`${API_URL}/order/${orderId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

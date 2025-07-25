@@ -15,7 +15,7 @@ export interface IOrder extends Document {
     totalAmount: number;
     discountAmount: number;
     couponCode?: string;
-    addressId: string;
+    addressId?: string;
     status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed' | 'rejected' | 'refunded';
     paymentId: string;
     paymentStatus: string;
