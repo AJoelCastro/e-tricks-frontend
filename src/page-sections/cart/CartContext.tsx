@@ -31,7 +31,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const token = await getToken();
       const rawCart = await UserService.getCartItems(token as string);
       const cartWithProducts = await Promise.all(
-        rawCart.map(async item => {
+        rawCart.map(async (item: any) => {
           const product = await ProductService.GetProductById(item.productId);
           return { ...item, product };
         })
