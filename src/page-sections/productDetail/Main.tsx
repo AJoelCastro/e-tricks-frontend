@@ -21,7 +21,7 @@ import { primary } from '@/theme/colors';
 import Image from 'next/image';
 import { SignInButton, useAuth } from '@clerk/nextjs';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { fi } from 'date-fns/locale';
+import { CheckCircle } from 'lucide-react';
 type Props = {
     id: string;
 };
@@ -43,6 +43,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const [favoriteIds, setFavoriteIds] = useState<Array<string>>([]);
     const [quantity, setQuantity] = useState<number>(1);
     const [openSizeGuide, setOpenSizeGuide] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
@@ -214,8 +215,6 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     />
                                 ))}
                             </Box>
-                        </Grid>
-                        <Grid size={{xs:12, sm:12, md:12}} sx={{backgroundColor:'cyan'}}>
                         </Grid>
                     </Grid>
                     <Grid size={{xs:12, sm:12, md:4}} sx={{ py:{xs:0, sm:2, md:4}, px:{xs:2, sm:1, md:0}}} spacing={2}>
@@ -465,6 +464,69 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                 </Box>
                             </Box>
                         </Grid>
+                    </Grid>
+                    {/* cuadro de caracteristicas */}
+                    <Grid size={{xs:12, sm:12, md:8}} sx={{ backgroundColor: '#f8f9fa', borderRadius: 2, p: 3, mt: 4, mx:{xs:1,sm:2,md:4}, mb:{xs:2,sm:2,md:4} }}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                            Características del producto
+                        </Typography>
+
+                        <Box
+                            sx={{
+                            maxHeight: expanded ? 'none' : 160,
+                            overflow: 'hidden',
+                            position: 'relative',
+                            transition: 'max-height 0.3s ease',
+                            filter: expanded ? 'none' : 'blur(2px)',
+                            pr: 1
+                            }}
+                        >
+                            <Grid container spacing={1}>
+                            {[
+                                'Material exterior: Cuero sintético de alta calidad',
+                                'Forro interior: Textil acolchado',
+                                'Suela: Goma antideslizante',
+                                'Altura del taco: 3.5 cm',
+                                'Diseñado para uso diario',
+                                'Hecho en Perú',
+                                'Resistente al agua',
+                                'Disponible solo en colores neutros',
+                                'Recomendado por podólogos',
+                                'Ajuste ergonómico para mayor confort'
+                            ].map((feature, index) => (
+                                <Grid size={{xs:12, sm:6}} key={index}>
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                    <CheckCircle size={18} color="#5f3dc4" />
+                                    <Typography sx={{ fontSize: 14 }}>{feature}</Typography>
+                                </Box>
+                                </Grid>
+                            ))}
+                            </Grid>
+
+                            {!expanded && (
+                            <Box
+                                sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: '100%',
+                                background: 'linear-gradient(to bottom, rgba(248,249,250,0.0), rgba(248,249,250,1))',
+                                }}
+                            />
+                            )}
+                        </Box>
+
+                        <Box sx={{ textAlign: 'center', mt: 2 }}>
+                            <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setExpanded(prev => !prev)}
+                            sx={{ textTransform: 'none', fontWeight: 500 }}
+                            >
+                            {expanded ? 'Ver menos' : 'Ver todas las características'}
+                            </Button>
+                        </Box>
                     </Grid>
                 </>
             </Grid>
