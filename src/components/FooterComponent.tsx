@@ -3,6 +3,7 @@ import React from 'react';
 import { Box, Grid, Typography, Button, Divider, IconButton } from '@mui/material';
 import Image from 'next/image';
 import { Facebook, Instagram, Youtube } from 'lucide-react';
+import Link from 'next/link';
 
 const FooterComponent = () => {
   return (
@@ -55,30 +56,49 @@ const FooterComponent = () => {
         <Grid size={{xs:12, sm:6, md:8}}>
           <Grid container spacing={4}>
             {[
-              { title: 'ACERCA DE', items: ['Nosotros', 'Contactanos'] },
-              { title: 'TÉRMINOS Y CONDICIONES', items: ['Terminos del Servicio', 'Politica de Privacidad'] },
-              { title: 'TE AYUDAMOS', items: ['Compras y/o Envíos', 'Preguntas Frecuentes'] }
+              {
+                title: 'ACERCA DE',
+                items: [
+                  { label: 'Nosotros', href: '/nosotros' },
+                  { label: 'Contáctanos', href: '/contacto' }
+                ]
+              },
+              {
+                title: 'TÉRMINOS Y CONDICIONES',
+                items: [
+                  { label: 'Términos del Servicio', href: '/terminos-y-condiciones' },
+                  { label: 'Política de Privacidad', href: '/politicas-de-privacidad' }
+                ]
+              },
+              {
+                title: 'TE AYUDAMOS',
+                items: [
+                  { label: 'Compras y/o Envíos', href: '/envios' },
+                  { label: 'Preguntas Frecuentes', href: '/faq' }
+                ]
+              }
             ].map((section, index) => (
               <Grid size={{xs:12, sm:6, md:4}} key={index}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   {section.title}
                 </Typography>
                 {section.items.map((item, idx) => (
-                  <Typography
-                    key={idx}
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      mb: 1,
-                      transition: 'color 0.2s',
-                      cursor: 'pointer',
-                      ':hover': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  >
-                    {item}
-                  </Typography>
+                  <Link href={item.href} key={idx} passHref>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        mb: 1,
+                        transition: 'color 0.2s',
+                        cursor: 'pointer',
+                        ':hover': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                  </Link>
                 ))}
               </Grid>
             ))}

@@ -42,6 +42,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [favoriteIds, setFavoriteIds] = useState<Array<string>>([]);
     const [quantity, setQuantity] = useState<number>(1);
+    const [openSizeGuide, setOpenSizeGuide] = useState(false);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
@@ -336,7 +337,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     color: 'primary.main',
                                     },
                                 }}
-                                onClick={() => {console.log("pressed")}}
+                                onClick={() => setOpenSizeGuide(true)}
                             >
                                 Guía de tallas
                             </Typography>
@@ -520,7 +521,59 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     </Link>
                 </DialogActions>
             </Dialog>
+            <Dialog open={openSizeGuide} onClose={() => setOpenSizeGuide(false)} maxWidth="xs" fullWidth>
+                <DialogTitle>Guía de Tallas Perú - Mujer</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        Mide tu pie desde el talón hasta el dedo más largo (en centímetros) y compara con la siguiente tabla de tallas peruanas para mujer.
+                    </Typography>
 
+                    <Box
+                        sx={{
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        mt: 1
+                        }}
+                    >
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead style={{ backgroundColor: '#f5f5f5' }}>
+                            <tr>
+                            <th style={{ padding: '8px', fontSize: 14 }}>PE</th>
+                            <th style={{ padding: '8px', fontSize: 14 }}>CM</th>
+                            <th style={{ padding: '8px', fontSize: 14 }}>US</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[
+                            { pe: 34, cm: 21.5, us: 4 },
+                            { pe: 35, cm: 22.0, us: 5 },
+                            { pe: 36, cm: 22.5, us: 5.5 },
+                            { pe: 37, cm: 23.5, us: 6.5 },
+                            { pe: 38, cm: 24.0, us: 7 },
+                            { pe: 39, cm: 24.5, us: 8 },
+                            { pe: 40, cm: 25.0, us: 8.5 },
+                            { pe: 41, cm: 25.5, us: 9 },
+                            { pe: 42, cm: 26.0, us: 10 }
+                            ].map((row) => (
+                            <tr key={row.pe}>
+                                <td style={{ padding: '8px', textAlign: 'center' }}>{row.pe}</td>
+                                <td style={{ padding: '8px', textAlign: 'center' }}>{row.cm} cm</td>
+                                <td style={{ padding: '8px', textAlign: 'center' }}>{row.us}</td>
+                            </tr>
+                            ))}
+                        </tbody>
+                        </table>
+                    </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+                    <Button onClick={() => setOpenSizeGuide(false)} variant="contained">
+                    Cerrar
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }
