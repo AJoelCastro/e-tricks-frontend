@@ -18,38 +18,50 @@ const Carousel: React.FC<CarouselProps> = ({ images }) => {
     mode: 'free',
     slides: {
       perView: 1,
-      spacing: 15,
+      spacing: 0,
     },
   });
 
   useEffect(() => {
-    // Iniciar autoplay
     timerRef.current = setInterval(() => {
-      if (instanceRef.current) {
-        instanceRef.current.next();
-      }
-    }, 4000); // Cambia cada 3 segundos
-
-    // Limpiar intervalo al desmontar
+      instanceRef.current?.next();
+    }, 4000);
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [instanceRef]);
+  }, []);
 
   return (
-    <Box ref={sliderRef} className="keen-slider">
+    <Box
+      ref={sliderRef}
+      className="keen-slider"
+      sx={{
+        width: '100vw',
+        height:'100vh',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       {images.map((image, index) => (
-        <div key={index} className="keen-slider__slide flex items-center justify-center relative">
+        <Box
+          key={index}
+          className="keen-slider__slide"
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }}
+        >
           <Image
             src={image}
             alt={`image-${index}`}
-            width={1920}
-            height={1080}
+            fill
             priority
+            style={{
+              objectFit: 'cover',
+            }}
           />
-        </div>
+        </Box>
       ))}
     </Box>
   );
