@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Typography } from '@mui/material';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
 import { ISubCategory } from '@/interfaces/SubCategory';
+import { IBrandWithCategories } from '@/interfaces/Brand';
 
 interface SidebarCategoryProps {
   activeGroup: IGroupCategory;
@@ -13,6 +14,7 @@ interface SidebarCategoryProps {
   onClose: () => void;
   onGroupHover: (group: IGroupCategory) => void;
   showWhiteBackground: boolean;
+  brandsWithCategories: IBrandWithCategories[];
 }
 
 const SidebarCategory = ({
@@ -20,7 +22,8 @@ const SidebarCategory = ({
   groupCategories,
   onClose,
   onGroupHover,
-  showWhiteBackground
+  showWhiteBackground,
+  brandsWithCategories
 }: SidebarCategoryProps) => {
   const [selectedSubCategory, setSelectedSubCategory] = useState<ISubCategory | null>(null);
   const [mobileActiveGroup, setMobileActiveGroup] = useState<IGroupCategory>(activeGroup);
@@ -28,6 +31,11 @@ const SidebarCategory = ({
   const [showCategories, setShowCategories] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isMarcasGroup = activeGroup.routeLink === 'marcas';
+  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
+
+  console.log('groupCategories',groupCategories);
+  console.log('activeGroup',activeGroup);
+  console.log('brandsWithCategories',brandsWithCategories);
 
   // Static "Nuevas Tendencias" section
   const staticTrendsSection = {
@@ -126,23 +134,39 @@ const SidebarCategory = ({
             {/* Subcategories - Left Column */}
             <div className="w-1/4 border-r border-gray-200 overflow-y-auto p-4 mt-2">
               <ul className="space-y-2">
-                {[staticTrendsSection, ...(activeGroup.subcategories || [])].map((subcategory: ISubCategory) => (
-                  <li key={`subcat-${subcategory._id}`}>
-                    <button
-                      className={`w-full font-semibold text-left p-3 transition-colors ${selectedSubCategory?._id === subcategory._id
-                          ? 'text-[#7950f2]'
-                          : 'hover:bg-gray-100 text-gray-800'
+                {isMarcasGroup ? (
+                  brandsWithCategories.map(({ brand }) => (
+                    <li key={`brand-${brand._id}`}>
+                      <button
+                        className={`w-full font-semibold text-left p-3 transition-colors ${
+                          selectedBrandId === brand._id ? 'text-[#7950f2]' : 'hover:bg-gray-100 text-gray-800'
                         }`}
-                      onMouseEnter={() => setSelectedSubCategory(subcategory)}
-                    >
-                      <Link href={subcategory._id === 'tendencias' ? `/${activeGroup.routeLink}/tendencias` : `/${activeGroup.routeLink}/${subcategory.routeLink}`}>
-                        <Typography variant='navbar'>
-                          {subcategory.name}
+                        onMouseEnter={() => setSelectedBrandId(brand._id)}
+                      >
+                        <Typography variant="navbar">
+                          {brand.name}
                         </Typography>
-                      </Link>
-                    </button>
-                  </li>
-                ))}
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  [staticTrendsSection, ...(activeGroup.subcategories || [])].map((subcategory: ISubCategory) => (
+                    <li key={`subcat-${subcategory._id}`}>
+                      <button
+                        className={`w-full font-semibold text-left p-3 transition-colors ${
+                          selectedSubCategory?._id === subcategory._id
+                            ? 'text-[#7950f2]'
+                            : 'hover:bg-gray-100 text-gray-800'
+                        }`}
+                        onMouseEnter={() => setSelectedSubCategory(subcategory)}
+                      >
+                        <Link href={subcategory._id === 'tendencias' ? `/${activeGroup.routeLink}/tendencias` : `/${activeGroup.routeLink}/${subcategory.routeLink}`}>
+                          <Typography variant='navbar'>{subcategory.name}</Typography>
+                        </Link>
+                      </button>
+                    </li>
+                  ))
+                )}
               </ul>
               <div className='absolute bottom-5 px-4'>
                 <ul className="space-y-2">
@@ -188,10 +212,28 @@ const SidebarCategory = ({
             {/* Product Categories - Middle Column */}
             <div className="w-1/3 p-4 flex flex-col">
               <div className="flex-1 overflow-hidden mt-2">
-                <Typography variant="nameCard" >
-                  {selectedSubCategory?.name === 'Nuevas Tendencias' ? 'Tendencias' : 'Categorias'}
+                <Typography variant="nameCard">
+                  {isMarcasGroup ? 'Categorías de Marca' : selectedSubCategory?.name === 'Nuevas Tendencias' ? 'Tendencias' : 'Categorias'}
                 </Typography>
-                {selectedSubCategory ? (
+                {isMarcasGroup ? (
+                  <ul className="space-y-2 mt-2">
+                    {brandsWithCategories
+                      .find((bwc) => bwc.brand._id === selectedBrandId)
+                      ?.categories.map((cat) => (
+                        <li key={`cat-${cat._id}`}>
+                          <Link
+                            href={`/products?brand=${selectedBrandId}&category=${cat._id}`}
+                            className="block w-full p-2 hover:text-[#7950f2] transition-colors"
+                            onClick={onClose}
+                          >
+                            <Typography variant="reseniasCard">{cat.name}</Typography>
+                          </Link>
+                        </li>
+                      )) || (
+                        <p className="text-gray-500 text-center mt-10">Selecciona una marca</p>
+                      )}
+                  </ul>
+                ) : selectedSubCategory ? (
                   <ul className="space-y-2">
                     {selectedSubCategory.productcategories?.map((category, index) => (
                       <li key={`prod-${category._id || index}-${category.name}`}>
@@ -201,12 +243,10 @@ const SidebarCategory = ({
                               ? `/tendencias/${category._id}`
                               : `/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${category.routeLink}`
                           }
-                          className="block w-full p-2  hover:text-[#7950f2] transition-colors"
+                          className="block w-full p-2 hover:text-[#7950f2] transition-colors"
                           onClick={onClose}
                         >
-                          <Typography variant="reseniasCard">
-                            {category.name}
-                          </Typography>
+                          <Typography variant="reseniasCard">{category.name}</Typography>
                         </Link>
                       </li>
                     ))}
@@ -220,16 +260,36 @@ const SidebarCategory = ({
                 )}
               </div>
             </div>
-
             {/* Image - Right Column */}
             <div className="w-1/3 p-4">
-              {selectedSubCategory && (
-                <div className="mt-4 h-[80vh] relative">
+              {isMarcasGroup && selectedBrandId ? (
+                <div className="mt-4 h-[80vh] relative rounded-xl overflow-hidden shadow-lg">
+                  <Image
+                    src={
+                      brandsWithCategories.find((bwc) => bwc.brand._id === selectedBrandId)?.brand.image ||
+                      '/default-brand.jpg'
+                    }
+                    alt="Imagen de marca"
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <Typography variant="h6" className="font-bold text-white">
+                      {
+                        brandsWithCategories.find((bwc) => bwc.brand._id === selectedBrandId)?.brand.name
+                      }
+                    </Typography>
+                  </div>
+                </div>
+              ) : selectedSubCategory ? (
+                <div className="mt-4 h-[80vh] relative rounded-xl overflow-hidden shadow-lg">
                   <Image
                     src={selectedSubCategory.image || '/default-subcategory.jpg'}
                     alt={selectedSubCategory.name}
                     fill
-                    style={{ objectFit: 'cover' }}
+                    className="object-cover"
                     priority
                     unoptimized={selectedSubCategory.image?.startsWith('http')}
                   />
@@ -239,7 +299,7 @@ const SidebarCategory = ({
                     </Typography>
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

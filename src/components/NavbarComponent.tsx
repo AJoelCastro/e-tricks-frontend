@@ -12,6 +12,8 @@ import GroupCategoryService from '@/services/GroupCategoryService';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
 import SidebarCategory from './modal/SidebarCategory';
 import UserService from '@/services/UserService';
+import { IBrandWithCategories } from '@/interfaces/Brand';
+import BrandService from '@/services/BrandService';
 
 type Props = {
   main?: boolean;
@@ -24,22 +26,31 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [groupCategories, setGroupCategories] = useState<IGroupCategory[]>([]);
+  const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
   const [activeGroup, setActiveGroup] = useState<IGroupCategory | null>(null);
   const [localCartCount, setLocalCartCount] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
 
   const { isSignedIn, getToken } = useAuth();
-
+  const fetchBrandsWithCategories = async () => {
+    try {
+      const data = await BrandService.getBrandsWithProductCategories();
+      setBrandsWithCategories(data);
+    } catch (error) {
+      console.error('Error fetching brands with categories:', error);
+    }
+  }
+  const fetchGroupCategories = async () => {
+    try {
+      const data = await GroupCategoryService.getGroupCategories();
+      setGroupCategories(data.filter((g : any) => ['Mujer', 'Marcas'].includes(g.name)));
+    } catch (error) {
+      console.error('Error fetching group categories:', error);
+    }
+  };
   useEffect(() => {
-    const fetchGroupCategories = async () => {
-      try {
-        const data = await GroupCategoryService.getGroupCategories();
-        setGroupCategories(data.filter((g : any) => ['Mujer', 'Marcas'].includes(g.name)));
-      } catch (error) {
-        console.error('Error fetching group categories:', error);
-      }
-    };
-
+    
+    fetchBrandsWithCategories();
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
@@ -261,6 +272,7 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
       {activeGroup && (
          <SidebarCategory
             activeGroup={activeGroup}
+            brandsWithCategories={brandsWithCategories}
             groupCategories={groupCategories}
             onClose={handleCloseModal}
             onGroupHover={handleGroupHover}

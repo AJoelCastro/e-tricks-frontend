@@ -64,6 +64,16 @@ const BrandService = {
             console.error('Error deleting brand:', error);
             throw error;
         }
+    },
+
+    getBrandsWithProductCategories: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/brand/getCategoryWithBrands`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching brands with product categories:', error);
+            throw error;
+        }
     }
 };
 
