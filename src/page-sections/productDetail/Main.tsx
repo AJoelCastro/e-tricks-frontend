@@ -482,25 +482,19 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                             }}
                         >
                             <Grid container spacing={1}>
-                            {[
-                                'Material exterior: Cuero sintético de alta calidad',
-                                'Forro interior: Textil acolchado',
-                                'Suela: Goma antideslizante',
-                                'Altura del taco: 3.5 cm',
-                                'Diseñado para uso diario',
-                                'Hecho en Perú',
-                                'Resistente al agua',
-                                'Disponible solo en colores neutros',
-                                'Recomendado por podólogos',
-                                'Ajuste ergonómico para mayor confort'
-                            ].map((feature, index) => (
-                                <Grid size={{xs:12, sm:6}} key={index}>
-                                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                                    <CheckCircle size={18} color="#5f3dc4" />
-                                    <Typography sx={{ fontSize: 14 }}>{feature}</Typography>
-                                </Box>
-                                </Grid>
-                            ))}
+                                {product?.caracteristicas?.map((item, index) => (
+                                    <Grid size={{xs:12, sm:6}}  key={index}>
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                                            <CheckCircle size={18} color="#5f3dc4" />
+                                            <Typography variant='marcaDetail' sx={{ fontSize: 14 }}>
+                                                {item.nombre}: 
+                                            </Typography>
+                                            <Typography sx={{ fontSize: 14 }}>
+                                                {item.valor}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                ))}
                             </Grid>
 
                             {!expanded && (
