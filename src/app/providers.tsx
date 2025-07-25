@@ -4,6 +4,7 @@ import { store, persistor } from '@/store';
 import ThemeProvider1 from '@/theme/theme-provider';
 import AuthTokenHandler from '@/hooks/AuthTokenHandler';
 import { PersistGate } from 'redux-persist/integration/react';
+import { CartProvider } from '@/page-sections/cart/CartContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <PersistGate loading={null} persistor={persistor}>
           <AuthTokenHandler>
             <ThemeProvider1>
-              {children}
+              <CartProvider>
+                {children}
+              </CartProvider>
             </ThemeProvider1>
           </AuthTokenHandler>
         </PersistGate>

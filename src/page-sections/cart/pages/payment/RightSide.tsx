@@ -80,8 +80,8 @@ const RightSidePayment = () => {
   const router = useRouter();
 
 
- console.log('delivery', deliveryType)
-     console.log('delivery', selectedAddress)
+  console.log('delivery', deliveryType)
+  console.log('address', selectedAddress)
 
 
   // Calcular totales

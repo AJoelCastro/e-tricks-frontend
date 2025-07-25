@@ -109,8 +109,8 @@ const RightSideDelivery = () => {
                                                             address={pickup}
                                                             selected={selectedAddressId === pickup._id}
                                                             onSelect={() => {
-                                                                     setSelectedPickup(pickup)
-                                                                    setSelectedAddressId(pickup._id??null)}}
+                                                                setSelectedPickup(pickup)
+                                                                setSelectedAddressId(pickup._id??null)}}
                                                             isPickup
                                                         />
                                                     </Grid>
