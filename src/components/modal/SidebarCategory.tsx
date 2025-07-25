@@ -42,7 +42,7 @@ const SidebarCategory = ({
     _id: 'trends',
     name: 'Nuevas Tendencias',
     productcategories: [
-      { _id: 'trend1', name: 'MAKE YOUR WAY' },
+      { _id: 'trend1', name: 'MAKE YOUR WAY' }, 
       { _id: 'trend2', name: 'H CAMINO EMPIEZA AHORA' },
       { _id: 'trend3', name: 'NUEVA COLECCIÓN' }
     ],
