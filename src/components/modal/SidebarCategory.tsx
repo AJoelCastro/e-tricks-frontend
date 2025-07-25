@@ -27,6 +27,7 @@ const SidebarCategory = ({
   const [showSubcategories, setShowSubcategories] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const isMarcasGroup = activeGroup.routeLink === 'marcas';
 
   // Static "Nuevas Tendencias" section
   const staticTrendsSection = {
@@ -125,7 +126,7 @@ const SidebarCategory = ({
             {/* Subcategories - Left Column */}
             <div className="w-1/4 border-r border-gray-200 overflow-y-auto p-4 mt-2">
               <ul className="space-y-2">
-                {[staticTrendsSection, ...(activeGroup.subcategories || [])].map((subcategory) => (
+                {[staticTrendsSection, ...(activeGroup.subcategories || [])].map((subcategory: ISubCategory) => (
                   <li key={`subcat-${subcategory._id}`}>
                     <button
                       className={`w-full font-semibold text-left p-3 transition-colors ${selectedSubCategory?._id === subcategory._id
