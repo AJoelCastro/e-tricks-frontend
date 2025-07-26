@@ -312,23 +312,55 @@ const MainComponent = () => {
           <Swiper
             spaceBetween={16}
             slidesPerView={isMobile ? 1.2 : 4}
+            pagination={{ clickable: true }}
+            modules={[Pagination]}
+          >
+            {dataProducts
+              .filter((product) => product.isNewProduct)
+              .map((product) => (
+                <SwiperSlide key={product._id}>
+                  <ProductCard
+                    products={product}
+                    show
+                    markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
+                    handleRemoveFavorite={handleRemoveFavorite}
+                    handleAddFavorite={handleAddFavorite}
+                    handleAddToCart={handleAddToCart}
+                    handleRemoveFromCart={handleRemoveFromCart}
+                    isInCart={isProductInCart(product._id)}
+                  />
+                </SwiperSlide>
+            ))}
+          </Swiper>
+        </Box>
+        <Box sx={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', marginY:3}}>
+          <Typography variant='subtitleMain' sx={{ marginY:2, color: primary.subtitleMain}}>
+            Descuentos
+          </Typography>
+        </Box>
+        <Box>
+          <Swiper
+            spaceBetween={16}
+            slidesPerView={isMobile ? 1.2 : 4}
             style={{ paddingBottom: '2rem' }}
             pagination={{ clickable: true }}
             modules={[Pagination]}
           >
-            {dataProducts.map((product, index) => (
-              <SwiperSlide key={index}>
-                <ProductCard
-                  products={product}
-                  show
-                  markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
-                  handleRemoveFavorite={handleRemoveFavorite}
-                  handleAddFavorite={handleAddFavorite}
-                  handleAddToCart={handleAddToCart} 
-                  handleRemoveFromCart={handleRemoveFromCart}
-                  isInCart={isProductInCart(product._id)} 
-                />
-              </SwiperSlide>
+            {dataProducts
+              .filter((product) => product.descuento!==0)
+              .map((product) => (
+                <SwiperSlide key={product._id}>
+                  <ProductCard
+                    products={product}
+                    show
+                    markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
+                    handleRemoveFavorite={handleRemoveFavorite}
+                    handleAddFavorite={handleAddFavorite}
+                    handleAddToCart={handleAddToCart}
+                    handleRemoveFromCart={handleRemoveFromCart}
+                    isInCart={isProductInCart(product._id)}
+                  />
+                </SwiperSlide>
             ))}
           </Swiper>
         </Box>

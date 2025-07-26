@@ -201,7 +201,26 @@ const ProductCard: React.FC<Props> = ({
             )}
           </Box>
         )}
-
+        {products.isNewProduct && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 1,
+              backgroundColor: 'primary.main', // verde
+              color: 'white',
+              px: 1.2,
+              py: 0.3,
+              fontSize: '0.75rem',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+            }}
+          >
+            Nuevo
+          </Box>
+        )}
         <Link href={`/producto/${products._id}`} passHref>
           <CardMedia
             component="img"
