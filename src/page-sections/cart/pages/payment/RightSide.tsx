@@ -134,9 +134,7 @@ const RightSidePayment = () => {
         hidePaymentButton: true,
       },
       paymentMethods: {
-        types: {
-          included: ['credit_card','debit_card']
-        }
+       
       }
     }
   }), [total, user?.emailAddresses]);
