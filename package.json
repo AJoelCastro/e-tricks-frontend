@@ -25,6 +25,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.9",
     "jwt-decode": "^4.0.0",
     "keen-slider": "^6.8.6",
     "lucide-react": "^0.511.0",

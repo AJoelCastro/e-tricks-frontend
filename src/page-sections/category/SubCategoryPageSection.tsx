@@ -13,6 +13,8 @@ import { setProductCategoryId } from '@/store/slices/categorySelectionSlice';
 import ProductService from '@/services/ProductService';
 import ProductCard from '@/components/cards/Products';
 import NoProductsFound from '@/components/NoProductsFound';
+import NavbarComponent from '@/components/NavbarComponent';
+import FooterComponent from '@/components/FooterComponent';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -73,6 +75,7 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
   }
   return (
     <>
+      <NavbarComponent/>
         <div className='h-16'></div>
         <Box sx={{minHeight: '100vh'}}>
           <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
@@ -142,6 +145,7 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
             )
           }
         </Box>
+        <FooterComponent/>
     </>
   )
 }

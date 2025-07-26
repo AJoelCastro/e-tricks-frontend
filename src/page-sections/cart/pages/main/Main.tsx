@@ -2,10 +2,13 @@ import RightSideCart from '@/page-sections/cart/pages/main/RightSide'
 import LeftSide from '@/components/favorites/LeftSide'
 import { Grid } from '@mui/material'
 import React from 'react'
+import NavbarComponent from '@/components/NavbarComponent'
+import FooterComponent from '@/components/FooterComponent'
 
 const MainCart = () => {
   return (
     <>
+      <NavbarComponent/>
       <div className='h-16'></div>
       <Grid container spacing={1} sx={{minHeight:'100vh'}}>
         <Grid size={{
@@ -19,6 +22,7 @@ const MainCart = () => {
           <RightSideCart/>
         </Grid>
       </Grid>
+      <FooterComponent/>
     </>
   )
 }
