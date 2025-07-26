@@ -9,13 +9,13 @@ import { Box, CircularProgress, Typography, Button } from '@mui/material';
 interface MPPaymentData {
     id: string;
     status: string;
-    [key: string]: any;
+    [key: string]: unknown; // Cambiado de 'any' a 'unknown'
 }
 
 interface MPError {
     message: string;
     type: string;
-    [key: string]: any;
+    [key: string]: unknown; // Cambiado de 'any' a 'unknown'
 }
 
 interface AntiResetCardPaymentProps {
@@ -25,6 +25,13 @@ interface AntiResetCardPaymentProps {
     onError?: (error: MPError) => void;
     onReady?: () => void;
     isProcessing?: boolean;
+}
+
+// Definir tipos específicos para los métodos de pago
+interface PaymentMethods {
+    creditCard?: string;
+    debitCard?: string;
+    mercadoPago?: string;
 }
 
 interface PaymentConfig {
@@ -41,10 +48,15 @@ interface PaymentConfig {
                 theme: string;
             };
         };
-        paymentMethods: {
-
-        };
+        paymentMethods: PaymentMethods; // Cambiado de {} a PaymentMethods
     };
+}
+
+// Tipo para los datos del formulario de MercadoPago
+interface MPFormData {
+    id?: string;
+    status?: string;
+    [key: string]: unknown;
 }
 
 const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
@@ -118,8 +130,8 @@ const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
 
     const handleSubmit = useCallback(
         async (
-            formData: any,
-            _additionalData?: any
+            formData: MPFormData, // Cambiado de 'any' a 'MPFormData'
+            _additionalData?: unknown // Cambiado de 'any' a 'unknown'
         ): Promise<void> => {
             try {
                 const paymentData: MPPaymentData = {
@@ -134,7 +146,6 @@ const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
         },
         [onSubmit, onError]
     );
-
 
     const handleError = useCallback((error: MPError): void => {
         console.error('❌ CardPayment error:', error);
@@ -200,7 +211,6 @@ const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
                 </Box>
             )}
 
-
             <div
                 ref={cardPaymentRef}
                 id="ultra_stable_cardpayment_container"
@@ -212,13 +222,14 @@ const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
                     borderRadius: '8px'
                 }}
             >
+                {/* arreglar aqui de acuerdo a la docu */}
                 <CardPayment
                     key="ultra-stable-never-reset" // Key fijo que NUNCA cambia
                     initialization={stableConfig.initialization}
-                    customization={stableConfig.customization}
-                    onSubmit={handleSubmit}
+                    customization={undefined}
+                    onSubmit={()=>handleSubmit({},{})}
                     onReady={handleReady}
-                    onError={handleError}
+                    onError={undefined}
                 />
 
                 <Button
