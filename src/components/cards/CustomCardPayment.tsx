@@ -56,7 +56,7 @@ const CustomCardPayment: React.FC<AntiResetCardPaymentProps> = ({
     isProcessing = false
 }) => {
     const [isCardReady, setIsCardReady] = useState<boolean>(false);
-    const cardPaymentRef = useRef<HTMLDivElement>(null);
+    const cardPaymentRef = useRef<HTMLDivElement | null>(null);
     const configCreated = useRef<boolean>(false);
     const lastConfigRef = useRef<PaymentConfig | null>(null);
 
