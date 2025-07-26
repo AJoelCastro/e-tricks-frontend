@@ -205,8 +205,10 @@ const SidebarCategory = ({
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-
-          <div className="h-full pt-16 flex flex-col">
+          <Box sx={{padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <Image src="https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_horizontal.svg" alt="Logo" width={120} height={120}/>
+          </Box>
+          <div className="h-full flex flex-col">
             {!showCategories && (
               <>
                 <div className="border-b p-4">
