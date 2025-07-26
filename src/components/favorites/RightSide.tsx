@@ -1,3 +1,4 @@
+'use client';
 import UserService from '@/services/UserService'
 import { Box, Button, CircularProgress, Grid, Typography, Accordion,
   AccordionSummary,
