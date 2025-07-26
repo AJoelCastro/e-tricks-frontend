@@ -138,7 +138,7 @@ const SidebarCategory = ({
                 ) : selectedSubCategory ? (
                   selectedSubCategory.productcategories?.map((cat, i) => (
                     <li key={cat._id || i}>
-                      <Link href={`/${cat._id}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
+                      <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
                         <Typography variant="productCategory">{cat.name}</Typography>
                       </Link>
                     </li>
