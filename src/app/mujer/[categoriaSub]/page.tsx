@@ -1,6 +1,4 @@
 'use client';
-import FooterComponent from '@/components/FooterComponent'
-import NavbarComponent from '@/components/NavbarComponent'
 import { SplashScreen } from '@/components/splash-screen';
 import SubCategoryPageSection from '@/page-sections/category/SubCategoryPageSection'
 import GroupCategoryService from '@/services/GroupCategoryService';
@@ -39,9 +37,7 @@ const SubCategoryPage = () => {
   
   return (
     <>
-      <NavbarComponent/>
       <SubCategoryPageSection groupId={idGroup!} subId={idSub!}/>
-      <FooterComponent/>
     </>
   )
 }

@@ -5,7 +5,7 @@ import React from 'react'
 const PaymentPage = () => {
   return (
     <>
-        <MainPayment/>
+      <MainPayment/>
     </>
   )
 }

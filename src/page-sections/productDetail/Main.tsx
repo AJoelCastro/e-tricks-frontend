@@ -22,6 +22,8 @@ import Image from 'next/image';
 import { SignInButton, useAuth } from '@clerk/nextjs';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { CheckCircle } from 'lucide-react';
+import NavbarComponent from '@/components/NavbarComponent';
+import FooterComponent from '@/components/FooterComponent';
 type Props = {
     id: string;
 };
@@ -165,7 +167,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
         )
     }
     return (
-        <>
+        <>  <NavbarComponent/>
             <div className='h-16'></div>
             <Grid container spacing={1} sx={{minHeight:'100vh', backgroundColor:'white', marginY:1, mx:{xs: 1, sm: 4, md: 8 }, borderRadius:4, marginBottom:4}}>
                 <>
@@ -630,6 +632,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <FooterComponent/>
         </>
     )
 }

@@ -1,10 +1,7 @@
 'use client';
-import FooterComponent from '@/components/FooterComponent'
-import NavbarComponent from '@/components/NavbarComponent'
 import { SplashScreen } from '@/components/splash-screen';
 import ProductCategoryPageSection from '@/page-sections/category/ProductCategoryPageSection'
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store';
 import React, { useEffect, useState } from 'react'
 import GroupCategoryService from '@/services/GroupCategoryService';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
@@ -44,9 +41,7 @@ const ProductCategoryPage = () => {
     if (!idGroup || !idSub || !idProduct) return <SplashScreen/>;
   return (
     <>
-      <NavbarComponent/>
       <ProductCategoryPageSection idGroup={idGroup!} idSub={idSub!} idProduct={idProduct!}/>
-      <FooterComponent/>
     </>
   )
 }

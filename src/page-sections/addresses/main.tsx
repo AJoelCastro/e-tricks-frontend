@@ -1,11 +1,14 @@
 import RightSideAddress from '@/components/addresses/RightSide'
 import LeftSide from '@/components/favorites/LeftSide'
+import FooterComponent from '@/components/FooterComponent'
+import NavbarComponent from '@/components/NavbarComponent'
 import { Grid } from '@mui/material'
 import React from 'react'
 
 const MainAddresses = () => {
   return (
     <>
+      <NavbarComponent/>
       <div className='h-16'></div>
       <Grid container spacing={1} sx={{minHeight:'100vh'}}>
         <Grid size={{
@@ -19,6 +22,7 @@ const MainAddresses = () => {
             <RightSideAddress/>
         </Grid>
       </Grid>
+      <FooterComponent/>
     </>
   )
 }

@@ -2,11 +2,14 @@ import React from 'react'
 import { Grid } from '@mui/material'
 import LeftSide from '@/components/favorites/LeftSide'
 import RightSide from '@/components/favorites/RightSide'
+import NavbarComponent from '@/components/NavbarComponent'
+import FooterComponent from '@/components/FooterComponent'
 
 const MainFavorites = () => {
 
   return (
     <>
+      <NavbarComponent/>
       <div className='h-16'></div>
       <Grid container spacing={1} sx={{minHeight:'100vh'}}>
         <Grid size={{
@@ -20,6 +23,7 @@ const MainFavorites = () => {
           <RightSide/>
         </Grid>
       </Grid>
+      <FooterComponent/>
     </>
     
   )
