@@ -3,7 +3,7 @@
 import OrderService from '@/services/OrderService'
 import CouponService from '@/services/CouponService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography, TextField, FormControl, InputLabel, Select, Chip } from '@mui/material'
-import React, { useEffect, useState , useCallback, useMemo} from 'react'
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
 
 import Image from 'next/image';
@@ -13,17 +13,18 @@ import { Snackbar, Alert } from '@mui/material';
 import { useAuth, useUser } from '@clerk/nextjs';
 import YapeCard from '../../../../components/cart/YapeCard';
 import { useCart } from '../../CartContext';
-import { useRouter} from 'next/navigation';
-import { 
-  Payment, 
+import { useRouter } from 'next/navigation';
+import {
+  Payment,
   StatusScreen,
-  CardNumber, 
+  CardNumber,
   CardPayment,
-  Wallet, initMercadoPago,
-  
+  Wallet, initMercadoPago, Brand
+
 } from '@mercadopago/sdk-react';
 import { ICreateOrderData } from '@/interfaces/Order';
-
+import { ICoupon } from '@/interfaces/Coupon';
+import CustomCardPayment from '@/components/cards/CustomCardPayment';
 // Interfaz para errores de MercadoPago
 interface MPError {
   message: string;
@@ -48,13 +49,11 @@ const style = {
 };
 
 const RightSidePayment = () => {
-  // Estados existentes
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
-    }
-  }, []);
+
+  // Estados existentes
+  const modalRef = useRef(null)
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -65,35 +64,32 @@ const RightSidePayment = () => {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'payment' | 'yape' | null>(null);
 
   // Estados para MercadoPago
-
+  const mpInitialized = useRef(false);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showMercadoPagoModal, setShowMercadoPagoModal] = useState(false);
 
-   // Estados para cupón de descuento
+  // Estados para cupón de descuento
   const [showCouponField, setShowCouponField] = useState(false);
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<ICoupon | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   // Estados para formularios de pago
-  const [cardFormData, setCardFormData] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    securityCode: '',
-    cardholderName: '',
-    cardholderEmail: '',
-    identificationType: '',
-    identificationNumber: ''
-  });
 
   const { getToken } = useAuth();
   const { user } = useUser();
   const { carrito, isLoading, selectedAddressId, deliveryType, pickUps, addresses, selectedAddress, selectedPickup } = useCart();
   const router = useRouter();
 
-  console.log(user)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !mpInitialized.current) {
+      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
+      mpInitialized.current = true;
+    }
+  }, []);
+
   // Calcular totales
   const calculateTotals = useCallback(() => {
     const subtotal = carrito.reduce((sum, item) => {
@@ -111,8 +107,9 @@ const RightSidePayment = () => {
     let total = subtotal - discount;
     let couponDiscount = 0;
 
-    
+
     if (appliedCoupon) {
+      console.log("discount", appliedCoupon.discountPercentage)
       couponDiscount = total * (appliedCoupon.discountPercentage / 100);
       total = total - couponDiscount;
     }
@@ -122,7 +119,7 @@ const RightSidePayment = () => {
 
   const { subtotal, discount, couponDiscount, total } = calculateTotals();
 
-   // Memoizar la configuración del CardPayment para evitar re-renders
+  // Memoizar la configuración del CardPayment para evitar re-renders
   const cardPaymentConfig = useMemo(() => ({
     initialization: {
       amount: total,
@@ -135,7 +132,7 @@ const RightSidePayment = () => {
         hidePaymentButton: true,
       },
       paymentMethods: {
-       
+
       }
     }
   }), [total, user?.emailAddresses]);
@@ -157,7 +154,7 @@ const RightSidePayment = () => {
       ? `📦 Recojo en tienda: ${selectedPickup?.city} - ${selectedPickup?.cc} - ${selectedPickup?.stand} `
       : `📍 Entrega a: ${selectedAddress?.name} - ${selectedAddress?.street} ${selectedAddress?.number}, ${selectedAddress?.city}, ${selectedAddress?.state}`;
 
-     const couponText = appliedCoupon ? `\n🎟️ Cupón aplicado: ${appliedCoupon.code} (-${appliedCoupon.discountPercentage}%)` : '';
+    const couponText = appliedCoupon ? `\n🎟️ Cupón aplicado: ${appliedCoupon.code} (-${appliedCoupon.discountPercentage}%)` : '';
 
 
     const mensaje = `👋 ¡Hola! Quisiera hacer un pedido:\n\n${carritoTexto}\n${metodoEntrega}\n\n💰 *Total: S/ ${total.toFixed(2)}*\n\n🛒 Gracias, quedo atento(a).`;
@@ -175,16 +172,15 @@ const RightSidePayment = () => {
     try {
       setIsValidatingCoupon(true);
       const token = await getToken();
-      
+
       if (!token) {
         throw new Error('No se pudo obtener el token de autenticación');
       }
 
       const couponData = await CouponService.validateCoupon(token, couponCode.trim());
-      
-      if (couponData) {
-        setAppliedCoupon(couponData);
-        handleShowSnackbar(`Cupón aplicado: ${couponData.discountPercentage}% de descuento`, "success");
+      if (couponData.success) {
+        setAppliedCoupon(couponData.data);
+        handleShowSnackbar(`Cupón aplicado: ${couponData.data.discountPercentage}% de descuento`, "success");
         setShowCouponField(false);
       } else {
         handleShowSnackbar("Cupón no válido o expirado", "error");
@@ -205,7 +201,7 @@ const RightSidePayment = () => {
 
 
   const handleCreateOrder = async () => {
-   
+
 
     if (!user?.id) {
       handleShowSnackbar("Usuario no autenticado", "error");
@@ -215,7 +211,7 @@ const RightSidePayment = () => {
     try {
       setIsProcessingPayment(true);
       const token = await getToken();
-      
+
       if (!token) {
         throw new Error('No se pudo obtener el token de autenticación');
       }
@@ -226,12 +222,12 @@ const RightSidePayment = () => {
         couponCode: appliedCoupon?.code
       };
 
-      
+
 
       console.log(orderData)
 
       const response = await OrderService.createOrder(token, orderData as ICreateOrderData);
-      
+
       if (response.success) {
         setOrderId(response.data.order._id);
         handleShowSnackbar("Orden creada exitosamente", "success");
@@ -245,6 +241,26 @@ const RightSidePayment = () => {
     }
   };
 
+  const handleCardPaymentSubmit = async (param: any) => {
+    try {
+      setIsProcessingPayment(true);
+
+
+      const createdOrderId = await handleCreateOrder();
+      if (createdOrderId) {
+        await handlePaymentSuccess(param);
+      }
+
+
+    } catch (error) {
+      console.error('Error in payment process:', error);
+      handlePaymentError(error as MPError);
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+
   const handlePaymentSuccess = async (paymentData: any) => {
     try {
       const token = await getToken();
@@ -253,9 +269,9 @@ const RightSidePayment = () => {
           orderId: orderId,
           paymentId: paymentData.id.toString()
         });
-        
+
         handleShowSnackbar("¡Pago realizado con éxito!", "success");
-        
+
         setTimeout(() => {
           router.push(`/order/success?orderId=${orderId}`);
         }, 2000);
@@ -318,54 +334,23 @@ const RightSidePayment = () => {
     </Box>
   );
 
-  
-
- const renderPaymentForm = () => {
-    console.log(paymentMethod)
-    switch (paymentMethod) {
-      case 'card':
-    
-        return (
-         <CardPayment
-            key={`card-payment-${total}-${user?.emailAddresses?.[0]?.emailAddress}`}
-            initialization={cardPaymentConfig.initialization}
-            customization={cardPaymentConfig.customization}
-            onSubmit={async (param) => {
-              try {
-                const createdOrderId = await handleCreateOrder();
-                if (createdOrderId) {
-                  await handlePaymentSuccess(param);
-                }
-              } catch (error) {
-                console.error('Error in payment process:', error);
-              }
-            }}
-            onReady={() => {
-              console.log('Card payment ready');
-            }}
-            onError={handlePaymentError}
-          />
-        );  
 
 
-      default:
-        return null;
-    }
-  };
+
 
 
   // Función para renderizar la información de entrega
   const renderDeliveryInfo = () => {
     if (deliveryType === 'pickup' && selectedPickup) {
       return (
-        <Box sx={{ 
-          p: 2, 
-          border: '1px solid #e0e0e0', 
+        <Box sx={{
+          p: 2,
+          border: '1px solid #e0e0e0',
           borderRadius: 2,
           backgroundColor: '#f9f9f9'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <Chip 
+            <Chip
               label="Recojo en tienda"
               size="small"
               color="primary"
@@ -390,14 +375,14 @@ const RightSidePayment = () => {
       );
     } else if (deliveryType === 'address' && selectedAddress) {
       return (
-        <Box sx={{ 
-          p: 2, 
-          border: '1px solid #e0e0e0', 
+        <Box sx={{
+          p: 2,
+          border: '1px solid #e0e0e0',
           borderRadius: 2,
           backgroundColor: '#f9f9f9'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <Chip 
+            <Chip
               label="Envío a domicilio"
               size="small"
               color="primary"
@@ -448,7 +433,7 @@ const RightSidePayment = () => {
               <LucideArrowLeft color='#7950f2' />
             </IconButton>
             <CartProgress activeStep={2} />
-            
+
             {/* Mostrar información de entrega */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="leftside" sx={{ mb: 2 }}>
@@ -510,15 +495,15 @@ const RightSidePayment = () => {
                     </Box>
                   )}
 
-                    {/* Sección de cupón de descuento */}
+                  {/* Sección de cupón de descuento */}
                   <Box sx={{ mb: 2, mt: 2 }}>
                     {!appliedCoupon && !showCouponField && (
                       <Button
                         variant="text"
                         size="small"
                         onClick={() => setShowCouponField(true)}
-                        sx={{ 
-                          textTransform: 'none', 
+                        sx={{
+                          textTransform: 'none',
                           color: '#7950f2',
                           fontSize: '0.875rem',
                           p: 0
@@ -544,7 +529,7 @@ const RightSidePayment = () => {
                             size="small"
                             onClick={handleValidateCoupon}
                             disabled={isValidatingCoupon || !couponCode.trim()}
-                            sx={{ 
+                            sx={{
                               minWidth: 'auto',
                               px: 2,
                               textTransform: 'none'
@@ -564,8 +549,8 @@ const RightSidePayment = () => {
                             setShowCouponField(false);
                             setCouponCode('');
                           }}
-                          sx={{ 
-                            textTransform: 'none', 
+                          sx={{
+                            textTransform: 'none',
                             color: 'text.secondary',
                             fontSize: '0.75rem',
                             p: 0
@@ -577,9 +562,9 @@ const RightSidePayment = () => {
                     )}
 
                     {appliedCoupon && (
-                      <Box sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
+                      <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
                         mb: 1,
                         p: 1,
@@ -602,7 +587,7 @@ const RightSidePayment = () => {
                           <Button
                             size="small"
                             onClick={handleRemoveCoupon}
-                            sx={{ 
+                            sx={{
                               minWidth: 'auto',
                               p: 0.5,
                               color: 'text.secondary'
@@ -629,7 +614,10 @@ const RightSidePayment = () => {
                       if (paymentMethod === 'yape') {
                         setShowModalWebPay(true);
                       } else if (paymentMethod && ['card'].includes(paymentMethod)) {
-                        setShowMercadoPagoModal(true);
+
+                        setTimeout(() => {
+                          setShowMercadoPagoModal(true);
+                        }, 100);
                       } else {
                         handleShowSnackbar("Selecciona un método de pago", "warning");
                       }
@@ -681,7 +669,7 @@ const RightSidePayment = () => {
             <Typography variant="h6" sx={{ mb: 3, textAlign: 'center' }}>
               Confirmar pago - S/ {total.toFixed(2)}
             </Typography>
-            
+
             <Box sx={{ mb: 2 }}>
               <Typography variant="body1" sx={{ mb: 1, fontWeight: 'bold' }}>
                 Método seleccionado:
@@ -691,10 +679,10 @@ const RightSidePayment = () => {
               </Typography>
             </Box>
 
-            <Box sx={{ 
-              border: '1px solid #e0e0e0', 
-              borderRadius: 2, 
-              p: 2, 
+            <Box sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              p: 2,
               mb: 3,
               backgroundColor: '#f9f9f9'
             }}>
@@ -724,22 +712,36 @@ const RightSidePayment = () => {
                 </>
               ) : null}
             </Box>
-            
-            {/* Botón para crear orden y proceder al pago */}
-            {
-               renderPaymentForm()
-            }
+              <Brand />
 
-              <Button
+            <Box sx={{ display: showMercadoPagoModal ? 'block' : 'none' }}>
+              <CardPayment
+                key={`card-payment-${total}-${user?.emailAddresses?.[0]?.emailAddress}`}
+                initialization={cardPaymentConfig.initialization}
+                customization={cardPaymentConfig.customization}
+                onSubmit={async (param) => {
+                  handleCardPaymentSubmit(param)
+                }}
+                onReady={() => {
+                  console.log('Card payment ready');
+                }}
+                onError={handlePaymentError}
+              />
+             
+          
+            </Box>
+
+            {/* Botón para crear orden y proceder al pago */}
+            <Button
               type='submit'
               variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
             >
               Pagar
             </Button>
-            
+
             <Button
               onClick={() => {
                 setShowMercadoPagoModal(false);
@@ -775,10 +777,10 @@ const RightSidePayment = () => {
               Pasos para realizar tu compra vía Yape
             </Typography>
 
-            <Box sx={{ 
-              border: '1px solid #e0e0e0', 
-              borderRadius: 2, 
-              p: 2, 
+            <Box sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              p: 2,
               mb: 3,
               backgroundColor: '#f9f9f9'
             }}>
