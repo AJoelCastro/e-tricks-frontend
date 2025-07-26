@@ -61,5 +61,6 @@ declare module '@mui/material/Typography' {
     h7: true;
     sideBarSubCategories: true;
     productCategory: true;
+    subCategory: true;
   }
 }
