@@ -10,13 +10,8 @@ interface CouponValidationResponse {
 
 
 const CouponService = {
-    /**
-     * Validates a coupon code
-     * @param {string} token - Authentication token
-     * @param {string} code - Coupon code to validate
-     * @returns {Promise<ICoupon>} Valid coupon data
-     */
-    validateCoupon: async (token: string, code: string): Promise<ICoupon> => {
+   
+    validateCoupon: async (token: string, code: string): Promise<CouponValidationResponse> => {
         if (!token) {
             throw new Error('No hay token de autenticación');
         }
@@ -27,6 +22,7 @@ const CouponService = {
                     'Authorization': `Bearer ${token}`
                 }
             });
+           console.log("response data",response.data)
             return response.data;
         } catch (error) {
             console.error('Error validating coupon:', error);
