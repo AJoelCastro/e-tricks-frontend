@@ -1,33 +1,34 @@
 'use client';
-import UserService from '@/services/UserService'
+
 import OrderService from '@/services/OrderService'
+import CouponService from '@/services/CouponService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography, TextField, FormControl, InputLabel, Select, Chip } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState , useCallback, useMemo} from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
-import { ICartItem } from '@/interfaces/CartItem';
-import ProductService from '@/services/ProductService';
+
 import Image from 'next/image';
-import Link from 'next/link';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { IAddress } from '@/interfaces/Address';
-import { IPickUp } from '@/interfaces/PickUp';
-import SelectableAddressCard from '../../../../components/addresses/SelectableAddressCard';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth, useUser } from '@clerk/nextjs';
-import SavedCard from '../../../../components/cart/SavedCard';
 import YapeCard from '../../../../components/cart/YapeCard';
 import { useCart } from '../../CartContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter} from 'next/navigation';
 import { 
   Payment, 
   StatusScreen,
   CardNumber, 
   CardPayment,
-  Wallet,
+  Wallet, initMercadoPago,
   
 } from '@mercadopago/sdk-react';
+
+// Interfaz para errores de MercadoPago
+interface MPError {
+  message: string;
+  type: string;
+}
+
 
 const style = {
   position: 'absolute',
@@ -47,6 +48,12 @@ const style = {
 
 const RightSidePayment = () => {
   // Estados existentes
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
+    }
+  }, []);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -57,11 +64,17 @@ const RightSidePayment = () => {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'payment' | 'yape' | null>(null);
 
   // Estados para MercadoPago
-  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showMercadoPagoModal, setShowMercadoPagoModal] = useState(false);
+
+   // Estados para cupón de descuento
+  const [showCouponField, setShowCouponField] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   // Estados para formularios de pago
   const [cardFormData, setCardFormData] = useState({
@@ -76,17 +89,12 @@ const RightSidePayment = () => {
 
   const { getToken } = useAuth();
   const { user } = useUser();
-  const { carrito, isLoading,selectedAddressId,deliveryType,pickUps,addresses,selectedAddress,selectedPickup } = useCart();
+  const { carrito, isLoading, selectedAddressId, deliveryType, pickUps, addresses, selectedAddress, selectedPickup } = useCart();
   const router = useRouter();
 
-
-  console.log('delivery', deliveryType)
-  console.log('address', selectedAddress)
-
-
+  console.log(user)
   // Calcular totales
-  const calculateTotals = () => {
-
+  const calculateTotals = useCallback(() => {
     const subtotal = carrito.reduce((sum, item) => {
       return sum + item.product.price * item.quantity;
     }, 0);
@@ -99,12 +107,39 @@ const RightSidePayment = () => {
       return sum;
     }, 0);
 
-    const total = subtotal - discount;
+    let total = subtotal - discount;
+    let couponDiscount = 0;
 
-    return { subtotal, discount, total };
-  };
+    
+    if (appliedCoupon) {
+      couponDiscount = total * (appliedCoupon.discountPercentage / 100);
+      total = total - couponDiscount;
+    }
 
-  const { subtotal, discount, total } = calculateTotals();
+    return { subtotal, discount, couponDiscount, total };
+  }, [carrito, appliedCoupon]);
+
+  const { subtotal, discount, couponDiscount, total } = calculateTotals();
+
+   // Memoizar la configuración del CardPayment para evitar re-renders
+  const cardPaymentConfig = useMemo(() => ({
+    initialization: {
+      amount: total,
+      payer: {
+        email: user?.emailAddresses?.[0]?.emailAddress || '',
+      }
+    },
+    customization: {
+      visual: {
+        hidePaymentButton: true,
+      },
+      paymentMethods: {
+        types: {
+          included: ['credit_card','debit_card']
+        }
+      }
+    }
+  }), [total, user?.emailAddresses]);
 
   const handleContinueByWhatsApp = () => {
     const carritoTexto = carrito.map((item, index) => {
@@ -119,10 +154,12 @@ const RightSidePayment = () => {
       return `🛍️ *${nombre}*\n🔗 ${linkProducto}\n📸 ${imagen}\n📏 Talla: ${talla} | Cant: ${cantidad}\n💵 Subtotal: S/ ${subtotal}\n`;
     }).join('\n');
 
-    
     const metodoEntrega = deliveryType === 'pickup'
       ? `📦 Recojo en tienda: ${selectedPickup?.city} - ${selectedPickup?.cc} - ${selectedPickup?.stand} `
       : `📍 Entrega a: ${selectedAddress?.name} - ${selectedAddress?.street} ${selectedAddress?.number}, ${selectedAddress?.city}, ${selectedAddress?.state}`;
+
+     const couponText = appliedCoupon ? `\n🎟️ Cupón aplicado: ${appliedCoupon.code} (-${appliedCoupon.discountPercentage}%)` : '';
+
 
     const mensaje = `👋 ¡Hola! Quisiera hacer un pedido:\n\n${carritoTexto}\n${metodoEntrega}\n\n💰 *Total: S/ ${total.toFixed(2)}*\n\n🛒 Gracias, quedo atento(a).`;
 
@@ -130,11 +167,46 @@ const RightSidePayment = () => {
     window.open(urlWhatsApp, '_blank');
   };
 
-  const handleCreateOrder = async () => {
-    if (!selectedAddress?._id) {
-      handleShowSnackbar("No se encontró la dirección seleccionada", "error");
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      handleShowSnackbar("Ingresa un código de cupón", "warning");
       return;
     }
+
+    try {
+      setIsValidatingCoupon(true);
+      const token = await getToken();
+      
+      if (!token) {
+        throw new Error('No se pudo obtener el token de autenticación');
+      }
+
+      const couponData = await CouponService.validateCoupon(token, couponCode.trim());
+      
+      if (couponData) {
+        setAppliedCoupon(couponData);
+        handleShowSnackbar(`Cupón aplicado: ${couponData.discountPercentage}% de descuento`, "success");
+        setShowCouponField(false);
+      } else {
+        handleShowSnackbar("Cupón no válido o expirado", "error");
+      }
+    } catch (error: any) {
+      console.error('Error validating coupon:', error);
+      handleShowSnackbar(error.response?.data?.message || "Error al validar el cupón", "error");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    handleShowSnackbar("Cupón removido", "info");
+  };
+
+
+  const handleCreateOrder = async () => {
+   
 
     if (!user?.id) {
       handleShowSnackbar("Usuario no autenticado", "error");
@@ -151,15 +223,20 @@ const RightSidePayment = () => {
 
       const orderData = {
         userId: user.id,
-        addressId: selectedAddress._id,
+        addressId: selectedPickup ? selectedPickup._id : selectedAddress,
+        couponCode: appliedCoupon?.code
       };
+
+      
+
+      console.log(orderData)
 
       const response = await OrderService.createOrder(token, orderData);
       
       if (response.success) {
         setOrderId(response.data.order._id);
-        setPreferenceId(response.data.order.mercadoPagoPreferenceId || null);
-        setShowMercadoPagoModal(true);
+        handleShowSnackbar("Orden creada exitosamente", "success");
+        return response.data.order._id;
       }
     } catch (error) {
       console.error('Error creating order:', error);
@@ -190,7 +267,7 @@ const RightSidePayment = () => {
     }
   };
 
-  const handlePaymentError = (error: BrickError) => {
+  const handlePaymentError = (error: MPError) => {
     console.error('Payment error:', error);
     handleShowSnackbar(`Error en el pago: ${error.message}`, "error");
   };
@@ -242,79 +319,107 @@ const RightSidePayment = () => {
     </Box>
   );
 
-  const renderPaymentForm = () => {
-    if (!preferenceId) return null;
+  
 
+ const renderPaymentForm = () => {
+    console.log(paymentMethod)
     switch (paymentMethod) {
       case 'card':
+    
         return (
-          <CardPayment
-            initialization={{
-              amount: total,
-              preferenceId: preferenceId,
-            }}
-            customization={{
-              paymentMethods: {
-                creditCard: "all",
-                debitCard: "all",
-              },
-            }}
+         <CardPayment
+            key={`card-payment-${total}-${user?.emailAddresses?.[0]?.emailAddress}`}
+            initialization={cardPaymentConfig.initialization}
+            customization={cardPaymentConfig.customization}
             onSubmit={async (param) => {
-              await handlePaymentSuccess(param);
+              try {
+                const createdOrderId = await handleCreateOrder();
+                if (createdOrderId) {
+                  await handlePaymentSuccess(param);
+                }
+              } catch (error) {
+                console.error('Error in payment process:', error);
+              }
             }}
             onReady={() => {
               console.log('Card payment ready');
             }}
             onError={handlePaymentError}
           />
-        );
+        );  
 
-      case 'wallet':
-        return (
-          <Wallet
-            initialization={{
-              preferenceId: preferenceId,
-            }}
-            customization={{
-              texts: {
-                valueProp: 'smart_option',
-              },
-            }}
-            onReady={() => {
-              console.log('Wallet ready');
-            }}
-            onError={handlePaymentError}
-          />
-        );
-
-      case 'payment':
-        return (
-          <Payment
-            initialization={{
-              amount: total,
-              preferenceId: preferenceId,
-            }}
-            customization={{
-              paymentMethods: {
-                ticket: "all",
-                creditCard: "all",
-                debitCard: "all",
-                mercadoPago: "all",
-              },
-            }}
-            onSubmit={async (param) => {
-              await handlePaymentSuccess(param);
-            }}
-            onReady={() => {
-              console.log('Payment ready');
-            }}
-            onError={handlePaymentError}
-          />
-        );
 
       default:
         return null;
     }
+  };
+
+
+  // Función para renderizar la información de entrega
+  const renderDeliveryInfo = () => {
+    if (deliveryType === 'pickup' && selectedPickup) {
+      return (
+        <Box sx={{ 
+          p: 2, 
+          border: '1px solid #e0e0e0', 
+          borderRadius: 2,
+          backgroundColor: '#f9f9f9'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Chip 
+              label="Recojo en tienda"
+              size="small"
+              color="primary"
+            />
+          </Box>
+          <Typography variant="subtitle1" fontWeight="bold">
+            {selectedPickup.city}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {selectedPickup.address}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Centro Comercial: {selectedPickup.cc}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Stand: {selectedPickup.stand}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Tel: {selectedPickup.contactNumber}
+          </Typography>
+        </Box>
+      );
+    } else if (deliveryType === 'address' && selectedAddress) {
+      return (
+        <Box sx={{ 
+          p: 2, 
+          border: '1px solid #e0e0e0', 
+          borderRadius: 2,
+          backgroundColor: '#f9f9f9'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Chip 
+              label="Envío a domicilio"
+              size="small"
+              color="primary"
+            />
+          </Box>
+          <Typography variant="subtitle1" fontWeight="bold">
+            {selectedAddress.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {selectedAddress.street} {selectedAddress.number}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {selectedAddress.city}, {selectedAddress.state}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Tel: {selectedAddress.phone}
+          </Typography>
+        </Box>
+      );
+    }
+    return null;
   };
 
   if (isLoading) {
@@ -345,39 +450,12 @@ const RightSidePayment = () => {
             </IconButton>
             <CartProgress activeStep={2} />
             
-            {/* Mostrar dirección seleccionada */}
+            {/* Mostrar información de entrega */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="leftside" sx={{ mb: 2 }}>
-                Dirección de entrega seleccionada
+                {deliveryType === 'pickup' ? 'Punto de recojo seleccionado' : 'Dirección de entrega seleccionada'}
               </Typography>
-              {selectedAddress && (
-                <Box sx={{ 
-                  p: 2, 
-                  border: '1px solid #e0e0e0', 
-                  borderRadius: 2,
-                  backgroundColor: '#f9f9f9'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Chip 
-                      label={deliveryType === 'pickup' ? 'Recojo en tienda' : 'Envío a domicilio'}
-                      size="small"
-                      color="primary"
-                    />
-                  </Box>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {selectedAddress.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedAddress.street} {selectedAddress.number}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedAddress.city}, {selectedAddress.state}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Tel: {selectedAddress.phone}
-                  </Typography>
-                </Box>
-              )}
+              {renderDeliveryInfo()}
             </Box>
 
             {/* Métodos de pago */}
@@ -389,26 +467,12 @@ const RightSidePayment = () => {
               {renderPaymentMethodCard(
                 'card',
                 'Tarjeta de Crédito/Débito',
-                'Paga con tu tarjeta de crédito o débito',
-                'https://http2.mlstatic.com/storage/logos-api-admin/a5f047d0-9be0-11ec-aad4-c3381a5889ec-m.svg',
+                'Paga con tu tarjeta de crédito o débito, Mastercard, American Express',
+                'https://st2.depositphotos.com/1102480/10686/i/450/depositphotos_106860552-stock-photo-collection-of-popular-payment-system.jpg',
                 paymentMethod === 'card'
               )}
 
-              {renderPaymentMethodCard(
-                'wallet',
-                'MercadoPago Wallet',
-                'Paga con tu cuenta de MercadoPago',
-                'https://http2.mlstatic.com/storage/logos-api-admin/51b446b0-571c-11e8-9a2d-4b2bd7b1bf77-m.svg',
-                paymentMethod === 'wallet'
-              )}
 
-              {renderPaymentMethodCard(
-                'payment',
-                'Todos los métodos',
-                'Tarjetas, efectivo, transferencias y más',
-                'https://http2.mlstatic.com/storage/logos-api-admin/aa2b8f70-5c85-11ec-ae75-df2bef173be2-m.svg',
-                paymentMethod === 'payment'
-              )}
 
               {/* Yape Card */}
               <YapeCard
@@ -447,6 +511,111 @@ const RightSidePayment = () => {
                     </Box>
                   )}
 
+                    {/* Sección de cupón de descuento */}
+                  <Box sx={{ mb: 2, mt: 2 }}>
+                    {!appliedCoupon && !showCouponField && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() => setShowCouponField(true)}
+                        sx={{ 
+                          textTransform: 'none', 
+                          color: '#7950f2',
+                          fontSize: '0.875rem',
+                          p: 0
+                        }}
+                      >
+                        ¿Tienes un código de descuento?
+                      </Button>
+                    )}
+
+                    {showCouponField && !appliedCoupon && (
+                      <Box sx={{ mt: 1 }}>
+                        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                          <TextField
+                            size="small"
+                            placeholder="Código de cupón"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            sx={{ flex: 1 }}
+                            disabled={isValidatingCoupon}
+                          />
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={handleValidateCoupon}
+                            disabled={isValidatingCoupon || !couponCode.trim()}
+                            sx={{ 
+                              minWidth: 'auto',
+                              px: 2,
+                              textTransform: 'none'
+                            }}
+                          >
+                            {isValidatingCoupon ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              'Aplicar'
+                            )}
+                          </Button>
+                        </Box>
+                        <Button
+                          variant="text"
+                          size="small"
+                          onClick={() => {
+                            setShowCouponField(false);
+                            setCouponCode('');
+                          }}
+                          sx={{ 
+                            textTransform: 'none', 
+                            color: 'text.secondary',
+                            fontSize: '0.75rem',
+                            p: 0
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                      </Box>
+                    )}
+
+                    {appliedCoupon && (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mb: 1,
+                        p: 1,
+                        backgroundColor: '#e8f5e8',
+                        borderRadius: 1,
+                        border: '1px solid #4caf50'
+                      }}>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                            Cupón: {appliedCoupon.code}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            -{appliedCoupon.discountPercentage}% de descuento
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
+                            -S/ {couponDiscount.toFixed(2)}
+                          </Typography>
+                          <Button
+                            size="small"
+                            onClick={handleRemoveCoupon}
+                            sx={{ 
+                              minWidth: 'auto',
+                              p: 0.5,
+                              color: 'text.secondary'
+                            }}
+                          >
+                            ✕
+                          </Button>
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
                     <Typography variant="h7">Total</Typography>
                     <Typography variant="h7">S/ {total.toFixed(2)}</Typography>
@@ -460,8 +629,8 @@ const RightSidePayment = () => {
                     onClick={() => {
                       if (paymentMethod === 'yape') {
                         setShowModalWebPay(true);
-                      } else if (paymentMethod && ['card', 'wallet', 'payment'].includes(paymentMethod)) {
-                        handleCreateOrder();
+                      } else if (paymentMethod && ['card'].includes(paymentMethod)) {
+                        setShowMercadoPagoModal(true);
                       } else {
                         handleShowSnackbar("Selecciona un método de pago", "warning");
                       }
@@ -471,7 +640,7 @@ const RightSidePayment = () => {
                     {isProcessingPayment ? (
                       <CircularProgress size={24} color="inherit" />
                     ) : (
-                      <Typography variant="h7">Pagar</Typography>
+                      <Typography variant="h7">Continuar</Typography>
                     )}
                   </Button>
 
@@ -511,7 +680,7 @@ const RightSidePayment = () => {
         <Fade in={showMercadoPagoModal}>
           <Box sx={style}>
             <Typography variant="h6" sx={{ mb: 3, textAlign: 'center' }}>
-              Completa tu pago - S/ {total.toFixed(2)}
+              Confirmar pago - S/ {total.toFixed(2)}
             </Typography>
             
             <Box sx={{ mb: 2 }}>
@@ -520,8 +689,6 @@ const RightSidePayment = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {paymentMethod === 'card' && 'Tarjeta de Crédito/Débito'}
-                {paymentMethod === 'wallet' && 'MercadoPago Wallet'}
-                {paymentMethod === 'payment' && 'Todos los métodos de pago'}
               </Typography>
             </Box>
 
@@ -533,20 +700,52 @@ const RightSidePayment = () => {
               backgroundColor: '#f9f9f9'
             }}>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Dirección de entrega:</strong>
+                <strong>{deliveryType === 'pickup' ? 'Punto de recojo:' : 'Dirección de entrega:'}</strong>
               </Typography>
-              <Typography variant="body2">
-                {selectedAddress?.name} - {selectedAddress?.street} {selectedAddress?.number}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {selectedAddress?.city}, {selectedAddress?.state}
-              </Typography>
+              {deliveryType === 'pickup' && selectedPickup ? (
+                <>
+                  <Typography variant="body2">
+                    {selectedPickup.city} - {selectedPickup.cc}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Stand: {selectedPickup.stand}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedPickup.address}
+                  </Typography>
+                </>
+              ) : selectedAddress ? (
+                <>
+                  <Typography variant="body2">
+                    {selectedAddress.name} - {selectedAddress.street} {selectedAddress.number}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedAddress.city}, {selectedAddress.state}
+                  </Typography>
+                </>
+              ) : null}
             </Box>
             
-            {renderPaymentForm()}
+            {/* Botón para crear orden y proceder al pago */}
+            {
+               renderPaymentForm()
+            }
+
+              <Button
+              type='submit'
+              variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
+            >
+              Pagar
+            </Button>
             
             <Button
-              onClick={() => setShowMercadoPagoModal(false)}
+              onClick={() => {
+                setShowMercadoPagoModal(false);
+                setOrderId(null);
+              }}
               sx={{ mt: 2, width: '100%' }}
               variant="outlined"
             >
@@ -555,6 +754,7 @@ const RightSidePayment = () => {
           </Box>
         </Fade>
       </Modal>
+
 
       {/* Modal de Yape */}
       <Modal
@@ -587,7 +787,11 @@ const RightSidePayment = () => {
                 <strong>Total a pagar: S/ {total.toFixed(2)}</strong>
               </Typography>
               <Typography variant="body2">
-                Dirección: {selectedAddress?.name} - {selectedAddress?.street}
+                {deliveryType === 'pickup' && selectedPickup ? (
+                  `Recojo: ${selectedPickup.city} - ${selectedPickup.cc}`
+                ) : selectedAddress ? (
+                  `Dirección: ${selectedAddress.name} - ${selectedAddress.street}`
+                ) : ''}
               </Typography>
             </Box>
 
