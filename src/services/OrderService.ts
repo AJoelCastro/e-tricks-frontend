@@ -1,52 +1,13 @@
+import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse } from '@/interfaces/Order';
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-export interface CreateOrderData {
-    userId: string;
-    addressId: string;
-    couponCode?: string; 
-}
-
-export interface CreateOrderResponse {
-    success: boolean;
-    data: {
-        init_point: string;
-        sandbox_init_point: string;
-        order: {
-            _id: string;
-            userId: string;
-            items: Array<{
-                productId: string;
-                name: string;
-                price: number;
-                quantity: number;
-                size: string;
-            }>;
-            subtotalAmount: number;
-            totalAmount: number;
-            discountAmount?: number;
-            couponCode?: string;
-            addressId: string;
-            paymentMethod: string;
-            status: string;
-            paymentStatus: string;
-            paymentId?: string;
-
-        }
-    };
-}
-
-export interface ConfirmPaymentData {
-    orderId: string;
-    paymentId: string;
-}
 
 const OrderService = {
     /**
      * Crear nueva orden con MercadoPago
      */
-    createOrder: async (token: string, data: CreateOrderData): Promise<CreateOrderResponse> => {
+    createOrder: async (token: string, data: ICreateOrderData): Promise<ICreateOrderResponse> => {
         try {
             const response = await axios.post(`${API_URL}/order/checkout`, data, {
                 headers: {
@@ -64,7 +25,7 @@ const OrderService = {
     /**
      * Confirmar pago manualmente (para UX mejorada)
      */
-    confirmPayment: async (token: string, data: ConfirmPaymentData) => {
+    confirmPayment: async (token: string, data: IConfirmPaymentData) => {
         try {
             const response = await axios.post(`${API_URL}/order/checkout/payment/confirm`, 
                 data, 

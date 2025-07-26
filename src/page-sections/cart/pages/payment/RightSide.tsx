@@ -22,6 +22,7 @@ import {
   Wallet, initMercadoPago,
   
 } from '@mercadopago/sdk-react';
+import { ICreateOrderData } from '@/interfaces/Order';
 
 // Interfaz para errores de MercadoPago
 interface MPError {
@@ -229,7 +230,7 @@ const RightSidePayment = () => {
 
       console.log(orderData)
 
-      const response = await OrderService.createOrder(token, orderData);
+      const response = await OrderService.createOrder(token, orderData as ICreateOrderData);
       
       if (response.success) {
         setOrderId(response.data.order._id);
