@@ -32,7 +32,7 @@ export interface CreateOrderResponse {
             status: string;
             paymentStatus: string;
             paymentId?: string;
-            mercadoPagoPreferenceId?: string;
+
         }
     };
 }
