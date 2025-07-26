@@ -100,9 +100,9 @@ const SidebarCategory = ({
                           className={`w-full font-semibold text-left p-3 ${selectedBrandId === brand._id ? 'text-[#7950f2]' : 'text-gray-800 hover:bg-gray-100'}`}
                           onMouseEnter={() => setSelectedBrandId(brand._id)}
                         >
-                          {/* <Link href={`/${brand.name.toLowerCase()}`} onMouseEnter={() => setSelectedBrandId(brand._id)}> */}
+                          <Link href={`/${brand.name.toLowerCase()}`} onMouseEnter={() => setSelectedBrandId(brand._id)}>
                             <Typography variant="priceCard">{brand.name}</Typography>
-                          {/* </Link> */}
+                          </Link>
                         </button>
                       </li>
                     ))
@@ -112,9 +112,9 @@ const SidebarCategory = ({
                             className={`w-full font-semibold text-left p-3 ${selectedSubCategory?._id === subcategory._id ? 'text-[#7950f2]' : 'text-gray-800 hover:bg-gray-100'}`}
                             onMouseEnter={() => setSelectedSubCategory(subcategory)}
                           >
-                            {/* <Link href={`/${activeGroup.routeLink}/${subcategory.routeLink}`} onMouseEnter={() => setSelectedSubCategory(subcategory)}> */}
+                            <Link href={`/${activeGroup.routeLink}/${subcategory.routeLink}`} onMouseEnter={() => setSelectedSubCategory(subcategory)}>
                               <Typography variant="priceCard">{subcategory.name}</Typography>
-                            {/* </Link> */}
+                            </Link>
                           </button>
                       </li>
                     ))}
