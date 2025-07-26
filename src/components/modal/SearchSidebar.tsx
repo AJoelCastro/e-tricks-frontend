@@ -43,7 +43,6 @@ const SearchSidebar: React.FC<Props> = ({ isOpen, onClose }) => {
     'Outlet',
     'Nuevo',
     'Sigue tu pedido',
-    'Alvaro marikong'
   ];
 
  
