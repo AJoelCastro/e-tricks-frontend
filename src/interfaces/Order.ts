@@ -15,13 +15,11 @@ export interface IOrder extends Document {
     totalAmount: number;
     discountAmount: number;
     couponCode?: string;
-    addressId?: string;
+    addressId?: string | null;
     status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed' | 'rejected' | 'refunded';
     paymentId: string;
     paymentStatus: string;
     paymentMethod: string;
-    mercadoPagoPreferenceId?: string;
-    mercadoPagoMerchantOrderId?: string;
     createdAt: Date;
     updatedAt: Date;
 }
