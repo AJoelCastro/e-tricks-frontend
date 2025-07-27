@@ -21,28 +21,32 @@ import BrandService from '@/services/BrandService';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useProductLogic } from '@/hooks/useProductLogic';
+import ErrorNotification from '@/components/ErrorNotification';
+import { useNotification } from '@/hooks/useNotification';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState<Array<IProduct>>([]);
   const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
-  const router = useRouter();
+  const { 
+    notification, 
+    closeNotification, 
+    showError, 
+    showWarning, 
+    showSuccess, 
+    showInfo 
+  } = useNotification();
   
+  const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+  
   // Usar el hook personalizado para toda la l?gica de productos
   const {
     favoriteIds,
     cartItems,
-    loading,
-    snackbarOpen,
-    snackbarMessage,
-    snackbarSeverity,
     cartNotificationOpen,
     lastAddedProduct,
-    showSnackbar,
-    handleCloseSnackbar,
     handleAddFavorite,
     handleRemoveFavorite,
     handleAddToCart,
@@ -57,6 +61,7 @@ const MainComponent = () => {
       setBrandsWithCategories(data);
     } catch (error) {
       console.error('Error fetching brands with categories:', error);
+      showError('Error al cargar las categor?as de marcas');
     }
   }
 
@@ -66,7 +71,7 @@ const MainComponent = () => {
       setDataProducts(data);
     }catch(error){
       console.error('Error getting products:', error);
-      showSnackbar('Error al cargar productos', 'error');
+      showError('Error al cargar las categor?as de marcas');
     }
   }
 
@@ -266,17 +271,15 @@ const MainComponent = () => {
         autoHideDuration={5000}
       />
 
-      {/* Snackbar para notificaciones generales */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      {/* Notifaciones de error generales */}
+      <ErrorNotification
+        open={notification.open}
+        onClose={closeNotification}
+        message={notification.message}
+        type={notification.type}
+        autoHideDuration={4000}
+        position="top"
+      />
     </>
   )
 }
