@@ -2,26 +2,33 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from "@clerk/nextjs";
 import UserService from '@/services/UserService';
 import { IProduct } from '@/interfaces/Product';
+import { useNotification } from '@/hooks/useNotification'; // Ajusta la ruta según tu estructura
 
 interface ProductLogicState {
   favoriteIds: string[];
   cartItems: any[];
   loading: boolean;
-  snackbarOpen: boolean;
-  snackbarMessage: string;
-  snackbarSeverity: 'success' | 'error';
   cartNotificationOpen: boolean;
   lastAddedProduct: {
     product: IProduct;
     size: string;
     quantity: number;
   } | null;
+  // El estado de notificaciones ahora viene del hook useNotification
+  notification: {
+    open: boolean;
+    message: string;
+    type: 'error' | 'warning' | 'success' | 'info';
+  };
 }
 
 interface ProductLogicActions {
-  // Snackbar
-  showSnackbar: (message: string, severity: 'success' | 'error') => void;
-  handleCloseSnackbar: () => void;
+  // Notificaciones - ahora usando useNotification
+  showError: (message: string) => void;
+  showWarning: (message: string) => void;
+  showSuccess: (message: string) => void;
+  showInfo: (message: string) => void;
+  closeNotification: () => void;
   
   // Favoritos
   handleAddFavorite: (id: string) => Promise<void>;
@@ -41,31 +48,25 @@ interface ProductLogicActions {
 
 export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
   const { isSignedIn, getToken } = useAuth();
+  const { 
+    notification, 
+    showError, 
+    showWarning, 
+    showSuccess, 
+    showInfo, 
+    closeNotification 
+  } = useNotification();
   
   // Estados
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [cartNotificationOpen, setCartNotificationOpen] = useState(false);
   const [lastAddedProduct, setLastAddedProduct] = useState<{
     product: IProduct;
     size: string;
     quantity: number;
   } | null>(null);
-
-  // Función para mostrar notificaciones
-  const showSnackbar = useCallback((message: string, severity: 'success' | 'error') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  }, []);
-
-  const handleCloseSnackbar = useCallback(() => {
-    setSnackbarOpen(false);
-  }, []);
 
   // Cargar favoritos
   const getFavorites = useCallback(async () => {
@@ -120,14 +121,14 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       
       // Actualizar estado local
       setFavoriteIds(prev => [...prev, id]);
-      showSnackbar('Producto agregado a favoritos', 'success');
+      showSuccess('Producto agregado a favoritos');
     } catch (error) {
       console.error('Error adding favorite:', error);
-      showSnackbar('Error al agregar a favoritos', 'error');
+      showError('Error al agregar a favoritos');
     } finally {
       setLoading(false);
     }
-  }, [getToken, showSnackbar]);
+  }, [getToken, showSuccess, showError]);
 
   // Manejar remover favorito
   const handleRemoveFavorite = useCallback(async (id: string) => {
@@ -141,14 +142,14 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       
       // Actualizar estado local
       setFavoriteIds(prev => prev.filter(favId => favId !== id));
-      showSnackbar('Producto removido de favoritos', 'success');
+      showSuccess('Producto removido de favoritos');
     } catch (error) {
       console.error('Error removing favorite:', error);
-      showSnackbar('Error al remover de favoritos', 'error');
+      showError('Error al remover de favoritos');
     } finally {
       setLoading(false);
     }
-  }, [getToken, showSnackbar]);
+  }, [getToken, showSuccess, showError]);
 
   // Manejar agregar al carrito
   const handleAddToCart = useCallback(async (
@@ -167,7 +168,8 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       // Recargar items del carrito
       await getCartItems();
       
-      // Mostrar notificación del carrito si se proporciona el producto
+      // SIEMPRE mostrar el modal del carrito cuando se agrega un producto
+      // Si no se proporciona el producto, podríamos buscarlo o usar un valor por defecto
       if (product) {
         setLastAddedProduct({
           product,
@@ -175,6 +177,10 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
           quantity
         });
         setCartNotificationOpen(true);
+        console.log('Cart notification should be open:', true);
+        console.log('Last added product:', { product, size, quantity });
+      } else {
+        console.warn('No product provided to handleAddToCart - modal will not show');
       }
 
       // Refrescar contador en navbar si existe la función global
@@ -184,12 +190,12 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       
     } catch (error) {
       console.error('Error adding to cart:', error);
-      showSnackbar('Error al agregar al carrito', 'error');
+      showError('Error al agregar al carrito');
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [getToken, getCartItems, showSnackbar]);
+  }, [getToken, getCartItems, showError]);
 
   // Manejar remover del carrito
   const handleRemoveFromCart = useCallback(async (productId: string) => {
@@ -213,7 +219,7 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       });
 
       if (!cartItem) {
-        showSnackbar('Producto no encontrado en el carrito', 'error');
+        showError('Producto no encontrado en el carrito');
         return;
       }
 
@@ -228,7 +234,7 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
         return itemId !== cartItemId;
       }));
       
-      showSnackbar('Producto removido del carrito', 'success');
+      showSuccess('Producto removido del carrito');
 
       // Refrescar contador en navbar
       if (typeof window !== 'undefined' && (window as any).refreshNavbarCartCount) {
@@ -236,12 +242,12 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       }
     } catch (error) {
       console.error('Error removing from cart:', error);
-      showSnackbar('Error al remover del carrito', 'error');
+      showError('Error al remover del carrito');
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [getToken, cartItems, showSnackbar]);
+  }, [getToken, cartItems, showSuccess, showError]);
 
   // Verificar si un producto está en el carrito
   const isProductInCart = useCallback((productId: string): boolean => {
@@ -272,15 +278,18 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
     favoriteIds,
     cartItems,
     loading,
-    snackbarOpen,
-    snackbarMessage,
-    snackbarSeverity,
     cartNotificationOpen,
     lastAddedProduct,
+    notification,
     
-    // Acciones
-    showSnackbar,
-    handleCloseSnackbar,
+    // Acciones de notificaciones
+    showError,
+    showWarning,
+    showSuccess,
+    showInfo,
+    closeNotification,
+    
+    // Otras acciones
     handleAddFavorite,
     handleRemoveFavorite,
     handleAddToCart,

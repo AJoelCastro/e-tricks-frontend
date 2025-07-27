@@ -96,12 +96,15 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
           position: 'fixed',
           top: position === 'top' ? 20 : 'auto',
           bottom: position === 'bottom' ? 20 : 'auto',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          // Centrado responsive mejorado
+          left: { xs: 16, sm: '50%' }, // En móvil usar margen fijo, en desktop centrar
+          right: { xs: 16, sm: 'auto' }, // En móvil usar margen fijo en ambos lados
+          transform: { xs: 'none', sm: 'translateX(-50%)' }, // Solo transformar en desktop
           zIndex: 9999,
-          maxWidth: { xs: '90%', sm: '500px' },
-          width: 'auto',
-          minWidth: '300px',
+          // Ancho responsive
+          width: { xs: 'auto', sm: 'auto' },
+          maxWidth: { xs: 'none', sm: '500px' },
+          minWidth: { xs: 'auto', sm: '300px' },
         }}
       >
         <Fade in={visible}>
@@ -118,6 +121,8 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
               backdropFilter: 'blur(8px)',
               position: 'relative',
               overflow: 'hidden',
+              // Ancho completo en móvil
+              width: '100%',
               '&::before': {
                 content: '""',
                 position: 'absolute',
@@ -149,6 +154,8 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
                 fontWeight: 500,
                 flex: 1,
                 lineHeight: 1.4,
+                fontSize: { xs: '0.875rem', sm: '1rem' }, // Texto más pequeño en móvil
+                wordBreak: 'break-word', // Evitar overflow del texto
               }}
             >
               {message}
@@ -161,12 +168,13 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
               sx={{
                 color: config.iconColor,
                 flexShrink: 0,
+                padding: { xs: 0.25, sm: 0.5 }, // Botón más pequeño en móvil
                 '&:hover': {
                   backgroundColor: 'rgba(0, 0, 0, 0.04)',
                 },
               }}
             >
-              <Close sx={{ fontSize: 20 }} />
+              <Close sx={{ fontSize: { xs: 18, sm: 20 } }} />
             </IconButton>
 
             {/* Barra de progreso para auto-hide */}
