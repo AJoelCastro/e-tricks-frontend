@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+@import 'swiper/css';
+@import 'swiper/css/scrollbar';
 :root {
   --background: #ffffff;
   --foreground: #171717;
