@@ -4,7 +4,7 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
     title: 'Marcas | Tricks',
 }
-const page = () => {
+const MarcasPage = () => {
   return (
     <>
       
@@ -12,4 +12,4 @@ const page = () => {
   )
 }
 
-export default page
+export default MarcasPage

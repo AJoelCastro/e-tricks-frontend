@@ -39,7 +39,6 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
   const fetchBrandsWithCategories = async () => {
     try {
       const data = await BrandService.getBrandsWithProductCategories();
-      console.log('brands with categories', data)
       setBrandsWithCategories(data);
     } catch (error) {
       console.error('Error fetching brands with categories:', error);

@@ -33,8 +33,6 @@ const SidebarCategory = ({
   const isMarcasGroup = activeGroup.routeLink === 'marcas';
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const allSubcategories = mobileActiveGroup.subcategories || [];
-  console.log('ag', activeGroup );
-  console.log('gc', groupCategories );
   const handleMobileGroupClick = (group: IGroupCategory) => {
     setMobileActiveGroup(group);
     setShowSubcategories(true);
@@ -137,7 +135,7 @@ const SidebarCategory = ({
                   {isMarcasGroup && selectedBrandId ? (
                     brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.categories.map(cat => (
                       <li key={cat._id}>
-                        <Link href={`/${brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name.toLowerCase()}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
+                        <Link href={`/marcas/${brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name.toLowerCase()}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
                           <Typography variant="productCategory">{cat.name}</Typography>
                         </Link>
                       </li>
@@ -145,7 +143,7 @@ const SidebarCategory = ({
                   ) : selectedSubCategory ? (
                     selectedSubCategory.productcategories?.map((cat, i) => (
                       <li key={cat._id || i}>
-                        <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
+                        <Link href={`/marcas/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
                           <Typography variant="productCategory">{cat.name}</Typography>
                         </Link>
                       </li>
@@ -327,7 +325,7 @@ const SidebarCategory = ({
                     <ul className="space-y-2">
                       {brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.categories.map(cat => (
                         <li key={cat._id}>
-                          <Link href={`/${brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name.toLowerCase()}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
+                          <Link href={`/marcas/${brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name.toLowerCase()}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
                             <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>
@@ -339,7 +337,7 @@ const SidebarCategory = ({
                     <ul className="space-y-2">
                       {selectedSubCategory.productcategories.map((cat, i) => (
                         <li key={cat._id || i}>
-                          <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
+                          <Link href={`/marcas/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
                             <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>
