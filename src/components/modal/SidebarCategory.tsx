@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
 import { ISubCategory } from '@/interfaces/SubCategory';
 import { IBrandWithCategories } from '@/interfaces/Brand';
@@ -211,17 +211,18 @@ const SidebarCategory = ({
           <div className="h-full flex flex-col">
             {!showCategories && (
               <>
-                <div className="border-b p-4">
-                  <Typography variant="nameCard">Categorías</Typography>
+                <div className="p-4 shadow-2xl">
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     {groupCategories.map((group) => (
-                      <button
+                      <Button
                         key={group._id}
                         onClick={() => handleMobileGroupClick(group)}
-                        className={`py-3 px-1 border rounded-lg ${mobileActiveGroup._id === group._id ? 'bg-[#7950f2] text-white' : 'bg-gray-50 text-gray-800 hover:bg-gray-100'}`}
+                        sx={{borderColor: '#7950f2'}}
+                        color={mobileActiveGroup._id === group._id ? 'primary' : 'inherit'}
+                        className="w-full"
                       >
-                        <Typography variant="priceCard">{group.name}</Typography>
-                      </button>
+                        <Typography variant="productCategory">{group.name}</Typography>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -234,7 +235,7 @@ const SidebarCategory = ({
                           <path d="m15 18-6-6 6-6" />
                         </svg>
                       </button>
-                      <h3 className="font-bold text-lg text-gray-800">{mobileActiveGroup.name}</h3>
+                      <Typography variant="nameDetail">{mobileActiveGroup.name}</Typography>
                     </div>
                     <ul className="space-y-1">
                       {mobileActiveGroup.routeLink === 'marcas'
@@ -245,12 +246,12 @@ const SidebarCategory = ({
                                   setSelectedBrandId(brand._id);
                                   setShowCategories(true);
                                 }}
-                                className="w-full text-left p-3 text-gray-800 hover:bg-gray-100 rounded-lg flex items-center justify-between"
+                                className="w-full p-3 text-gray-800 hover:bg-gray-100 rounded-lg"
                               >
-                                <Typography variant="sideBarSubCategories">{brand.name}</Typography>
-                                <svg width="16" height="16" stroke="currentColor" fill="none" strokeWidth="2">
-                                  <path d="m9 18 6-6-6-6" />
-                                </svg>
+                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1}}>
+                                  <Typography variant="priceDetail" sx={{fontWeight: 'bold'}}>{brand.name}</Typography>
+                                  <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                                </Box>
                               </button>
                             </li>
                           ))
@@ -258,12 +259,12 @@ const SidebarCategory = ({
                             <li key={subcategory._id}>
                               <button
                                 onClick={() => handleMobileSubcategoryClick(subcategory)}
-                                className="w-full text-left p-3 text-gray-800 hover:bg-gray-100 rounded-lg flex items-center justify-between"
+                                className="w-full p-3 text-gray-800 hover:bg-gray-100 rounded-lg"
                               >
-                                <Typography variant="sideBarSubCategories">{subcategory.name}</Typography>
-                                <svg width="16" height="16" stroke="currentColor" fill="none" strokeWidth="2">
-                                  <path d="m9 18 6-6-6-6" />
-                                </svg>
+                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1}}>
+                                  <Typography variant="priceDetail" sx={{fontWeight: 'bold'}}>{subcategory.name}</Typography>
+                                  <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                                </Box>
                               </button>
                             </li>
                           ))}
@@ -286,13 +287,48 @@ const SidebarCategory = ({
                   </div>
                 </div>
 
+                {/* Imagen horizontal en mobile */}
+                <div className="px-4 pt-4">
+                  {mobileActiveGroup.routeLink === 'marcas' && selectedBrandId ? (
+                    <div className="h-40 w-full relative rounded-lg overflow-hidden shadow-md mb-4">
+                      <Image
+                        src={brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.image || '/default-brand.jpg'}
+                        alt="Marca"
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                        <Typography variant="h5" className="text-white font-bold ml-4">
+                          {brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name}
+                        </Typography>
+                      </div>
+                    </div>
+                  ) : selectedSubCategory ? (
+                    <div className="h-40 w-full relative rounded-lg overflow-hidden shadow-md mb-4">
+                      <Image
+                        src={selectedSubCategory.image || '/default-subcategory.jpg'}
+                        alt={selectedSubCategory.name}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                        <Typography variant="h5" className="text-white font-bold ml-4">
+                          {selectedSubCategory.name}
+                        </Typography>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
                 <div className="p-4 flex-1 overflow-y-auto">
                   {mobileActiveGroup.routeLink === 'marcas' && selectedBrandId ? (
                     <ul className="space-y-2">
                       {brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.categories.map(cat => (
                         <li key={cat._id}>
                           <Link href={`/${brandsWithCategories.find(b => b.brand._id === selectedBrandId)?.brand.name.toLowerCase()}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
-                            <Typography variant="h7" sx={{ color: '#707071ff', ":hover": { color: "#7950f2" } }}>
+                            <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>
                           </Link>
@@ -304,7 +340,7 @@ const SidebarCategory = ({
                       {selectedSubCategory.productcategories.map((cat, i) => (
                         <li key={cat._id || i}>
                           <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
-                            <Typography variant="h7" sx={{ color: '#707071ff', ":hover": { color: "#7950f2" } }}>
+                            <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>
                           </Link>
