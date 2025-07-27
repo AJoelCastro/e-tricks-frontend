@@ -1,9 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const privateRoutes = [
-  '/favorites(.*)',
-  '/cart(.*)',
-  '/addresses(.*)',
+  '/favoritos(.*)',
+  '/carrito(.*)',
+  '/direcciones(.*)',
 ]
 const isProtectedRoute  = createRouteMatcher(privateRoutes);
 
