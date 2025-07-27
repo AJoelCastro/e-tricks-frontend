@@ -302,38 +302,77 @@ const ProductCard: React.FC<Props> = ({
             textAlign: 'center'
           }}
         >
-          <Button
-            variant="contained"
-            color={isInCart ? 'error' : 'primary'}
-            onClick={isInCart ? handleRemoveFromCartClick : handleOpenModal}
-            disabled={!hasStock || (!handleAddToCart && !isInCart)}
-            startIcon={
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            }
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'medium',
-              backgroundColor: isInCart ? undefined : '#7950f2',
-              '&:hover': {
-                backgroundColor: isInCart ? undefined : '#6a40e0'
-              },
-              '&.Mui-disabled': {
-                backgroundColor: '#e0e0e0',
-                color: '#9e9e9e'
+          {isSignedIn ? (
+            <Button
+              variant="contained"
+              color={isInCart ? 'error' : 'primary'}
+              onClick={isInCart ? handleRemoveFromCartClick : handleOpenModal}
+              disabled={!hasStock || (!handleAddToCart && !isInCart)}
+              startIcon={
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
               }
-            }}
-          >
-            {!hasStock ? 'Agotado' : isInCart ? 'Quitar del carro' : 'Añadir al carro'}
-          </Button>
+              sx={{
+                textTransform: 'none',
+                fontWeight: 'medium',
+                width: '100%',
+                backgroundColor: isInCart ? undefined : '#7950f2',
+                '&:hover': {
+                  backgroundColor: isInCart ? undefined : '#6a40e0'
+                },
+                '&.Mui-disabled': {
+                  backgroundColor: '#e0e0e0',
+                  color: '#9e9e9e'
+                }
+              }}
+            >
+              {!hasStock ? 'Agotado' : isInCart ? 'Quitar del carro' : 'Añadir al carro'}
+            </Button>
+          ) : (
+            <SignInButton mode='modal'>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!hasStock}
+                startIcon={
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                }
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  backgroundColor: '#7950f2',
+                  color: 'white',
+                  width: '100%',
+                  '&:hover': {
+                    backgroundColor: '#6a40e0'
+                  },
+                  '&.Mui-disabled': {
+                    backgroundColor: '#e0e0e0',
+                    color: '#9e9e9e'
+                  }
+                }}
+              >
+                {!hasStock ? 'Agotado' : 'Añadir al carro'}
+              </Button>
+            </SignInButton>
+          )}
         </Box>
       </Card>
 
