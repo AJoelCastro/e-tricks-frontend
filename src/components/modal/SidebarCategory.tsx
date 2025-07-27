@@ -91,7 +91,7 @@ const SidebarCategory = ({
           {/* Content */}
           <div className="flex h-full pt-16 mt-6 gap-1">
             {/* Subcategories */}
-            <div className="md:w-5/16 lg:w-17/64 border-r overflow-y-auto p-4 mt-2">
+            <div className="md:w-5/16 lg:w-17/64 overflow-y-auto p-4 mt-2">
               <ul className="space-y-2">
                 {isMarcasGroup
                   ? brandsWithCategories.map(({ brand }) => (
