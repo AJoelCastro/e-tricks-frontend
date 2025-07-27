@@ -17,6 +17,7 @@ import { set } from 'react-hook-form';
 import { se } from 'date-fns/locale';
 import { IProduct } from '@/interfaces/Product';
 import NoFavoritesFound from '../NoFavoritesFound';
+import { useProductLogic } from '@/hooks/useProductLogic';
 const RightSide = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [favorites, setFavorites] = useState([]);
@@ -25,7 +26,23 @@ const RightSide = () => {
     const { getToken } = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+    const {
+        favoriteIds,
+        cartItems,
+        loading,
+        snackbarOpen,
+        snackbarMessage,
+        snackbarSeverity,
+        cartNotificationOpen,
+        lastAddedProduct,
+        handleCloseSnackbar,
+        handleAddFavorite,
+        handleRemoveFavorite,
+        handleAddToCart,
+        handleRemoveFromCart,
+        isProductInCart,
+        closeCartNotification,
+    } = useProductLogic();
     const getFavorites = async() =>{
         try {
             setIsLoading(true)
@@ -43,18 +60,6 @@ const RightSide = () => {
         getFavorites()
     }, [])
    
-    const handleRemoveFavorite = useCallback(
-      async (id:string) => {
-        try {
-            const token = await getToken();
-            await UserService.removeFavorite(token as string,id)
-            getFavorites()
-        } catch (error) {
-            throw error
-        }
-      },
-      [],
-    )
 
     const applyFilter = useCallback(() => {
         if (!filterBy) return setFilteredFavorites([...favorites]);
@@ -149,9 +154,9 @@ const RightSide = () => {
                     favorites.length === 0 ? (
                         <NoFavoritesFound/>
                     ) : (
-                        filteredFavorites.map((favorite, idx) => (
+                        filteredFavorites.map((favorite: IProduct) => (
                             <Grid
-                                key={idx}
+                                key={favorite._id}
                                 size={{
                                     xs: 12, sm: 6, md: 4
                                 }}
@@ -161,6 +166,9 @@ const RightSide = () => {
                                     markedFavorite={true}
                                     handleRemoveFavorite={handleRemoveFavorite}
                                     show
+                                    handleAddToCart={handleAddToCart}
+                                    handleRemoveFromCart={handleRemoveFromCart}
+                                    isInCart={isProductInCart(favorite._id)}
                                 />
                             </Grid>
                         ))

@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from "@clerk/nextjs";
 import MainCarouselComponent from '../../components/carousel/MainCarousel'
 import { imagesPrueba } from '@/data/ThreeImagesPrueba'
 import ProductCard from '../../components/cards/Products'
 import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
-import UserService from '@/services/UserService';
 import { Box, Grid, Typography, Snackbar, Alert } from '@mui/material';
 import NavbarComponent from '@/components/NavbarComponent';
 import FooterComponent from '@/components/FooterComponent';
@@ -21,48 +20,46 @@ import { IBrandWithCategories } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useProductLogic } from '@/hooks/useProductLogic';
 
 const MainComponent = () => {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState<Array<IProduct>>([]);
-  const [favoriteIds, setFavoriteIds] = useState<Array<string>>([]);
-  const [cartItems, setCartItems] = useState<Array<any>>([]);
-  const [loading, setLoading] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
   const router = useRouter();
-  // Estados para la notificación del carrito
-  const [cartNotificationOpen, setCartNotificationOpen] = useState(false);
-  const [lastAddedProduct, setLastAddedProduct] = useState<{
-    product: IProduct;
-    size: string;
-    quantity: number;
-  } | null>(null);
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Función para mostrar notificaciones
-  const showSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
+  // Usar el hook personalizado para toda la l?gica de productos
+  const {
+    favoriteIds,
+    cartItems,
+    loading,
+    snackbarOpen,
+    snackbarMessage,
+    snackbarSeverity,
+    cartNotificationOpen,
+    lastAddedProduct,
+    showSnackbar,
+    handleCloseSnackbar,
+    handleAddFavorite,
+    handleRemoveFavorite,
+    handleAddToCart,
+    handleRemoveFromCart,
+    isProductInCart,
+    closeCartNotification,
+  } = useProductLogic();
 
   const fetchBrandsWithCategories = async () => {
-      try {
-        const data = await BrandService.getBrandsWithProductCategories();
-        setBrandsWithCategories(data);
-      } catch (error) {
-        console.error('Error fetching brands with categories:', error);
-      }
+    try {
+      const data = await BrandService.getBrandsWithProductCategories();
+      setBrandsWithCategories(data);
+    } catch (error) {
+      console.error('Error fetching brands with categories:', error);
     }
+  }
+
   const getProducts = async () => {
     try{
       const data = await ProductService.GetProducts();
@@ -73,204 +70,17 @@ const MainComponent = () => {
     }
   }
 
-  const getFavorites = async () => {
-    if (!isSignedIn) return;
-    try {
-      const token = await getToken();
-      if (!token) return;
-      
-      const data = await UserService.getFavoriteIds(token);
-      setFavoriteIds(data || []);
-    } catch (error) {
-      console.error('Error getting favorites:', error);
-    }
-  }
-
-  const getCartItems = async () => {
-    if (!isSignedIn) return;
-    try {
-      const token = await getToken();
-      if (!token) return;
-      
-      const data = await UserService.getCartItems(token);
-      setCartItems(data || []);
-    } catch (error) {
-      console.error('Error getting cart items:', error);
-      setCartItems([]); 
-    }
-  }
-
   // Cargar datos iniciales
   useEffect(() => {
     fetchBrandsWithCategories();
     getProducts();
-    if (isSignedIn) {
-      getFavorites();
-      getCartItems();
-    }
-  }, [isSignedIn]);
+  }, []);
 
-  const handleRemoveFavorite = useCallback(
-    async (id: string) => {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        if (!token) throw new Error('No token available');
-        
-        await UserService.removeFavorite(token, id);
-        console.log("Favorite removed:", id);
-        
-        // Actualizar estado local
-        setFavoriteIds(prev => prev.filter(favId => favId !== id));
-        showSnackbar('Producto removido de favoritos', 'success');
-      } catch (error) {
-        console.error('Error removing favorite:', error);
-        showSnackbar('Error al remover de favoritos', 'error');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getToken],
-  )
-
-  const handleAddFavorite = useCallback(
-    async (id: string) => {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        if (!token) throw new Error('No token available');
-        
-        await UserService.addFavorite(token, id);
-        console.log("Favorite added:", id);
-        
-        // Actualizar estado local
-        setFavoriteIds(prev => [...prev, id]);
-        showSnackbar('Producto agregado a favoritos', 'success');
-      } catch (error) {
-        console.error('Error adding favorite:', error);
-        showSnackbar('Error al agregar a favoritos', 'error');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getToken],
-  )
-
-  // Función para agregar al carrito
-  const handleAddToCart = useCallback(
-    async (productId: string, size: string, quantity: number) => {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        if (!token) throw new Error('No token available');
-
-        await UserService.addCartItem(token, productId, quantity, size);
-        // Recargar items del carrito
-        await getCartItems();
-        
-        // Encontrar el producto agregado para la notificación
-        const addedProduct = dataProducts.find(p => p._id === productId);
-        if (addedProduct) {
-          setLastAddedProduct({
-            product: addedProduct,
-            size,
-            quantity
-          });
-          setCartNotificationOpen(true);
-        }
-
-        // Refrescar contador en navbar si existe la función global
-        if (typeof window !== 'undefined' && (window as any).refreshNavbarCartCount) {
-          (window as any).refreshNavbarCartCount();
-        }
-        
-        // La notificación de éxito se mostrará desde el modal de notificación
-      } catch (error) {
-        console.error('Error adding to cart:', error);
-        showSnackbar('Error al agregar al carrito', 'error');
-        throw error; // Re-throw para que el ProductCard pueda manejarlo
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getToken, dataProducts],
-  )
-
-  // Función para remover del carrito
-  const handleRemoveFromCart = useCallback(
-    async (productId: string) => {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        if (!token) throw new Error('No token available');
-
-        // Encontrar el item del carrito por productId con verificaciones de seguridad
-        const cartItem = cartItems.find(item => {
-          if (item?.product?._id) {
-            return item.product._id === productId;
-          }
-          if (item?._id) {
-            return item._id === productId;
-          }
-          if (item?.idProduct) {
-            return item.idProduct === productId;
-          }
-          return false;
-        });
-
-        if (!cartItem) {
-          showSnackbar('Producto no encontrado en el carrito', 'error');
-          return;
-        }
-
-
-        const cartItemId = cartItem._id || cartItem.id;
-        
-        await UserService.removeCartItem(token, cartItemId);
-        console.log("Product removed from cart:", productId);
-        
-        // Actualizar estado local
-        setCartItems(prev => prev.filter(item => {
-          const itemId = item._id || item.id;
-          return itemId !== cartItemId;
-        }));
-        showSnackbar('Producto removido del carrito', 'success');
-
-       
-        if (typeof window !== 'undefined' && (window as any).refreshNavbarCartCount) {
-          (window as any).refreshNavbarCartCount();
-        }
-      } catch (error) {
-        console.error('Error removing from cart:', error);
-        showSnackbar('Error al remover del carrito', 'error');
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [getToken, cartItems],
-  )
-
-  // Función para verificar si un producto está en el carrito
-  const isProductInCart = useCallback((productId: string): boolean => {
-    if (!cartItems || cartItems.length === 0) return false;
-    
-    return cartItems.some(item => {
-      // Verificar diferentes estructuras posibles
-      if (item?.product?._id) {
-        return item.product._id === productId;
-      }
-      // Si el item directamente tiene el productId
-      if (item?._id) {
-        return item._id === productId;
-      }
-      // Si tiene idProduct
-      if (item?.idProduct) {
-        return item.idProduct === productId;
-      }
-      return false;
-    });
-  }, [cartItems]);
+  // Funci?n mejorada para agregar al carrito con producto completo
+  const handleAddToCartWithProduct = async (productId: string, size: string, quantity: number) => {
+    const product = dataProducts.find(p => p._id === productId);
+    await handleAddToCart(productId, size, quantity, product);
+  };
 
   return (
     <>
@@ -339,7 +149,7 @@ const MainComponent = () => {
                     markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
                     handleRemoveFavorite={handleRemoveFavorite}
                     handleAddFavorite={handleAddFavorite}
-                    handleAddToCart={handleAddToCart}
+                    handleAddToCart={handleAddToCartWithProduct}
                     handleRemoveFromCart={handleRemoveFromCart}
                     isInCart={isProductInCart(product._id)}
                   />
@@ -435,7 +245,7 @@ const MainComponent = () => {
                     markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
                     handleRemoveFavorite={handleRemoveFavorite}
                     handleAddFavorite={handleAddFavorite}
-                    handleAddToCart={handleAddToCart}
+                    handleAddToCart={handleAddToCartWithProduct}
                     handleRemoveFromCart={handleRemoveFromCart}
                     isInCart={isProductInCart(product._id)}
                   />
@@ -446,13 +256,10 @@ const MainComponent = () => {
       </Box>
       <FooterComponent/>
 
-      {/* Modal de notificación del carrito */}
+      {/* Modal de notificaci?n del carrito */}
       <CartNotificationModal
         open={cartNotificationOpen}
-        onClose={() => {
-          setCartNotificationOpen(false);
-          setLastAddedProduct(null);
-        }}
+        onClose={closeCartNotification}
         product={lastAddedProduct?.product || null}
         size={lastAddedProduct?.size}
         quantity={lastAddedProduct?.quantity}
