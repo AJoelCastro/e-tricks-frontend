@@ -218,17 +218,17 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
             </div>
 
             {/* CENTER SECTION - LOGO */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+            <div className="absolute left-1/2 transform -translate-x-1/2 z-10 flex items-center justify-center h-full">
               <Link href="/" className="flex items-center">
                 <Image
                   src={main ? (showWhiteBackground
-                    ? 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg'
-                    : 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_transparente.svg')
-                    : 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_oscuro.svg'}
+                    ? 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_horizontal.svg'
+                    : 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logo_horizontal_blanco.svg')
+                    : 'https://tricks-bucket.s3.us-east-2.amazonaws.com/logos/logo_horizontal.svg'}
                   alt="Logo"
                   width={32}
                   height={32}
-                  className="h-36 w-auto"
+                  className="h-7 md:h-12 w-auto" // Altura ajustada: h-8 en móvil (32px), h-12 en desktop (48px)
                 />
               </Link>
             </div>

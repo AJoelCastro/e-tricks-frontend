@@ -1,7 +1,6 @@
 'use client';
-import UserService from '@/services/UserService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
-import React, {  useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,21 +8,36 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SelectableAddressard from '../../../../components/addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
-import { Snackbar, Alert } from '@mui/material';
-import { useAuth } from '@clerk/nextjs';
-import { useCart } from '../../CartContext';
 import { useRouter } from 'next/navigation';
 import EmptyCartComponent from '@/components/EmptyCartComponent';
+import ErrorNotification from '@/components/ErrorNotification';
+import { useProductLogic } from '@/hooks/useProductLogic'; // Importa tu hook de producto
+import { useCart } from '../../CartContext';
 
 const RightSideCart = () => {
+    // Usar tu hook de producto que ya incluye las notificaciones
+    const {
+        notification,
+        closeNotification,
+        showError,
+        showSuccess,
+        handleRemoveFromCart,
+        loading: productLoading
+    } = useProductLogic();
 
-    //datos del menu list 
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    // Estados locales específicos del componente
     const [menuAnchor, setMenuAnchor] = useState<{
         anchor: HTMLElement | null;
         itemId: string | null;
     }>({ anchor: null, itemId: null });
-    const open = Boolean(anchorEl);
+    const [isRemoving, setIsRemoving] = useState<boolean>(false);
+
+    // Context del carrito
+    const { carrito, setCarrito, getCartItems, isLoading } = useCart();
+    const router = useRouter();
+
+    const open = Boolean(menuAnchor.anchor);
+
     const handleClickListItem = (event: React.MouseEvent<HTMLElement>, itemId: string) => {
         setMenuAnchor({
             anchor: event.currentTarget,
@@ -39,38 +53,30 @@ const RightSideCart = () => {
         try {
             setIsRemoving(true);
             if (!menuAnchor.itemId) return;
-            const token = await getToken()
-            await UserService.removeCartItem(token as string,menuAnchor.itemId);
-            await getCartItems();
-            handleShowSnackbar("Producto eliminado del carrito", 'success');
+            
+            // Usar tu hook para remover del carrito (esto maneja la llamada al backend)
+            await handleRemoveFromCart(menuAnchor.itemId);
+            
+            // Actualizar el estado local del carrito sin recargar toda la página
+            setCarrito(prev => prev.filter(item => item._id !== menuAnchor.itemId));
+            
+            showSuccess("Producto eliminado del carrito");
             handleClose();
         } catch (error) {
-            handleShowSnackbar(`${error}`, 'error');
-        }finally{
+            showError(`Error al eliminar producto: ${error}`);
+        } finally {
             setIsRemoving(false);
         }
     };
 
-
-    //datos propios
-    const [isRemoving, setIsRemoving] = useState<boolean>(false);
-    const [snackbar, setSnackbar] = useState<{
-        open: boolean;
-        message: string;
-        severity: 'success' | 'error' | 'info' | 'warning';
-    }>({ open: false, message: '', severity: 'info' });
-    const router = useRouter();
-    const { carrito, setCarrito, getCartItems, isLoading, etapa, setEtapa } = useCart();
-    const { getToken } = useAuth();
-   
     const handleChangeQuantity = (index: number, newQuantity: number) => {
         if (newQuantity < 1 || newQuantity > 12) return;
 
         setCarrito(prev => {
             const updated = [...prev];
             updated[index] = {
-            ...updated[index],
-            quantity: newQuantity,
+                ...updated[index],
+                quantity: newQuantity,
             };
             return updated;
         });
@@ -78,100 +84,93 @@ const RightSideCart = () => {
         // Si quieres persistirlo en la base de datos también:
         // await UserService.updateCartItemQuantity(itemId, newQuantity);
     };
-    const handleChangeEtapa = async()=>{
+
+    const handleChangeEtapa = async () => {
         try {
             if (carrito.length === 0) {
-                handleShowSnackbar("Tu carrito está vacío", 'error');
+                showError("Tu carrito está vacío");
                 return;
             }
             router.push('/carrito/delivery');
         } catch (error) {
-            setSnackbar({ open: true, message: `${error}`, severity: 'error' });
+            showError(`${error}`);
         }
     }
 
-    const handleShowSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
-        setSnackbar({ open: true, message, severity });
-    };
-
-    const handleCloseSnackbar = () => {
-        setSnackbar(prev => ({ ...prev, open: false }));
-    };
-
-    if(isLoading){
-        return(
+    if (isLoading) {
+        return (
             <Grid size={{
                 xs: 12, sm: 12, md: 12
-            }} 
-            sx={{ textAlign: 'center', mt: 4 }}
+            }}
+                sx={{ textAlign: 'center', mt: 4 }}
             >
-                <CircularProgress/>
+                <CircularProgress />
             </Grid>
         )
     }
-    
+
     return (
-        <Box >
-            <Grid container sx={{ marginX: 2, marginBottom: 4, mt:{ xs: 0, sm: 2, md: 2 }, paddingY: 1 }} spacing={2}>
+        <Box>
+            <Grid container sx={{ marginX: 2, marginBottom: 4, mt: { xs: 0, sm: 2, md: 2 }, paddingY: 1 }} spacing={2}>
                 <>
-                    <Grid 
+                    <Grid
                         size={{
-                            xs:12,
-                            sm:12,
-                            md:8
+                            xs: 12,
+                            sm: 12,
+                            md: 8
                         }}
-                        sx={{paddingX: 2, backgroundColor:'white',borderRadius: 2, paddingTop:2, paddingBottom:2}}
+                        sx={{ paddingX: 2, backgroundColor: 'white', borderRadius: 2, paddingTop: 2, paddingBottom: 2 }}
                     >
-                        <CartProgress activeStep={0}/>
+                        <CartProgress activeStep={0} />
                         {
-                            !carrito || carrito.length === 0 ?(
-                                    <EmptyCartComponent/>
-                            ):(
+                            !carrito || carrito.length === 0 ? (
+                                <EmptyCartComponent />
+                            ) : (
                                 carrito.map((item, index) => (
                                     <Grid
                                         container
                                         key={item._id}
-                                        sx={{marginY:2}}
+                                        sx={{ marginY: 2 }}
                                     >
-                                        <Grid size={{xs:3, sm:4, md:2}} sx={{ display:'flex', justifyContent:'center', alignItems:'center'}}>
+                                        <Grid size={{ xs: 3, sm: 4, md: 2 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                             <Image
                                                 src={item.product.images[0]}
                                                 alt="principal"
                                                 width={80}
                                                 height={80}
-                                                style={{ objectFit: 'contain', borderRadius:4 }}
+                                                style={{ objectFit: 'contain', borderRadius: 4 }}
                                             />
                                         </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:6, sm:4, md:4}}>
+                                        <Grid sx={{ display: 'flex', justifyContent: 'start', alignItems: 'center' }} size={{ xs: 6, sm: 4, md: 4 }}>
                                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                                 <Link href={`/marcas/${item.product.brand.name.toLowerCase()}`}>
-                                                    <Typography variant='marcaCard'  sx={{ color: 'text.primary'}}>
+                                                    <Typography variant='marcaCard' sx={{ color: 'text.primary' }}>
                                                         {item.product.brand.name}
                                                     </Typography>
                                                 </Link>
                                                 <Link href={`/producto/${item.product._id}`}>
-                                                    <Typography variant='nameCard' sx={{ color: 'text.primary'  }}>
-                                                        {item.product.name }
+                                                    <Typography variant='nameCard' sx={{ color: 'text.primary' }}>
+                                                        {item.product.name}
                                                     </Typography>
                                                 </Link>
-                                                <Typography fontSize={11} sx={{ color: 'text.secondary', fontWeight:'bold',  }}>
+                                                <Typography fontSize={11} sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
                                                     Talla: {item.size} US
                                                 </Typography>
                                             </Box>
                                         </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'start', alignItems:'center' }} size={{xs:3, sm:4, md:3}}>
+                                        <Grid sx={{ display: 'flex', justifyContent: 'start', alignItems: 'center' }} size={{ xs: 3, sm: 4, md: 3 }}>
                                             {item.product.descuento ? (
                                                 <Box>
                                                     <Grid container spacing={1} alignItems="center">
-                                                        <Grid >
-                                                        <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
-                                                            S/ {item.product.price}
-                                                        </Typography>
+                                                        <Grid>
+                                                            <Typography variant="priceCard" sx={{ color: 'text.primary' }}>
+                                                                S/ {item.product.price}
+                                                            </Typography>
                                                         </Grid>
                                                         <Grid sx={{ backgroundColor: 'red', borderRadius: '6px', px: 1 }}>
-                                                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
-                                                            -{item.product.descuento}%
-                                                        </Typography>
+                                                            <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
+                                                                -{item.product.descuento}%
+                                                            </Typography>
                                                         </Grid>
                                                     </Grid>
                                                     <Typography
@@ -180,7 +179,7 @@ const RightSideCart = () => {
                                                             color: 'text.secondary',
                                                             textDecoration: 'line-through',
                                                             fontSize: '12px',
-                                                            mt:{xs:1, sm:0, md:0}
+                                                            mt: { xs: 1, sm: 0, md: 0 }
                                                         }}
                                                     >
                                                         S/ {item.product.price + (item.product.price * item.product.descuento) / 100}
@@ -188,11 +187,11 @@ const RightSideCart = () => {
                                                 </Box>
                                             ) : (
                                                 <Typography variant="priceCard" sx={{ color: 'text.primary', mt: 2 }}>
-                                                S/ {item.product.price}
+                                                    S/ {item.product.price}
                                                 </Typography>
                                             )}
                                         </Grid>
-                                        <Grid sx={{ display:'flex', justifyContent:'center', alignItems:'center', ml:{xs:2, sm:6, md:0}, mt:{xs:1, sm:0, md:0} }} size={{xs:5, sm:4, md:3}}>
+                                        <Grid sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', ml: { xs: 2, sm: 6, md: 0 }, mt: { xs: 1, sm: 0, md: 0 } }} size={{ xs: 5, sm: 4, md: 3 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Box sx={{
                                                     display: 'flex',
@@ -223,7 +222,7 @@ const RightSideCart = () => {
                                                     MÁXIMO 12 UNIDADES
                                                 </Typography>
                                             </Box>
-                                            <Box >
+                                            <Box>
                                                 <IconButton
                                                     id="lock-button"
                                                     aria-haspopup="listbox"
@@ -231,6 +230,7 @@ const RightSideCart = () => {
                                                     aria-label="when device is locked"
                                                     aria-expanded={open ? 'true' : undefined}
                                                     onClick={(e) => handleClickListItem(e, item._id)}
+                                                    disabled={isRemoving}
                                                     sx={{
                                                         borderRadius: '50%',
                                                         padding: 1,
@@ -239,19 +239,25 @@ const RightSideCart = () => {
                                                         },
                                                     }}
                                                 >
-                                                    <MoreVertIcon  
-                                                        sx={{
-                                                            color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
-                                                        }}
-                                                    />
+                                                    {isRemoving && menuAnchor.itemId === item._id ? (
+                                                        <CircularProgress size={20} />
+                                                    ) : (
+                                                        <MoreVertIcon
+                                                            sx={{
+                                                                color: menuAnchor.itemId === item._id && Boolean(menuAnchor.anchor) ? 'primary.main' : 'inherit',
+                                                            }}
+                                                        />
+                                                    )}
                                                 </IconButton>
                                                 <Menu
                                                     anchorEl={menuAnchor.anchor}
                                                     open={menuAnchor.itemId === item._id}
                                                     onClose={handleClose}
                                                 >
-                                                    <MenuItem onClick={handleMenuItemClick}>
-                                                        <Typography variant="body2">Eliminar</Typography>
+                                                    <MenuItem onClick={handleMenuItemClick} disabled={isRemoving}>
+                                                        <Typography variant="body2">
+                                                            {isRemoving ? 'Eliminando...' : 'Eliminar'}
+                                                        </Typography>
                                                     </MenuItem>
                                                 </Menu>
                                             </Box>
@@ -260,16 +266,15 @@ const RightSideCart = () => {
                                 ))
                             )
                         }
-                        
                     </Grid>
                     <Grid size={{
-                        xs:12,
-                        sm:12,
-                        md:4
+                        xs: 12,
+                        sm: 12,
+                        md: 4
                     }}
-                    sx={{ paddingX:2, backgroundColor:'white',borderRadius: 2, paddingTop:2 }}
+                        sx={{ paddingX: 2, backgroundColor: 'white', borderRadius: 2, paddingTop: 2 }}
                     >
-                        <Box sx={{display:'flex', justifyContent:'center', mb: 4}}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
                             <Typography variant='h7'>
                                 DETALLES DE LA COMPRA
                             </Typography>
@@ -280,15 +285,15 @@ const RightSideCart = () => {
                                 carrito.length > 0 && (
                                     <>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="h7" >Productos ({carrito.length})</Typography>
+                                            <Typography variant="h7">Productos ({carrito.length})</Typography>
                                             <Typography variant="h7">
                                                 S/ {
-                                                carrito.reduce((sum, item) => {
-                                                    const precioUnitario = item.product.descuento
-                                                    ? item.product.price
-                                                    : item.product.price;
-                                                    return sum + precioUnitario * item.quantity;
-                                                }, 0).toFixed(2)
+                                                    carrito.reduce((sum, item) => {
+                                                        const precioUnitario = item.product.descuento
+                                                            ? item.product.price
+                                                            : item.product.price;
+                                                        return sum + precioUnitario * item.quantity;
+                                                    }, 0).toFixed(2)
                                                 }
                                             </Typography>
                                         </Box>
@@ -297,13 +302,13 @@ const RightSideCart = () => {
                                             <Typography variant="h7">Descuentos ({carrito.length})</Typography>
                                             <Typography variant="h7" color="error">
                                                 - S/ {
-                                                carrito.reduce((sum, item) => {
-                                                    if (item.product.descuento) {
-                                                    const descuento = (item.product.price * item.product.descuento) / 100;
-                                                    return sum + descuento * item.quantity;
-                                                    }
-                                                    return sum;
-                                                }, 0).toFixed(2)
+                                                    carrito.reduce((sum, item) => {
+                                                        if (item.product.descuento) {
+                                                            const descuento = (item.product.price * item.product.descuento) / 100;
+                                                            return sum + descuento * item.quantity;
+                                                        }
+                                                        return sum;
+                                                    }, 0).toFixed(2)
                                                 }
                                             </Typography>
                                         </Box>
@@ -312,12 +317,12 @@ const RightSideCart = () => {
                                             <Typography variant="h7">Total</Typography>
                                             <Typography variant="h7">
                                                 S/ {
-                                                carrito.reduce((sum, item) => {
-                                                    const descuento = item.product.descuento
-                                                    ? (item.product.price * item.product.descuento) / 100
-                                                    : 0;
-                                                    return sum + (item.product.price - descuento) * item.quantity;
-                                                }, 0).toFixed(2)
+                                                    carrito.reduce((sum, item) => {
+                                                        const descuento = item.product.descuento
+                                                            ? (item.product.price * item.product.descuento) / 100
+                                                            : 0;
+                                                        return sum + (item.product.price - descuento) * item.quantity;
+                                                    }, 0).toFixed(2)
                                                 }
                                             </Typography>
                                         </Box>
@@ -325,7 +330,7 @@ const RightSideCart = () => {
                                             variant="contained"
                                             color="primary"
                                             fullWidth
-                                            sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
+                                            sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
                                             onClick={handleChangeEtapa}
                                         >
                                             <Typography variant="h7">
@@ -335,23 +340,20 @@ const RightSideCart = () => {
                                     </>
                                 )
                             }
-                            
                         </Box>
                     </Grid>
                 </>
             </Grid>
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
+
+            {/* Notificaciones usando tu hook de producto */}
+            <ErrorNotification
+                open={notification.open}
+                onClose={closeNotification}
+                message={notification.message}
+                type={notification.type}
+                autoHideDuration={3000}
+            />
         </Box>
-        
     )
 }
 
