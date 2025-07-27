@@ -11,6 +11,10 @@ import ProductCard from '@/components/cards/Products';
 import NoProductsFound from '@/components/NoProductsFound';
 import NavbarComponent from '@/components/NavbarComponent';
 import FooterComponent from '@/components/FooterComponent';
+import ErrorNotification from '@/components/ErrorNotification';
+import CartNotificationModal from '@/components/cart/CartNotificationModal';
+import { useProductLogic } from '@/hooks/useProductLogic';
+import { useAuth } from '@clerk/nextjs';
 
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -25,7 +29,22 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
   const [products, setProducts] = useState<IProduct[]>([])
   const pathname = usePathname();
   const router = useRouter();
-
+  const { isSignedIn } = useAuth();
+  const {
+    favoriteIds,
+    cartItems,
+    loading,
+    cartNotificationOpen,
+    lastAddedProduct,
+    notification,
+    closeNotification,
+    handleAddFavorite,
+    handleRemoveFavorite,
+    handleAddToCart,
+    handleRemoveFromCart,
+    isProductInCart,
+    closeCartNotification,
+    } = useProductLogic();
   const segments = pathname.split('/').filter(Boolean);
 
   const categoria = capitalize(segments[0] || '');
@@ -43,6 +62,19 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
       setIsLoading(false);
     }
   }
+  const handleAddFavoriteLocal = async (productId: string) => {
+    await handleAddFavorite(productId);
+  }
+  const handleRemoveFavoriteLocal = async (productId: string) => {
+    await handleRemoveFavorite(productId);
+  };
+
+  const handleAddToCartLocal = async (productId: string, size: string, quantity: number) => {
+    const product = products.find(p => p._id === productId);
+    if (product) {
+      await handleAddToCart(productId, size, quantity, product);
+    }
+  };
 
   useEffect(() => {
     getProducts();
@@ -52,7 +84,7 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
       <>
         <div className='h-16'></div>
         <Box sx={{minHeight: '100vh'}}>
-          <Grid size={12} 
+          <Grid size={12}
             sx={{ textAlign: 'center', mt: 4 }}
           >
             <CircularProgress/>
@@ -67,6 +99,22 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
       <NavbarComponent/>
       <div className='h-16'></div>
       <Box sx={{minHeight: '100vh'}}>
+        {/* Notificaciones */}
+        <ErrorNotification
+            open={notification.open}
+            onClose={closeNotification}
+            message={notification.message}
+            type={notification.type}
+            autoHideDuration={3000}
+        />
+        <CartNotificationModal
+            open={cartNotificationOpen}
+            onClose={closeCartNotification}
+            product={lastAddedProduct?.product || null}
+            size={lastAddedProduct?.size}
+            quantity={lastAddedProduct?.quantity}
+            autoHideDuration={5000}
+        />
         <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
           <IconButton onClick={()=>router.push(`/${categoria.toLowerCase()}/${subcategoria.toLowerCase()}`)}>
             <KeyboardBackspaceIcon sx={{color: 'black', ":hover": {color: '#7c3aed'}}}/>
@@ -93,7 +141,7 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
             src={'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dw22bade2c/Menu/POWER06.05.jpg?sw=1777&q=80'}
             alt='banner'
             fill
-            style={{ objectFit: 'cover' }} 
+            style={{ objectFit: 'cover' }}
           />
         </Box>
 
@@ -107,14 +155,23 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
           </Typography>
         </Box>
         {
-          products.length === 0 ? 
+          products.length === 0 ?
             <NoProductsFound/>:
           (
             <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
               {
                 products.map((product: IProduct) => (
                   <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
-                    <ProductCard products={product} show/>
+                    <ProductCard
+                      products={product}
+                      show
+                      markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
+                      handleRemoveFavorite={handleRemoveFavoriteLocal}
+                      handleAddToCart={handleAddToCartLocal}
+                      handleRemoveFromCart={handleRemoveFromCart}
+                      isInCart={isProductInCart(product._id)}
+                      handleAddFavorite={handleAddFavoriteLocal}
+                    />
                   </Grid>
                 ))
               }
