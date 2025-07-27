@@ -179,7 +179,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                 alignItems: 'center',
                 backgroundColor: 'white',
                 borderRadius: 2,
-                marginX: 4,
+                mx: { xs: 2, sm: 2, md: 4 },
                 marginBottom: 2,
                 mt: { xs: 0, sm: 1, md: 3 }
             }}>
