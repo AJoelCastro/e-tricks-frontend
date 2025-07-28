@@ -19,19 +19,22 @@ import {
   StatusScreen,
   CardNumber,
   CardPayment,
-  Wallet, initMercadoPago, Brand
-
+  Wallet, 
+  initMercadoPago, 
+  Brand
 } from '@mercadopago/sdk-react';
 import { ICreateOrderData } from '@/interfaces/Order';
 import { ICoupon } from '@/interfaces/Coupon';
 import CustomCardPayment from '@/components/cards/CustomCardPayment';
 import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
+import { useNotification } from '@/hooks/useNotification';
+import ErrorNotification from '@/components/ErrorNotification';
+
 // Interfaz para errores de MercadoPago
 interface MPError {
   message: string;
   type: string;
 }
-
 
 const style = {
   position: 'absolute',
@@ -50,16 +53,11 @@ const style = {
 };
 
 const RightSidePayment = () => {
-
-
+  const router = useRouter();
+  const { notification, showError, closeNotification, showSuccess, showInfo, showWarning } = useNotification(); 
+  
   // Estados existentes
   const modalRef = useRef(null)
-
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error' | 'info' | 'warning';
-  }>({ open: false, message: '', severity: 'info' });
   const [showModalWebPay, setShowModalWebPay] = useState<boolean>(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'payment' | 'yape' | null>(null);
@@ -77,21 +75,30 @@ const RightSidePayment = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<ICoupon | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
-  // Estados para formularios de pago
+  // Estados para MercadoPago - NUEVOS ESTADOS PARA EVITAR RE-RENDERS
+  const [cardPaymentKey, setCardPaymentKey] = useState(0);
+  const [mpReady, setMpReady] = useState(false);
 
   const { getToken } = useAuth();
   const { user } = useUser();
   const { carrito, isLoading, selectedAddressId, deliveryType, pickUps, addresses, selectedAddress, selectedPickup } = useCart();
-  const router = useRouter();
+  console.log('User:', user);
 
+  // Inicializar MercadoPago solo una vez
   useEffect(() => {
     if (typeof window !== 'undefined' && !mpInitialized.current) {
-      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
-      mpInitialized.current = true;
+      try {
+        initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
+        mpInitialized.current = true;
+        setMpReady(true);
+      } catch (error) {
+        console.error('Error initializing MercadoPago:', error);
+        showError('Error al inicializar el sistema de pagos');
+      }
     }
   }, []);
 
-  // Calcular totales
+  // Calcular totales (mantenemos la misma lógica)
   const calculateTotals = useCallback(() => {
     const subtotal = carrito.reduce((sum, item) => {
       return sum + item.product.price * item.quantity;
@@ -108,9 +115,7 @@ const RightSidePayment = () => {
     let total = subtotal - discount;
     let couponDiscount = 0;
 
-
     if (appliedCoupon) {
-      console.log("discount", appliedCoupon.discountPercentage)
       couponDiscount = total * (appliedCoupon.discountPercentage / 100);
       total = total - couponDiscount;
     }
@@ -120,23 +125,29 @@ const RightSidePayment = () => {
 
   const { subtotal, discount, couponDiscount, total } = calculateTotals();
 
-  // Memoizar la configuración del CardPayment para evitar re-renders
-  const cardPaymentConfig = useMemo(() => ({
-    initialization: {
-      amount: total,
-      payer: {
-        email: user?.emailAddresses?.[0]?.emailAddress || '',
-      }
-    },
-    customization: {
-      visual: {
-        hidePaymentButton: true,
-      },
-      paymentMethods: {
-
-      }
+  // CONFIGURACIÓN ESTABLE PARA MERCADOPAGO
+  const cardPaymentConfig = useMemo(() => {
+    if (!mpReady || !user?.emailAddresses?.[0]?.emailAddress) {
+      return null;
     }
-  }), [total, user?.emailAddresses]);
+
+    return {
+      initialization: {
+        amount: total,
+        payer: {
+          email: user.emailAddresses[0].emailAddress,
+        }
+      },
+      customization: {
+        visual: {
+          hidePaymentButton: true,
+        },
+        paymentMethods: {
+          // Puedes agregar configuraciones específicas aquí
+        }
+      }
+    };
+  }, [total, user?.emailAddresses, mpReady]);
 
   const handleContinueByWhatsApp = () => {
     const carritoTexto = carrito.map((item, index) => {
@@ -155,9 +166,6 @@ const RightSidePayment = () => {
       ? `📦 Recojo en tienda: ${selectedPickup?.city} - ${selectedPickup?.cc} - ${selectedPickup?.stand} `
       : `📍 Entrega a: ${selectedAddress?.name} - ${selectedAddress?.street} ${selectedAddress?.number}, ${selectedAddress?.city}, ${selectedAddress?.state}`;
 
-    const couponText = appliedCoupon ? `\n🎟️ Cupón aplicado: ${appliedCoupon.code} (-${appliedCoupon.discountPercentage}%)` : '';
-
-
     const mensaje = `👋 ¡Hola! Quisiera hacer un pedido:\n\n${carritoTexto}\n${metodoEntrega}\n\n💰 *Total: S/ ${total.toFixed(2)}*\n\n🛒 Gracias, quedo atento(a).`;
 
     const urlWhatsApp = `https://wa.me/51969742589?text=${encodeURIComponent(mensaje)}`;
@@ -166,7 +174,7 @@ const RightSidePayment = () => {
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
-      handleShowSnackbar("Ingresa un código de cupón", "warning");
+      showError('Por favor, ingresa un código de cupón válido.');
       return;
     }
 
@@ -181,14 +189,14 @@ const RightSidePayment = () => {
       const couponData = await CouponService.validateCoupon(token, couponCode.trim());
       if (couponData.success) {
         setAppliedCoupon(couponData.data);
-        handleShowSnackbar(`Cupón aplicado: ${couponData.data.discountPercentage}% de descuento`, "success");
+        showSuccess('Cupón aplicado correctamente');
         setShowCouponField(false);
       } else {
-        handleShowSnackbar("Cupón no válido o expirado", "error");
+        showError(`${couponData.message}`);
       }
     } catch (error: any) {
       console.error('Error validating coupon:', error);
-      handleShowSnackbar(error.response?.data?.message || "Error al validar el cupón", "error");
+      showError('Error al validar el cupón');
     } finally {
       setIsValidatingCoupon(false);
     }
@@ -197,19 +205,17 @@ const RightSidePayment = () => {
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode('');
-    handleShowSnackbar("Cupón removido", "info");
+    showInfo('Cupón removido correctamente');
   };
 
-
   const handleCreateOrder = async () => {
-
-
-    if (!user?.id) {
-      handleShowSnackbar("Usuario no autenticado", "error");
-      return;
-    }
-
     try {
+      console.log('Creating order...');
+       if (!user?.id) {
+        showError('No se pudo obtener el ID del usuario');
+        return null;
+      }
+      console.log("pasa por aqui")
       setIsProcessingPayment(true);
       const token = await getToken();
 
@@ -222,37 +228,41 @@ const RightSidePayment = () => {
         addressId: selectedPickup ? selectedPickup._id : selectedAddress,
         couponCode: appliedCoupon?.code
       };
-
-
-
-      console.log(orderData)
+      console.log("order data",orderData)
 
       const response = await OrderService.createOrder(token, orderData as ICreateOrderData);
 
       if (response.success) {
-        setOrderId(response.data.order._id);
-        handleShowSnackbar("Orden creada exitosamente", "success");
-        return response.data.order._id;
+        const createdOrderId = response.data.order._id;
+        setOrderId(createdOrderId);
+        showSuccess('Orden creada correctamente');
+        return createdOrderId;
       }
+      return null;
     } catch (error) {
       console.error('Error creating order:', error);
-      handleShowSnackbar("Error al crear la orden", "error");
+      showError('Error al crear la orden');
+      return null;
     } finally {
       setIsProcessingPayment(false);
     }
   };
 
-  const handleCardPaymentSubmit = async (param: any) => {
+  const handleCardPaymentSubmit = async (paymentData: any) => {
     try {
       setIsProcessingPayment(true);
-
-
-      const createdOrderId = await handleCreateOrder();
-      if (createdOrderId) {
-        await handlePaymentSuccess(param);
+      
+      // Crear orden primero
+      let currentOrderId = orderId;
+      if (!currentOrderId) {
+        currentOrderId = await handleCreateOrder();
       }
-
-
+      
+      if (currentOrderId && paymentData?.id) {
+        await handlePaymentSuccess(paymentData, currentOrderId);
+      } else {
+        throw new Error('No se pudo procesar el pago');
+      }
     } catch (error) {
       console.error('Error in payment process:', error);
       handlePaymentError(error as MPError);
@@ -261,47 +271,59 @@ const RightSidePayment = () => {
     }
   };
 
-
-  const handlePaymentSuccess = async (paymentData: any) => {
+  const handlePaymentSuccess = async (paymentData: any, orderIdToUse: string) => {
     try {
       const token = await getToken();
-      if (token && orderId && paymentData.id) {
+      if (token && orderIdToUse && paymentData.id) {
         await OrderService.confirmPayment(token, {
-          orderId: orderId,
+          orderId: orderIdToUse,
           paymentId: paymentData.id.toString()
         });
-
-        handleShowSnackbar("¡Pago realizado con éxito!", "success");
-
+        showSuccess('Pago confirmado correctamente');
         setTimeout(() => {
-          router.push(`/order/success?orderId=${orderId}`);
+          router.push(`/order/success?orderId=${orderIdToUse}`);
         }, 2000);
       }
     } catch (error) {
       console.error('Error confirming payment:', error);
-      handleShowSnackbar("Error al confirmar el pago", "error");
+      showError('Error al confirmar el pago');
     }
   };
 
   const handlePaymentError = (error: MPError) => {
     console.error('Payment error:', error);
-    handleShowSnackbar(`Error en el pago: ${error.message}`, "error");
-  };
-
-  const handleShowSnackbar = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    showError('Error en el pago: ' + (error.message || 'Error desconocido'));
   };
 
   const handleUploadComprobante = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       console.log('Comprobante subido:', file.name);
-      handleShowSnackbar("Comprobante subido. Procesaremos tu pago pronto.", "success");
+      showSuccess('Comprobante subido correctamente');
       setShowModalWebPay(false);
+    }
+  };
+
+  // Función para abrir modal de MercadoPago
+  const openMercadoPagoModal = async () => {
+    if (!mpReady) {
+      showError('El sistema de pagos no está listo. Intenta nuevamente.');
+      return;
+    }
+
+    try {
+      console.log('Opening payment modal...');
+      // Crear orden antes de abrir el modal
+      const createdOrderId = await handleCreateOrder();
+      if (createdOrderId) {
+        console.log('Created order ID:', createdOrderId);
+        // Forzar re-render del componente CardPayment
+        setCardPaymentKey(prev => prev + 1);
+        setShowMercadoPagoModal(true);
+      }
+    } catch (error) {
+      console.error('Error opening payment modal:', error);
+      showError('Error al abrir el modal de pagos');
     }
   };
 
@@ -334,11 +356,6 @@ const RightSidePayment = () => {
       </Box>
     </Box>
   );
-
-
-
-
-
 
   // Función para renderizar la información de entrega
   const renderDeliveryInfo = () => {
@@ -456,8 +473,6 @@ const RightSidePayment = () => {
                 'https://st2.depositphotos.com/1102480/10686/i/450/depositphotos_106860552-stock-photo-collection-of-popular-payment-system.jpg',
                 paymentMethod === 'card'
               )}
-
-
 
               {/* Yape Card */}
               <YapeCard
@@ -614,13 +629,10 @@ const RightSidePayment = () => {
                     onClick={() => {
                       if (paymentMethod === 'yape') {
                         setShowModalWebPay(true);
-                      } else if (paymentMethod && ['card'].includes(paymentMethod)) {
-
-                        setTimeout(() => {
-                          setShowMercadoPagoModal(true);
-                        }, 100);
+                      } else if (paymentMethod === 'card') {
+                        openMercadoPagoModal();
                       } else {
-                        handleShowSnackbar("Selecciona un método de pago", "warning");
+                        showWarning('Seleccione un método de pago');
                       }
                     }}
                     disabled={isProcessingPayment}
@@ -631,7 +643,9 @@ const RightSidePayment = () => {
                       <Typography variant="h7">Continuar</Typography>
                     )}
                   </Button>
+                  
                   <ProtectionConsumer/>
+                  
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 2, mt: 2 }}>
                     <Button onClick={handleContinueByWhatsApp}>
                       <Image
@@ -653,10 +667,13 @@ const RightSidePayment = () => {
         </>
       </Grid>
 
-      {/* Modal de MercadoPago */}
+      {/* Modal de MercadoPago MEJORADO */}
       <Modal
         open={showMercadoPagoModal}
-        onClose={() => setShowMercadoPagoModal(false)}
+        onClose={() => {
+          setShowMercadoPagoModal(false);
+          // NO resetear orderId aquí para mantener la orden creada
+        }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{
@@ -676,7 +693,7 @@ const RightSidePayment = () => {
                 Método seleccionado:
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {paymentMethod === 'card' && 'Tarjeta de Crédito/Débito'}
+                Tarjeta de Crédito/Débito
               </Typography>
             </Box>
 
@@ -713,40 +730,30 @@ const RightSidePayment = () => {
                 </>
               ) : null}
             </Box>
-              <Brand />
 
-            <Box sx={{ display: showMercadoPagoModal ? 'block' : 'none' }}>
+            {/* Brand de MercadoPago */}
+            <Brand />
+
+            {/* CardPayment con key estable */}
+            {cardPaymentConfig && mpReady && (
               <CardPayment
-                key={`card-payment-${total}-${user?.emailAddresses?.[0]?.emailAddress}`}
+                key={cardPaymentKey}
                 initialization={cardPaymentConfig.initialization}
                 customization={cardPaymentConfig.customization}
-                onSubmit={async (param) => {
-                  handleCardPaymentSubmit(param)
-                }}
+                onSubmit={handleCardPaymentSubmit}
                 onReady={() => {
                   console.log('Card payment ready');
                 }}
                 onError={handlePaymentError}
               />
-             
-          
-            </Box>
-
-            {/* Botón para crear orden y proceder al pago */}
-            <Button
-              type='submit'
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
-            >
-              Pagar
-            </Button>
+            )}
 
             <Button
               onClick={() => {
                 setShowMercadoPagoModal(false);
+                // Resetear estados si es necesario
                 setOrderId(null);
+                setCardPaymentKey(prev => prev + 1);
               }}
               sx={{ mt: 2, width: '100%' }}
               variant="outlined"
@@ -757,8 +764,7 @@ const RightSidePayment = () => {
         </Fade>
       </Modal>
 
-
-      {/* Modal de Yape */}
+      {/* Modal de Yape (sin cambios) */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -779,7 +785,7 @@ const RightSidePayment = () => {
             </Typography>
 
             <Box sx={{
-              border: '1px solid #e0e0e0',
+              border: '1px solid #e0e0e',
               borderRadius: 2,
               p: 2,
               mb: 3,
@@ -845,17 +851,14 @@ const RightSidePayment = () => {
           </Box>
         </Fade>
       </Modal>
-
-      <Snackbar
-        open={snackbar.open}
+      <ErrorNotification
+        open={notification.open}
+        onClose={closeNotification}
+        message={notification.message}
+        type={notification.type}
         autoHideDuration={4000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        position="top"
+      />
     </Box>
   )
 }

@@ -27,7 +27,7 @@ const RightSideDelivery = () => {
    // const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
 
     const { getToken } = useAuth();
-    const { carrito, addresses, isLoading, etapa,pickUps, setEtapa, setSelectedAddress,selectedAddress,setSelectedPickup,selectedPickup, deliveryType,setDeliveryType} = useCart();
+    const { carrito, addresses, isLoading, etapa,pickUps, setEtapa, setSelectedAddress,selectedAddress,setSelectedPickup,selectedPickup, deliveryType, setDeliveryType} = useCart();
     const router = useRouter();
 
     const handleChangeEtapa = async()=>{
