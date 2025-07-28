@@ -143,7 +143,7 @@ const SidebarCategory = ({
                   ) : selectedSubCategory ? (
                     selectedSubCategory.productcategories?.map((cat, i) => (
                       <li key={cat._id || i}>
-                        <Link href={`/marcas/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
+                        <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-2 hover:text-[#7950f2] transition-colors">
                           <Typography variant="productCategory">{cat.name}</Typography>
                         </Link>
                       </li>
@@ -337,7 +337,7 @@ const SidebarCategory = ({
                     <ul className="space-y-2">
                       {selectedSubCategory.productcategories.map((cat, i) => (
                         <li key={cat._id || i}>
-                          <Link href={`/marcas/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
+                          <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
                             <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>
