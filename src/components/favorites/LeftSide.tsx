@@ -54,6 +54,7 @@ const LeftSide= () => {
     { href: '/compras', label: 'MIS COMPRAS' },
     { href: '/direcciones', label: 'MIS DIRECCIONES' },
     { href: '/metodos-pago', label: 'METODOS DE PAGO' },
+    { href: '/rembolsos-devoluciones', label: 'REMBOLSOS Y DEVOLUCIONES' },
     { href: '/club/mis-puntos', label: 'MIS PUNTOS' },
   ];
 
