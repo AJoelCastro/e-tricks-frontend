@@ -39,6 +39,7 @@ const SelectablePickUpCard: React.FC<Props> = ({ address, selected, onSelect, is
         width: '100%',
         maxWidth: '800px',
         marginX: 'auto',
+        height: '100%',
       }}
     >
       {/* Icono + Nombre */}

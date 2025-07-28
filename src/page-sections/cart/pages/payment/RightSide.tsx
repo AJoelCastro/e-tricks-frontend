@@ -25,6 +25,7 @@ import {
 import { ICreateOrderData } from '@/interfaces/Order';
 import { ICoupon } from '@/interfaces/Coupon';
 import CustomCardPayment from '@/components/cards/CustomCardPayment';
+import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
 // Interfaz para errores de MercadoPago
 interface MPError {
   message: string;
@@ -630,7 +631,7 @@ const RightSidePayment = () => {
                       <Typography variant="h7">Continuar</Typography>
                     )}
                   </Button>
-
+                  <ProtectionConsumer/>
                   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 2, mt: 2 }}>
                     <Button onClick={handleContinueByWhatsApp}>
                       <Image

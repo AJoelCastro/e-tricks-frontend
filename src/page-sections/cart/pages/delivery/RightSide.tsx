@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import StoreIcon from '@mui/icons-material/Store';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SelectablePickUpCard from '@/components/addresses/SelectablePickUpCard';
+import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
 
 const RightSideDelivery = () => {
     //datos propios
@@ -241,6 +242,7 @@ const RightSideDelivery = () => {
                                                 Continuar compra
                                             </Typography>
                                         </Button>
+                                        <ProtectionConsumer/>
                                     </>
                                 )
                             }

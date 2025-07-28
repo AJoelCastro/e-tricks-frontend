@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useNotification } from '@/hooks/useNotification';
+import WhatsAppFloat from '@/components/WhatsAppFloat';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();
@@ -267,7 +268,7 @@ const MainComponent = () => {
         </Box>
       </Box>
       <FooterComponent/>
-
+      <WhatsAppFloat />
       {/* Modal de notificaci?n del carrito */}
       <CartNotificationModal
         open={cartNotificationOpen}
