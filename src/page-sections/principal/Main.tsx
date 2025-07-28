@@ -163,7 +163,6 @@ const MainComponent = () => {
           </Swiper>
         </Box>
         {/* NOVEDADES TRICKS */}
-
         <Box>
           <Swiper
             spaceBetween={4}
@@ -173,6 +172,7 @@ const MainComponent = () => {
             slidesPerView={isMobile ? 1.2 : 4}
             modules={[Scrollbar]}
             className="mySwiper"
+            style={{ paddingBottom: '2rem' }}
           >
             {brandsWithCategories
               .find((brand) => brand.brand.name === 'Tricks')
@@ -182,21 +182,22 @@ const MainComponent = () => {
                     sx={{
                       position: 'relative',
                       width: '100%',
-                      maxHeight: '100%',
+                      height: { xs: '400px', sm: '450px', md: '500px' }, // Altura fija responsiva
                       overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        transition: 'transform 0.3s ease'
+                      }
                     }}
                   >
                     <Image
                       src={category.image}
                       alt={category.name}
-                      width={200}
-                      height={200}
+                      fill // Usar fill en lugar de width/height específicos
                       style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'cover', // Esto mantendrá las proporciones y llenará el contenedor
                       }}
-                      
                     />
                     <Box
                       sx={{
@@ -209,6 +210,10 @@ const MainComponent = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                          transition: 'background-color 0.3s ease'
+                        }
                       }}
                     >
                       <Typography
@@ -218,6 +223,7 @@ const MainComponent = () => {
                           fontWeight: 'bold',
                           textAlign: 'center',
                           px: 1,
+                          fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } // Tamaño responsivo del texto
                         }}
                       >
                         {category.name.toUpperCase()}
@@ -239,6 +245,7 @@ const MainComponent = () => {
             slidesPerView={isMobile ? 1.2 : 4}
             pagination={{ clickable: true }}
             modules={[Pagination]}
+            style={{ paddingBottom: '2rem' }} 
           >
             {dataProducts
               .filter((product) => product.isNewProduct)
