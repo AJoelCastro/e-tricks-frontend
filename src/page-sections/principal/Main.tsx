@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from "@clerk/nextjs";
 import MainCarouselComponent from '../../components/carousel/MainCarousel'
 import { imagesPrueba } from '@/data/ThreeImagesPrueba'
-import ProductCard from '../../components/cards/Products'
+import ProductCard from '../../components/product/Products'
 import ThreeImages from '../../components/sections/ThreeImages'
 import ProductService from '@/services/ProductService'
 import { Box, Grid, Typography, Snackbar, Alert } from '@mui/material';
-import NavbarComponent from '@/components/NavbarComponent';
-import FooterComponent from '@/components/FooterComponent';
+import NavbarComponent from '@/components/principal/NavbarComponent';
+import FooterComponent from '@/components/principal/FooterComponent';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -23,10 +23,10 @@ import { useRouter } from 'next/navigation';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useNotification } from '@/hooks/useNotification';
-import WhatsAppFloat from '@/components/WhatsAppFloat';
+import WhatsAppFloat from '@/components/whatsapp/WhatsAppFloat';
 import BannerPrincipalService from '@/services/BannerPrincipalService';
 import { IBannerPrincipal } from '@/interfaces/BannerPrincipal';
-import BannerPrincipal from '@/components/BannerPrincipal';
+import BannerPrincipal from '@/components/principal/BannerPrincipal';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();

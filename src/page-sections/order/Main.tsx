@@ -1,8 +1,8 @@
 import { Grid } from '@mui/material'
 import React from 'react'
 import RightSideOrder from '../../components/order/RightSide'
-import NavbarComponent from '@/components/NavbarComponent'
-import FooterComponent from '@/components/FooterComponent'
+import NavbarComponent from '@/components/principal/NavbarComponent'
+import FooterComponent from '@/components/principal/FooterComponent'
 import LeftSide from '@/components/favorites/LeftSide'
 
 const MainOrder= () => {

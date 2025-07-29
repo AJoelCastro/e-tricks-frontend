@@ -1,5 +1,5 @@
-import FooterComponent from '@/components/FooterComponent'
-import NavbarComponent from '@/components/NavbarComponent'
+import FooterComponent from '@/components/principal/FooterComponent'
+import NavbarComponent from '@/components/principal/NavbarComponent'
 import TermsAndConditions from '@/components/TermsAndConditions'
 import React from 'react'
 

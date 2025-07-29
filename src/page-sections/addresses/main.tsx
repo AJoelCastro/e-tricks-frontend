@@ -1,7 +1,7 @@
 import RightSideAddress from '@/components/addresses/RightSide'
 import LeftSide from '@/components/favorites/LeftSide'
-import FooterComponent from '@/components/FooterComponent'
-import NavbarComponent from '@/components/NavbarComponent'
+import FooterComponent from '@/components/principal/FooterComponent'
+import NavbarComponent from '@/components/principal/NavbarComponent'
 import { Grid } from '@mui/material'
 import React from 'react'
 

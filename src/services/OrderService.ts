@@ -66,22 +66,18 @@ const OrderService = {
      */
     getUserOrders: async (token: string) => {
         try {
-             const { userId} = store.getState().auth;
-                console.log("userId",userId)
-        if (!userId || !token) {
-            throw new Error('Faltan credenciales del usuario');
-        }
+            const { userId} = store.getState().auth;
+            if (!userId || !token) {
+                throw new Error('Faltan credenciales del usuario');
+            }
 
-     
-        const response = await axios.get(`${API_URL}/order/user/${userId}`, {
+            const response = await axios.get(`${API_URL}/order/user/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log("response ", response )
             return response.data;
         } catch (error) {
-            console.error('Error fetching user orders:', error);
             throw error;
         }
     },

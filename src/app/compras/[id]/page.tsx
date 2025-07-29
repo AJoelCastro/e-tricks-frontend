@@ -5,8 +5,8 @@ import OrderDetailPage from '@/page-sections/order/detail/Main';
 import { useParams } from 'next/navigation';
 import LeftSide from '@/components/favorites/LeftSide';
 
-import NavbarComponent from '@/components/NavbarComponent';
-import FooterComponent from '@/components/FooterComponent';
+import NavbarComponent from '@/components/principal/NavbarComponent';
+import FooterComponent from '@/components/principal/FooterComponent';
 
 const MainOrderDetailPage = () => {
     const { id } = useParams()

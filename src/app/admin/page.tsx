@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import NavbarComponent from '@/components/NavbarComponent';
-import FooterComponent from '@/components/FooterComponent';
+import NavbarComponent from '@/components/principal/NavbarComponent';
+import FooterComponent from '@/components/principal/FooterComponent';
 import MainAdmin from '@/page-sections/admin/Main';
 
 const AdminPage = () => {

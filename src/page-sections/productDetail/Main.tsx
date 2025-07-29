@@ -22,8 +22,8 @@ import Image from 'next/image';
 import { SignInButton, useAuth } from '@clerk/nextjs';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { CheckCircle } from 'lucide-react';
-import NavbarComponent from '@/components/NavbarComponent';
-import FooterComponent from '@/components/FooterComponent';
+import NavbarComponent from '@/components/principal/NavbarComponent';
+import FooterComponent from '@/components/principal/FooterComponent';
 type Props = {
     id: string;
 };

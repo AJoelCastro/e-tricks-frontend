@@ -9,7 +9,7 @@ import SelectableAddressard from '../../../../components/addresses/SelectableAdd
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import EmptyCartComponent from '@/components/EmptyCartComponent';
+import EmptyCartComponent from '@/components/not-found/EmptyCartComponent';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useProductLogic } from '@/hooks/useProductLogic'; // Importa tu hook de producto
 import { useCart } from '../../CartContext';

@@ -2,13 +2,13 @@
 import UserService from '@/services/UserService'
 import { Box, CircularProgress, Grid } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import ProductCard from '../cards/Products';
+import ProductCard from '../product/Products';
 import { useAuth } from '@clerk/nextjs';
 import { IProduct } from '@/interfaces/Product';
-import NoFavoritesFound from '../NoFavoritesFound';
+import NoFavoritesFound from '../not-found/NoFavoritesFound';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useProductFilter } from '@/hooks/useProductFilter';
-import ProductFilter from '../ProductFilter';
+import ProductFilter from '../product/ProductFilter';
 import CartNotificationModal from '../cart/CartNotificationModal';
 import ErrorNotification from '../ErrorNotification';
 import { Typography, Button } from '@mui/material';

@@ -22,14 +22,14 @@ import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { LucideArrowLeft, User, Calendar, Package, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import EmptyOrderComponent from '@/components/EmptyOrderComponent';
+import EmptyOrderComponent from '@/components/not-found/EmptyOrderComponent';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useCart } from '../../page-sections/cart/CartContext';
 import { useAuth, useUser } from '@clerk/nextjs';
 import OrderService from '@/services/OrderService';
 import { IOrder } from '@/interfaces/Order';
-import OrderFilter from '../OrderFilter';
+import OrderFilter from './OrderFilter';
 
 interface FilterState {
     type: string;
@@ -72,9 +72,9 @@ const RightSideOrder = () => {
             }
 
             const data = await OrderService.getUserOrders(token);
+            console.log("data",data)
             setDataOrders(data.data);
         } catch (error) {
-            console.error('Error getting orders:', error);
             showError('Error al cargar las órdenes');
         }
     };
