@@ -1,5 +1,6 @@
 import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse } from '@/interfaces/Order';
 import axios from 'axios';
+import { store } from '@/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -63,13 +64,21 @@ const OrderService = {
     /**
      * Obtener todas las órdenes de un usuario
      */
-    getUserOrders: async (token: string, userId: string) => {
+    getUserOrders: async (token: string) => {
         try {
-            const response = await axios.get(`${API_URL}/order/user/${userId}`, {
+             const { userId} = store.getState().auth;
+                console.log("userId",userId)
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+     
+        const response = await axios.get(`${API_URL}/order/user/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log("response ", response )
             return response.data;
         } catch (error) {
             console.error('Error fetching user orders:', error);
