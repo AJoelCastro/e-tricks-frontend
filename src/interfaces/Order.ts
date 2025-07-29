@@ -44,20 +44,25 @@ export interface IOrderItem {
     price: number;
     quantity: number;
     size: string;
+    image:string;
 }
 
 export interface IOrder extends Document {
+    _id: string;
     userId: string;
+    orderNumber:string;
     items: IOrderItem[];
     subtotalAmount: number;
     totalAmount: number;
     discountAmount: number;
     couponCode?: string;
-    addressId?: string | null;
-    status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed' | 'rejected' | 'refunded';
+    addressId: string;
+    status: string;
+    orderType:string;
     paymentId: string;
     paymentStatus: string;
     paymentMethod: string;
+    deliveryStatus?:string;
     createdAt: Date;
     updatedAt: Date;
 }
