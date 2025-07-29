@@ -81,7 +81,7 @@ const RightSidePayment = () => {
 
   const { getToken } = useAuth();
   const { user } = useUser();
-  const { carrito, isLoading, selectedAddressId, deliveryType, pickUps, addresses, selectedAddress, selectedPickup } = useCart();
+  const { carrito, isLoading, deliveryType, selectedAddress, selectedPickup } = useCart();
   console.log('User:', user);
 
   // Inicializar MercadoPago solo una vez

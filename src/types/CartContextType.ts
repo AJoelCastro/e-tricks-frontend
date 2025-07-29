@@ -7,8 +7,6 @@ export interface CartContextType {
   carrito: ICartItem[];
   setCarrito: React.Dispatch<React.SetStateAction<ICartItem[]>>;
   addresses: IAddress[];
-  selectedAddressId: string | null;
-  setSelectedAddressId: React.Dispatch<React.SetStateAction<string | null>>;
   deliveryType: 'pickup' | 'address' | null;
   setDeliveryType: React.Dispatch<React.SetStateAction<'pickup' | 'address' | null>>;
   selectedCardId: string | null;

@@ -15,7 +15,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [carrito, setCarrito] = useState<ICartItem[]>([]);
   const [pickUps, setPickUps] = useState<IPickUp[]>([]);
   const [addresses, setAddresses] = useState<IAddress[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
@@ -75,8 +74,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         carrito,
         setCarrito,
         addresses,
-        selectedAddressId,
-        setSelectedAddressId,
         deliveryType,
         setDeliveryType,
         selectedCardId,
@@ -91,7 +88,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         etapa,
         setEtapa,
-        pickUps
+        pickUps,
       }}
     >
       {children}

@@ -18,21 +18,30 @@ import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
 
 const RightSideDelivery = () => {
     //datos propios
-    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
         severity: 'success' | 'error' | 'info' | 'warning';
     }>({ open: false, message: '', severity: 'info' });
-   // const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
 
     const { getToken } = useAuth();
-    const { carrito, addresses, isLoading, etapa,pickUps, setEtapa, setSelectedAddress,selectedAddress,setSelectedPickup,selectedPickup, deliveryType, setDeliveryType} = useCart();
+    const { 
+        carrito, 
+        addresses, 
+        isLoading, 
+        pickUps,
+        setSelectedAddress,
+        selectedAddress,
+        setSelectedPickup,
+        selectedPickup, 
+        deliveryType, 
+        setDeliveryType
+    } = useCart();
     const router = useRouter();
 
     const handleChangeEtapa = async()=>{
         try {
-            if (selectedAddressId) {
+            if (selectedAddress || selectedPickup) {
                 router.push('/carrito/pagos');
             }else{
                 handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
@@ -49,6 +58,36 @@ const RightSideDelivery = () => {
 
     const handleCloseSnackbar = () => {
         setSnackbar(prev => ({ ...prev, open: false }));
+    };
+
+    // Función para manejar la selección de pickup
+    const handlePickupSelection = (pickup: any) => {
+        setSelectedPickup(pickup);
+        // Limpiar la selección de address si había una
+        if (selectedAddress) {
+            setSelectedAddress(null);
+        }
+    };
+
+    // Función para manejar la selección de address
+    const handleAddressSelection = (address: any) => {
+        setSelectedAddress(address);
+        // Limpiar la selección de pickup si había una
+        if (selectedPickup) {
+            setSelectedPickup(null);
+        }
+    };
+
+    // Función para manejar el cambio de tipo de entrega
+    const handleDeliveryTypeChange = (type: 'pickup' | 'address') => {
+        setDeliveryType(type);
+        
+        // Limpiar las selecciones cuando cambias de tipo
+        if (type === 'pickup') {
+            setSelectedAddress(null);
+        } else if (type === 'address') {
+            setSelectedPickup(null);
+        }
     };
 
     if(isLoading){
@@ -87,31 +126,41 @@ const RightSideDelivery = () => {
                                     </Typography>
                                 </Grid>
                                 <Grid container spacing={2}>
+                                    {/* PICKUP OPTION */}
                                     <Grid size={{xs:12, sm:12, md:12}}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, border: deliveryType === 'pickup' ? '2px solid #7950f2' : '1px solid #e0e0e0',borderRadius: 2,p: 2,cursor: 'pointer', }}
-                                        onClick={() => setDeliveryType('pickup')}
+                                        <Box 
+                                            sx={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                gap: 2, 
+                                                border: deliveryType === 'pickup' ? '2px solid #7950f2' : '1px solid #e0e0e0',
+                                                borderRadius: 2,
+                                                p: 2,
+                                                cursor: 'pointer',
+                                                backgroundColor: deliveryType === 'pickup' ? '#f8f6ff' : 'white',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onClick={() => handleDeliveryTypeChange('pickup')}
                                         >
                                             <Radio
                                                 checked={deliveryType === 'pickup'}
-                                                onChange={() => setDeliveryType('pickup')}
+                                                onChange={() => handleDeliveryTypeChange('pickup')}
                                                 color="primary"
                                             />
                                             <StoreIcon sx={{ color: '#7c3aed', fontSize: 32 }} />
-                                            <Typography
-                                            >
+                                            <Typography>
                                                 Recojo en tienda
                                             </Typography>
                                         </Box>
+                                        
                                         {deliveryType === 'pickup' && (
                                             <Grid container spacing={1} sx={{ mt: 1 }}>
                                                 {pickUps.map((pickup) => (
                                                     <Grid key={pickup._id} size={{xs:12, sm:12, md:6}}>
                                                         <SelectablePickUpCard
                                                             address={pickup}
-                                                            selected={selectedAddressId === pickup._id}
-                                                            onSelect={() => {
-                                                                setSelectedPickup(pickup)
-                                                                setSelectedAddressId(pickup._id??null)}}
+                                                            selected={selectedPickup?._id === pickup._id}
+                                                            onSelect={() => handlePickupSelection(pickup)}
                                                             isPickup
                                                         />
                                                     </Grid>
@@ -119,14 +168,26 @@ const RightSideDelivery = () => {
                                             </Grid>
                                         )}
                                     </Grid>
+
+                                    {/* ADDRESS OPTION */}
                                     <Grid size={{xs:12, sm:12, md:12}}>
                                         <Box 
-                                            sx={{ display: 'flex', alignItems: 'center', gap: 2, border: deliveryType === 'address' ? '2px solid #7950f2' : '1px solid #e0e0e0',borderRadius: 2,p: 2,cursor: 'pointer', }}
-                                            onClick={() => setDeliveryType('address')}
+                                            sx={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                gap: 2, 
+                                                border: deliveryType === 'address' ? '2px solid #7950f2' : '1px solid #e0e0e0',
+                                                borderRadius: 2,
+                                                p: 2,
+                                                cursor: 'pointer',
+                                                backgroundColor: deliveryType === 'address' ? '#f8f6ff' : 'white',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onClick={() => handleDeliveryTypeChange('address')}
                                         >
                                             <Radio
                                                 checked={deliveryType === 'address'}
-                                                onChange={() => setDeliveryType('address')}
+                                                onChange={() => handleDeliveryTypeChange('address')}
                                                 color="primary"
                                             />
                                             <LocalShippingIcon sx={{ color: '#7c3aed', fontSize: 32 }} />
@@ -134,6 +195,7 @@ const RightSideDelivery = () => {
                                                 Enviar a domicilio
                                             </Typography>
                                         </Box>
+                                        
                                         {deliveryType === 'address' && (
                                             <Grid container spacing={1} sx={{ mt: 1 }}>
                                                 {addresses.length === 0 ? 
@@ -150,14 +212,12 @@ const RightSideDelivery = () => {
                                                             </Typography>
                                                         </Grid>
                                                     ) : (
-                                                        addresses.map((address)=>(
+                                                        addresses.map((address) => (
                                                             <Grid key={address._id} size={{xs:12, sm:12, md:6}}>
                                                                 <SelectableAddressCard
                                                                     address={address}
-                                                                    selected={selectedAddressId === address._id}
-                                                                    onSelect={() => {
-                                                                        setSelectedAddress(address)
-                                                                        setSelectedAddressId(address._id??null)}}
+                                                                    selected={selectedAddress?._id === address._id}
+                                                                    onSelect={() => handleAddressSelection(address)}
                                                                     isPickup={false}
                                                                 />
                                                             </Grid>  
@@ -194,29 +254,30 @@ const RightSideDelivery = () => {
                                             <Typography variant="h7">
                                                 S/ {
                                                 carrito.reduce((sum, item) => {
-                                                    const precioUnitario = item.product.descuento
-                                                    ? item.product.price
-                                                    : item.product.price;
+                                                    const precioUnitario = item.product.price;
                                                     return sum + precioUnitario * item.quantity;
                                                 }, 0).toFixed(2)
                                                 }
                                             </Typography>
                                         </Box>
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="h7">Descuentos ({carrito.length})</Typography>
-                                            <Typography variant="h7" color="error">
-                                                - S/ {
-                                                carrito.reduce((sum, item) => {
-                                                    if (item.product.descuento) {
-                                                    const descuento = (item.product.price * item.product.descuento) / 100;
-                                                    return sum + descuento * item.quantity;
+                                        {/* Solo mostrar descuentos si hay productos con descuento */}
+                                        {carrito.some(item => item.product.descuento && item.product.descuento > 0) && (
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="h7">Descuentos</Typography>
+                                                <Typography variant="h7" color="error">
+                                                    - S/ {
+                                                    carrito.reduce((sum, item) => {
+                                                        if (item.product.descuento) {
+                                                            const descuento = (item.product.price * item.product.descuento) / 100;
+                                                            return sum + descuento * item.quantity;
+                                                        }
+                                                        return sum;
+                                                    }, 0).toFixed(2)
                                                     }
-                                                    return sum;
-                                                }, 0).toFixed(2)
-                                                }
-                                            </Typography>
-                                        </Box>
+                                                </Typography>
+                                            </Box>
+                                        )}
 
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
                                             <Typography variant="h7">Total</Typography>
@@ -231,15 +292,40 @@ const RightSideDelivery = () => {
                                                 }
                                             </Typography>
                                         </Box>
+
+                                        {/* Mostrar información de la selección actual */}
+                                        {(selectedAddress || selectedPickup) && (
+                                            <Box sx={{ 
+                                                mt: 2, 
+                                                p: 2, 
+                                                backgroundColor: '#f8f6ff', 
+                                                borderRadius: 1,
+                                                border: '1px solid #7950f2'
+                                            }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#7950f2' }}>
+                                                    {deliveryType === 'pickup' ? 'Punto de recojo:' : 'Dirección seleccionada:'}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                                    {selectedPickup ? 
+                                                        `${selectedPickup.city} - ${selectedPickup.cc}` : 
+                                                        selectedAddress ? 
+                                                            `${selectedAddress.name} - ${selectedAddress.street}` : 
+                                                            ''
+                                                    }
+                                                </Typography>
+                                            </Box>
+                                        )}
+
                                         <Button
                                             variant="contained"
                                             color="primary"
                                             fullWidth
                                             sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
                                             onClick={handleChangeEtapa}
+                                            disabled={!selectedAddress && !selectedPickup}
                                         >
                                             <Typography variant="h7">
-                                                Continuar compra
+                                                {selectedAddress || selectedPickup ? 'Continuar compra' : 'Selecciona una opción'}
                                             </Typography>
                                         </Button>
                                         <ProtectionConsumer/>
