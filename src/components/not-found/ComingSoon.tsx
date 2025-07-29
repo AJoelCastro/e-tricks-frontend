@@ -4,8 +4,8 @@ import React from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import FooterComponent from './FooterComponent';
-import NavbarComponent from './NavbarComponent';
+import FooterComponent from '../principal/FooterComponent';
+import NavbarComponent from '../principal/NavbarComponent';
 
 const ComingSoon = () => {
   return (
