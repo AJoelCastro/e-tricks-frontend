@@ -55,7 +55,7 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
       <Box
         sx={{
           position: 'absolute',
-          top: '50%',
+          top: '80%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           display: 'flex',
@@ -68,17 +68,19 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
         {banner.links.map((link, index) => (
           <Button
             key={index}
-            variant="contained"
+            variant="outlined"
             sx={{
-              backgroundColor: '#7950f2',
+              borderColor: '#fff',
               color: '#fff',
               px: 3,
-              py: 1.5,
+              py: 1,
               fontSize: '1rem',
-              textTransform: 'none',
+              textTransform: 'uppercase',
               borderRadius: 2,
+              backgroundColor: 'transparent',
               '&:hover': {
-                backgroundColor: '#6741d9',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', // leve fondo al hover
+                borderColor: '#fff',
               },
               width: isMobile ? '200px' : 'auto',
             }}
