@@ -1,4 +1,4 @@
-import ComingSoon from '@/components/ComingSoon'
+import ComingSoon from '@/components/not-found/ComingSoon'
 import React from 'react'
 import { Metadata } from 'next'
 
