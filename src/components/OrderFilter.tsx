@@ -118,7 +118,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
                         <Accordion elevation={1} sx={{ borderRadius: 2, paddingY: 1 }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
+                                    <Typography variant="priceCard" >
                                         Pedidos
                                     </Typography>
                                     {filter.type && filter.type !== 'todo' && (

@@ -127,7 +127,7 @@ const RightSidePayment = () => {
 
   // CONFIGURACIÓN ESTABLE PARA MERCADOPAGO
   const cardPaymentConfig = useMemo(() => {
-    if (!mpReady || !user?.emailAddresses?.[0]?.emailAddress) {
+    if (!mpReady || !user?.primaryEmailAddress?.emailAddress) {
       return null;
     }
 
@@ -135,7 +135,7 @@ const RightSidePayment = () => {
       initialization: {
         amount: total,
         payer: {
-          email: user.emailAddresses[0].emailAddress,
+          email: user?.primaryEmailAddress?.emailAddress
         }
       },
       customization: {
@@ -147,7 +147,7 @@ const RightSidePayment = () => {
         }
       }
     };
-  }, [total, user?.emailAddresses, mpReady]);
+  }, [total, user?.primaryEmailAddress?.emailAddress, mpReady]);
 
   const handleContinueByWhatsApp = () => {
     const carritoTexto = carrito.map((item, index) => {

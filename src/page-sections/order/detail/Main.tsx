@@ -28,6 +28,7 @@ import { IAddress } from '@/interfaces/Address';
 import { IPickUp } from '@/interfaces/PickUp';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useProductLogic } from '@/hooks/useProductLogic';
+import { SplashScreen } from '@/components/splash-screen';
 
 type Props = {
     id: string;
@@ -115,7 +116,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
     };
 
     // Función para formatear fecha
-    const formatDate = (date: string | Date) => {
+    const formatDate = (date: Date) => {
         return new Date(date).toLocaleDateString('es-ES', {
             day: '2-digit',
             month: 'short',
@@ -136,25 +137,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                 return method;
         }
     };
-
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-                <CircularProgress sx={{ color: '#7950f2' }} />
-            </Box>
-        );
-    }
-
-    if (!order) {
-        return (
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
-                <Typography variant="h6">Orden no encontrada</Typography>
-                <Button onClick={() => router.back()} sx={{ mt: 2, color: '#7950f2' }}>
-                    Volver
-                </Button>
-            </Box>
-        );
-    }
+    if (!id) return <SplashScreen/>;
 
     return (
         <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
@@ -220,7 +203,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     N° de pedido:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.orderNumber}
+                                                    {order?.orderNumber}
                                                 </Typography>
                                                 <IconButton 
                                                     size="small" 
@@ -255,7 +238,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Pedido efectuado el:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {formatDate(order.createdAt)}
+                                                    {order?.createdAt ? formatDate(order.createdAt) : ''}
                                                 </Typography>
                                             </Box>
                                         }
@@ -270,7 +253,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Pago completado en:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.paymentStatus === 'approved' ? formatDate(order.updatedAt) : 'Pendiente'}
+                                                    {order?.paymentStatus === 'approved' ? formatDate(order?.updatedAt) : 'Pendiente'}
                                                 </Typography>
                                             </Box>
                                         }
@@ -285,7 +268,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Envío completado en:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.deliveryStatus === 'delivered' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                    {order?.deliveryStatus === 'delivered' ? formatDate(order?.updatedAt) : 'En proceso'}
                                                 </Typography>
                                             </Box>
                                         }
@@ -300,7 +283,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Pedido completado en:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.status === 'completed' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                    {order?.status === 'completed' ? formatDate(order?.updatedAt) : 'En proceso'}
                                                 </Typography>
                                             </Box>
                                         }
@@ -315,7 +298,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Método de pago:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {getPaymentMethodLabel(order.paymentMethod)}
+                                                    {getPaymentMethodLabel(order?.paymentMethod ?? '')}
                                                 </Typography>
                                             </Box>
                                         }
@@ -330,7 +313,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     {/* Estado de la Orden */}
                     <Box sx={{ mb: 3, textAlign: 'center' }}>
-                        {getStatusChip(order)}
+                        {order && getStatusChip(order)}
                     </Box>
 
                     {/* Información de Entrega */}
@@ -343,18 +326,18 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                 </Typography>
                             </Box>
                             
-                            {order.orderType === 'pickup' ? (
+                            {order?.orderType === 'pickup' ? (
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                                     Fecha de entrega estimada: 22 may, 2025
                                 </Typography>
                             ) : (
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                    Envío a domicilio - {order.deliveryStatus === 'delivered' ? 'Entregado' : 'En proceso'}
+                                    Envío a domicilio - {order?.deliveryStatus === 'delivered' ? 'Entregado' : 'En proceso'}
                                 </Typography>
                             )}
 
                             {/* Productos */}
-                            {order.items.map((item, index) => (
+                            {order?.items.map((item, index) => (
                                 <Box key={`${item.productId}-${index}`} sx={{ mb: 2 }}>
                                     <Grid container spacing={2} alignItems="center">
                                         <Grid size={{ xs: 3, sm: 2 }}>
@@ -395,7 +378,8 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                         
                                         <Grid size={{ xs: 9, sm: 10 }}>
                                             <Box>
-                                                <Link href={`/producto/${item.productId}`}>
+                                                {/* arreglar aqui el link */}
+                                                <Link href={`/producto/${item.name}`}>
                                                     <Typography 
                                                         variant="body1" 
                                                         sx={{ 
@@ -404,7 +388,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                             '&:hover': { color: '#7950f2' }
                                                         }}
                                                     >
-                                                        {item.name}
+                                                        {item.name} {item.productId.toString()}
                                                     </Typography>
                                                 </Link>
                                                 
@@ -452,7 +436,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                         </Button>
                                     </Box>
 
-                                    {index < order.items.length - 1 && <Divider sx={{ mt: 2 }} />}
+                                    {index < order?.items.length - 1 && <Divider sx={{ mt: 2 }} />}
                                 </Box>
                             ))}
                         </CardContent>
@@ -470,7 +454,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                     Subtotal
                                 </Typography>
                                 <Typography variant="body1">
-                                    PEN{order.totalAmount.toFixed(2)}
+                                    PEN{order?.totalAmount.toFixed(2)}
                                 </Typography>
                             </Box>
 
@@ -499,7 +483,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                     Total
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                    PEN {(order.totalAmount + 7.66 - 1.16).toFixed(2)}
+                                    PEN {(order ? (order.totalAmount + 7.66 - 1.16).toFixed(2) : '0.00')}
                                 </Typography>
                             </Box>
                         </CardContent>

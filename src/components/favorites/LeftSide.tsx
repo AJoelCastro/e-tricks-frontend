@@ -31,13 +31,13 @@ const style = {
 const StyledNavItem = styled(Link, {
   shouldForwardProp: (prop) => prop !== 'isActive'
 })(({ isActive }: { isActive: boolean }) => ({
-  color: theme.palette.text.secondary,
+  color: '#373737ff',
   transition: 'color 300ms',
   ':hover': {
-    color: '#5D2C8D',
+    color: '#7950f2',
   },
   ...(isActive && {
-    color: '#5D2C8D',
+    color: '#7950f2',
   }),
 }));
 
@@ -78,7 +78,7 @@ const LeftSide= () => {
                   <React.Fragment key={i}>
                     <ListItem>
                       <StyledNavItem href={link.href} isActive={isActive(link.href)}>
-                        <Typography variant="navbar">{link.label}</Typography>
+                        <Typography variant="productCategory">{link.label}</Typography>
                       </StyledNavItem>
                     </ListItem>
                     {i < links.length - 1 && <Divider component="li" />}
@@ -93,7 +93,7 @@ const LeftSide= () => {
               <React.Fragment key={i}>
                 <ListItem>
                   <StyledNavItem href={link.href} isActive={isActive(link.href)}>
-                    <Typography variant="navbar">{link.label}</Typography>
+                    <Typography variant="productCategory">{link.label}</Typography>
                   </StyledNavItem>
                 </ListItem>
                 {i < links.length - 1 && <Divider component="li" />}
