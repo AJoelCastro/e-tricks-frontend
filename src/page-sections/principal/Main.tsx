@@ -11,7 +11,7 @@ import FooterComponent from '@/components/FooterComponent';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Pagination, Scrollbar } from 'swiper/modules';
+import { Pagination, Scrollbar, Autoplay } from 'swiper/modules';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { primary } from '@/theme/colors';
 import { IProduct } from '@/interfaces/Product';
@@ -24,18 +24,19 @@ import { useProductLogic } from '@/hooks/useProductLogic';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useNotification } from '@/hooks/useNotification';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
+import BannerPrincipalService from '@/services/BannerPrincipalService';
+import { IBannerPrincipal } from '@/interfaces/BannerPrincipal';
+import BannerPrincipal from '@/components/BannerPrincipal';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState<Array<IProduct>>([]);
+  const [dataBannersPr, setDataBannersPr] = useState<Array<IBannerPrincipal>>([]);
   const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
   const { 
     notification, 
     closeNotification, 
     showError, 
-    showWarning, 
-    showSuccess, 
-    showInfo 
   } = useNotification();
   
   const router = useRouter();
@@ -66,6 +67,14 @@ const MainComponent = () => {
     }
   }
 
+  const getAllBannersPrincipales = async () => {
+    try {
+      const data = await BannerPrincipalService.getAllBanners();
+      setDataBannersPr(data);
+    } catch (error) {
+      showError(`${error}`)
+    }
+  }
   const getProducts = async () => {
     try{
       const data = await ProductService.GetProducts();
@@ -78,11 +87,12 @@ const MainComponent = () => {
 
   // Cargar datos iniciales
   useEffect(() => {
+    getAllBannersPrincipales();
     fetchBrandsWithCategories();
     getProducts();
   }, []);
 
-  // Funci?n mejorada para agregar al carrito con producto completo
+  // Funcion mejorada para agregar al carrito con producto completo
   const handleAddToCartWithProduct = async (productId: string, size: string, quantity: number) => {
     const product = dataProducts.find(p => p._id === productId);
     await handleAddToCart(productId, size, quantity, product);
@@ -93,14 +103,25 @@ const MainComponent = () => {
       <NavbarComponent main={true} cartItemsCount={cartItems.length} />
       <Box sx={{height:{xs:64, sm:64, md:0}}}></Box>
       <Box sx={{marginBottom:4}}>
-        {
-          isMobile ? (
-            <MainCarouselComponent images={['https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dw383b8e58/homepage/1.jpg?sw=2560&q=80', 'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dw383b8e58/homepage/1.jpg?sw=2560&q=80']}/>
-            
-          ) : (
-            <MainCarouselComponent images={['https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80', 'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dwac99c941/homepage/BannerHero_Mobile_Campa%C3%B1aPapa2905.jpg?sw=2560&q=80']}/>
-          )
-        }
+        {dataBannersPr.length > 0 && (
+          <Swiper
+            modules={[Autoplay]}
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false,
+            }}
+            loop={dataBannersPr.length > 1}
+            slidesPerView={1}
+            allowTouchMove={true}
+          >
+            {dataBannersPr.map((banner, index) => (
+              <SwiperSlide key={index}>
+                <BannerPrincipal banner={banner} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
         <Box sx={{height: 16}}></Box>
         {
           isMobile ? (
