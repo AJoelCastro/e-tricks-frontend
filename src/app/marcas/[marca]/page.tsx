@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { setMarcaId } from '@/store/slices/marcaSelectionSlice';
 import BrandService from '@/services/BrandService';
 import { IBrandWithCategories } from '@/interfaces/Brand';
-import MarcaPageSection from '@/page-sections/marcas/MarcaPageSection';
+import SubCategoryPageSection from '@/page-sections/categories/category/SubCategoryPageSection';
 
 const MarcaPage = () => {
   const [idMarca, setIdMarca] = useState<string>('');
@@ -40,7 +40,7 @@ const MarcaPage = () => {
   
   return (
     <>
-      <MarcaPageSection marcaId={idMarca}/>
+      <SubCategoryPageSection marca marcaId={idMarca}/>
     </>
   )
 }

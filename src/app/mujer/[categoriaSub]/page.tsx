@@ -1,6 +1,6 @@
 'use client';
 import { SplashScreen } from '@/components/splash-screen';
-import SubCategoryPageSection from '@/page-sections/women/category/SubCategoryPageSection'
+import SubCategoryPageSection from '@/page-sections/categories/category/SubCategoryPageSection'
 import GroupCategoryService from '@/services/GroupCategoryService';
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -37,7 +37,7 @@ const SubCategoryPage = () => {
   
   return (
     <>
-      <SubCategoryPageSection groupId={idGroup!} subId={idSub!}/>
+      <SubCategoryPageSection women groupId={idGroup!} subId={idSub!}/>
     </>
   )
 }

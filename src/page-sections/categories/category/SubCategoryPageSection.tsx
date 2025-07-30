@@ -19,14 +19,19 @@ import ErrorNotification from '@/components/ErrorNotification';
 import CartNotificationModal from '@/components/cart/CartNotificationModal';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useAuth } from '@clerk/nextjs';
+import BrandService from '@/services/BrandService';
+import { IBrandWithCategories } from '@/interfaces/Brand';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {
-  groupId: string;
-  subId: string;
+  groupId?: string;
+  subId?: string;
+  marcaId?: string;
+  women?: boolean;
+  marca?: boolean;
 }
-const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
+const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women, marca}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [productCategories, setProductCategories] = useState<IProductCategory[]>([]);
@@ -55,11 +60,34 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
   
   const categoria = capitalize(segments[0] || '');
   const subcategoria = capitalize(segments[1] || '');
-  
-  const getProductCategories = async () => {
+  const getProductCategoriesMarca = async () => {
     try {
       setIsLoading(true);
-      const data = await SubCategoryService.getCategoriesFromGroup(subId);
+      const data = await BrandService.getBrandsWithProductCategories();
+      const prodCat = data.find((marca: IBrandWithCategories) => marca.brand._id === marcaId)?.categories;
+      setProductCategories(prodCat);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  
+  const getProductsMarca = async () => {
+    try {
+      setIsLoading(true);
+      const data = await ProductService.GetProductsByIdMarca(marcaId!);
+      setProducts(data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  const getProductCategoriesWomen = async () => {
+    try {
+      setIsLoading(true);
+      const data = await SubCategoryService.getCategoriesFromGroup(subId!);
       setProductCategories(data.data);
     } catch (error) {
       throw error;
@@ -68,10 +96,10 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
     }
   }
   
-  const getProducts = async () => {
+  const getProductsWomen = async () => {
     try {
       setIsLoading(true);
-      const data = await ProductService.GetProductsByIdGroupAndIdSubCategory(groupId, subId);
+      const data = await ProductService.GetProductsByIdGroupAndIdSubCategory(groupId!, subId!);
       setProducts(data);
     } catch (error) {
       throw error;
@@ -107,8 +135,13 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId}) => {
   };
   
   useEffect(() => {
-    getProductCategories();
-    getProducts();
+    if (women) {
+      getProductCategoriesWomen();
+      getProductsWomen();
+    } else if (marca) {
+      getProductCategoriesMarca();
+      getProductsMarca();
+    }
   }, [])
   
   if (isLoading) {

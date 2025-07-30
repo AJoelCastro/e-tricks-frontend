@@ -54,7 +54,6 @@ const ProductService = {
             const response = await axios.get(`${API_URL}/product/${idGroup}/${idSubCategory}/products`);
             return response.data;
         }catch (error) {
-            console.error(error);
             throw error;
         }
     },
@@ -63,16 +62,22 @@ const ProductService = {
             const response = await axios.get(`${API_URL}/product/${idGroup}/${idSubCategory}/${idCategory}/products`);
             return response.data;
         }catch (error) {
-            console.error(error);
             throw error;
         }
     },
     GetProductsByIdMarca : async (idMarca : string) => {
         try {
-            const response = await axios.get(`${API_URL}/product/${idMarca}/products`);
+            const response = await axios.get(`${API_URL}/product/${idMarca}/productsBrands`);
             return response.data;
         }catch (error) {
-            console.error(error);
+            throw error;
+        }
+    },
+    GetProductsByIdMarcaAndIdCategory : async (idMarca : string, idCategory : string) => {
+        try {
+            const response = await axios.get(`${API_URL}/product/${idMarca}/${idCategory}/productsBrands`);
+            return response.data;
+        }catch (error) {
             throw error;
         }
     },

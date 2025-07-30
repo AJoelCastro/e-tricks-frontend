@@ -1,15 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react'
-import { Box, Button, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
+import { Box, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import SubCategoryService from '@/services/SubCategoryService';
 import { IProduct } from '@/interfaces/Product';
-import { IProductCategory } from '@/interfaces/ProductCategory';
-import { useDispatch } from 'react-redux';
-import { setProductCategoryId } from '@/store/slices/categorySelectionSlice';
 import ProductService from '@/services/ProductService';
 import ProductCard from '@/components/product/Products';
 import NoProductsFound from '@/components/not-found/NoProductsFound';
@@ -19,25 +15,24 @@ import ErrorNotification from '@/components/ErrorNotification';
 import CartNotificationModal from '@/components/cart/CartNotificationModal';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useAuth } from '@clerk/nextjs';
-import BrandService from '@/services/BrandService';
-import { IBrandWithCategories } from '@/interfaces/Brand';
+
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {
-  marcaId: string;
+  idGroup?: string;
+  idSub?: string;
+  idProduct?: string;
+  marcaId?: string;
+  marca?: boolean;
+  women?: boolean;
 }
-const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
+const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct, marcaId, marca, women}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [productCategories, setProductCategories] = useState<IProductCategory[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([])
   const pathname = usePathname();
   const router = useRouter();
-  const segments = pathname.split('/').filter(Boolean);
-  const dispatch = useDispatch();
   const { isSignedIn } = useAuth();
-  
-  // Hook para la lógica de productos
   const {
     favoriteIds,
     cartItems,
@@ -52,27 +47,17 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
     handleRemoveFromCart,
     isProductInCart,
     closeCartNotification,
-  } = useProductLogic();
-  
+    } = useProductLogic();
+  const segments = pathname.split('/').filter(Boolean);
+
   const categoria = capitalize(segments[0] || '');
-  const marcaName = capitalize(segments[1] || '');
-  
-  const getProductCategories = async () => {
+  const subcategoria = capitalize(segments[1] || '');
+  const productcategoria = capitalize(segments[2] || '');
+
+  const getProductsWomen = async () => {
     try {
       setIsLoading(true);
-      const data = await BrandService.getBrandsWithProductCategories();
-      setProductCategories(data.find((marca: IBrandWithCategories) => marca.brand._id === marcaId)?.brand.productcategories || []);
-    } catch (error) {
-      throw error;
-    }finally {
-      setIsLoading(false);
-    }
-  }
-  
-  const getProducts = async () => {
-    try {
-      setIsLoading(true);
-      const data = await ProductService.GetProductsByIdMarca(marcaId);
+      const data = await ProductService.GetProductsByIdGroupAndIdSubCategoryAndIdCategory(idGroup!, idSub!, idProduct!);
       setProducts(data);
     } catch (error) {
       throw error;
@@ -80,44 +65,45 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
       setIsLoading(false);
     }
   }
-
-  // Funciones locales para manejar favoritos y carrito
+  const getProductsMarca = async () => {
+    try {
+      setIsLoading(true);
+      const data = await ProductService.GetProductsByIdMarcaAndIdCategory(marcaId!, idProduct!);
+      console.log('data', data)
+      setProducts(data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
   const handleAddFavoriteLocal = async (productId: string) => {
     await handleAddFavorite(productId);
   }
-  
   const handleRemoveFavoriteLocal = async (productId: string) => {
     await handleRemoveFavorite(productId);
   };
 
   const handleAddToCartLocal = async (productId: string, size: string, quantity: number) => {
-    try {
-      // Encontrar el producto específico para pasarlo al hook
-      const product = products.find(p => p._id === productId);
-      
-      if (!product) {
-        console.error('Producto no encontrado');
-        return;
-      }
-      
-      // Llamar a la función del hook pasando el producto
+    const product = products.find(p => p._id === productId);
+    if (product) {
       await handleAddToCart(productId, size, quantity, product);
-    } catch (error) {
-      console.error('Error al agregar al carrito:', error);
     }
   };
-  
+
   useEffect(() => {
-    getProductCategories();
-    getProducts();
+    if (women) {
+      getProductsWomen();
+    }else if (marca) {
+      getProductsMarca();
+    }
   }, [])
-  
   if (isLoading) {
     return (
       <>
         <div className='h-16'></div>
         <Box sx={{minHeight: '100vh'}}>
-          <Grid size={12} 
+          <Grid size={12}
             sx={{ textAlign: 'center', mt: 4 }}
           >
             <CircularProgress/>
@@ -126,7 +112,7 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
       </>
     )
   }
-  
+
   return (
     <>
       <NavbarComponent/>
@@ -134,23 +120,22 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
       <Box sx={{minHeight: '100vh'}}>
         {/* Notificaciones */}
         <ErrorNotification
-          open={notification.open}
-          onClose={closeNotification}
-          message={notification.message}
-          type={notification.type}
-          autoHideDuration={3000}
+            open={notification.open}
+            onClose={closeNotification}
+            message={notification.message}
+            type={notification.type}
+            autoHideDuration={3000}
         />
         <CartNotificationModal
-          open={cartNotificationOpen}
-          onClose={closeCartNotification}
-          product={lastAddedProduct?.product || null}
-          size={lastAddedProduct?.size}
-          quantity={lastAddedProduct?.quantity}
-          autoHideDuration={5000}
+            open={cartNotificationOpen}
+            onClose={closeCartNotification}
+            product={lastAddedProduct?.product || null}
+            size={lastAddedProduct?.size}
+            quantity={lastAddedProduct?.quantity}
+            autoHideDuration={5000}
         />
-        
         <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
-          <IconButton onClick={()=>router.push(`/${categoria.toLowerCase()}`)}>
+          <IconButton onClick={()=>router.push(`/${categoria.toLowerCase()}/${subcategoria.toLowerCase()}`)}>
             <KeyboardBackspaceIcon sx={{color: 'black', ":hover": {color: '#7c3aed'}}}/>
           </IconButton>
           <Link href={`/${categoria.toLowerCase()}`}>
@@ -158,61 +143,46 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
               {categoria}
             </Typography>
           </Link>
+          <Typography variant='marcaCard' sx={{color: '#424142ff'}}>/</Typography>
+          <Link href={`/${categoria.toLowerCase()}/${subcategoria.toLowerCase()}`}>
+            <Typography variant='sideBarSubCategories' sx={{color: '#424142ff', ":hover": {color: '#7c3aed'}}}>
+              {subcategoria}
+            </Typography>
+          </Link>
           <Typography variant='marcaCard' sx={{color: '#7c3aed'}}>/</Typography>
           <Typography variant='sideBarSubCategories' sx={{color: '#7c3aed'}}>
-            {marcaName}
+            {productcategoria}
           </Typography>
         </Box>
-        
         {/* Banner section */}
         <Box sx={{width: '100%', height: {md:'225px', sm:'150px', xs:'100px'}, position: 'relative'}}>
           <Image
             src={'https://www.bata.com/dw/image/v2/BCLG_PRD/on/demandware.static/-/Sites-bata-pe-Library/es_PE/dw22bade2c/Menu/POWER06.05.jpg?sw=1777&q=80'}
             alt='banner'
             fill
-            style={{ objectFit: 'cover' }} 
+            style={{ objectFit: 'cover' }}
           />
         </Box>
-        
+
         {/* Productos */}
-        <Box sx={{ paddingX: 3, paddingY: 4, backgroundColor: 'white'}}>
-          <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-            <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
-              {marcaName}
-            </Typography>
-            <Typography variant='h6' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
-              [{products.length}]
-            </Typography>
-          </Box>
-          <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2}}>
-            {
-              productCategories.map((productCategory: IProductCategory) => (
-                <Button
-                  key={productCategory._id}
-                  onClick={() => {
-                    dispatch(setProductCategoryId(productCategory._id));
-                    router.push(`/${categoria.toLowerCase()}/${marcaName.toLowerCase()}/${productCategory.routeLink}`)
-                  }}
-                  sx={{color: 'black', ":hover": {borderColor: '#7c3aed', color:'#7c3aed'}, borderColor:'black'}}
-                  variant='outlined'
-                >
-                  {productCategory.name}
-                </Button>
-              ))
-            }
-          </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2,paddingX: 3, paddingY: 4, backgroundColor: 'white'}}>
+          <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
+            {productcategoria}
+          </Typography>
+          <Typography variant='h6' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
+            [{products.length}]
+          </Typography>
         </Box>
-        
         {
-          products.length === 0 ? 
+          products.length === 0 ?
             <NoProductsFound/>:
           (
             <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
               {
                 products.map((product: IProduct) => (
                   <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
-                    <ProductCard 
-                      products={product} 
+                    <ProductCard
+                      products={product}
                       show
                       markedFavorite={isSignedIn && favoriteIds.includes(product._id)}
                       handleRemoveFavorite={handleRemoveFavoriteLocal}
@@ -233,4 +203,4 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
   )
 }
 
-export default MarcaPageSection
+export default ProductCategoryPageSection
