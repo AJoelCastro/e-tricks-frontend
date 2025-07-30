@@ -15,6 +15,7 @@ const EmptyOrderComponent = ({ onReset }: { onReset?: () => void }) => {
         flexDirection: 'column',
         alignItems: 'center',
         width: '100%',
+        height: '100%',
       }}
       
     >

@@ -82,24 +82,6 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
         onSearchChange(event.target.value);
     };
 
-    const getButtonColor = (buttonKey: string) => {
-        if (filter.type === buttonKey) {
-            return {
-                backgroundColor: '#7950f2',
-                color: 'white',
-                '&:hover': { backgroundColor: '#6a40e0' }
-            };
-        }
-        return {
-            color: '#7950f2',
-            borderColor: '#7950f2',
-            '&:hover': { 
-                backgroundColor: 'rgba(121, 80, 242, 0.04)',
-                borderColor: '#7950f2'
-            }
-        };
-    };
-
     return (
         <Box>
             <Grid container sx={{
@@ -136,13 +118,12 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
                                             <Button
                                                 fullWidth
                                                 onClick={() => onFilterTypeChange(button.key)}
-                                                variant={filter.type === button.key ? 'contained' : 'outlined'}
-                                                sx={getButtonColor(button.key)}
+                                                variant={filter.type === button.key ? 'contained' : 'text'}
                                             >
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                                     <Typography variant="body2">{button.label}</Typography>
                                                     {button.count > 0 && (
-                                                        <Typography variant="body2">({button.count})</Typography>
+                                                        <Typography variant="body2">{button.count}</Typography>
                                                     )}
                                                 </Box>
                                             </Button>
@@ -150,68 +131,6 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
                                     ))}
                                 </List>
                                 
-                                <Box sx={{ px: 1, py: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder="N° de pedido, artículo o tienda"
-                                        value={filter.searchTerm}
-                                        onChange={handleSearchChange}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Search size={20} color="#666" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                '&:hover fieldset': {
-                                                    borderColor: '#7950f2',
-                                                },
-                                                '&.Mui-focused fieldset': {
-                                                    borderColor: '#7950f2',
-                                                },
-                                            }
-                                        }}
-                                    />
-
-                                    <FormControl fullWidth size="small">
-                                        <InputLabel sx={{ '&.Mui-focused': { color: '#7950f2' } }}>
-                                            Cualquier momento
-                                        </InputLabel>
-                                        <Select
-                                            value={filter.selectedPeriod}
-                                            onChange={onPeriodChange}
-                                            label="Cualquier momento"
-                                            sx={{
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#7950f2',
-                                                },
-                                            }}
-                                        >
-                                            <MenuItem value="">
-                                                <em>Cualquier momento</em>
-                                            </MenuItem>
-                                            {periods.map((period) => (
-                                                <MenuItem key={period.key} value={period.key}>
-                                                    {period.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-
-                                    {(filter.type !== 'todo' || filter.selectedPeriod || filter.searchTerm) && (
-                                        <Button
-                                            onClick={onClearFilters}
-                                            color="error"
-                                            variant="outlined"
-                                            size="small"
-                                        >
-                                            <Typography variant="body2">LIMPIAR FILTROS</Typography>
-                                        </Button>
-                                    )}
-                                </Box>
                             </AccordionDetails>
                         </Accordion>
                     ) : (
@@ -232,11 +151,10 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
                                     <Button
                                         key={button.key}
                                         onClick={() => onFilterTypeChange(button.key)}
-                                        variant={filter.type === button.key ? 'contained' : 'outlined'}
+                                        variant={filter.type === button.key ? 'contained' : 'text'}
                                         sx={{
-                                            ...getButtonColor(button.key),
                                             textTransform: 'none',
-                                            borderRadius: '20px',
+                                            borderRadius: '5px',
                                             minHeight: '36px',
                                             px: 2
                                         }}
@@ -250,95 +168,14 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
                                                     opacity: 0.8,
                                                     fontSize: '0.75rem'
                                                 }}>
-                                                    ({button.count})
+                                                    {button.count}
                                                 </Typography>
                                             )}
                                         </Box>
                                     </Button>
                                 ))}
                             </Box>
-
-                            {/* Barra de búsqueda y filtros */}
-                            <Box sx={{ 
-                                px: 3, 
-                                py: 2, 
-                                display: 'flex', 
-                                gap: 2, 
-                                alignItems: 'center',
-                                flexWrap: 'wrap'
-                            }}>
-                                <Box sx={{ flex: 1, minWidth: '300px' }}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder="N° de pedido, artículo o tienda"
-                                        value={filter.searchTerm}
-                                        onChange={handleSearchChange}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Search size={20} color="#666" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#f8f9fa',
-                                                '&:hover fieldset': {
-                                                    borderColor: '#7950f2',
-                                                },
-                                                '&.Mui-focused fieldset': {
-                                                    borderColor: '#7950f2',
-                                                },
-                                            }
-                                        }}
-                                    />
-                                </Box>
-
-                                <FormControl size="small" sx={{ minWidth: 200 }}>
-                                    <InputLabel sx={{ '&.Mui-focused': { color: '#7950f2' } }}>
-                                        Cualquier momento
-                                    </InputLabel>
-                                    <Select
-                                        value={filter.selectedPeriod}
-                                        onChange={onPeriodChange}
-                                        label="Cualquier momento"
-                                        sx={{
-                                            backgroundColor: '#f8f9fa',
-                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#7950f2',
-                                            },
-                                        }}
-                                    >
-                                        <MenuItem value="">
-                                            <em>Cualquier momento</em>
-                                        </MenuItem>
-                                        {periods.map((period) => (
-                                            <MenuItem key={period.key} value={period.key}>
-                                                {period.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                {(filter.type !== 'todo' || filter.selectedPeriod || filter.searchTerm) && (
-                                    <Button
-                                        onClick={onClearFilters}
-                                        variant="outlined"
-                                        size="small"
-                                        sx={{
-                                            color: '#dc3545',
-                                            borderColor: '#dc3545',
-                                            '&:hover': {
-                                                backgroundColor: 'rgba(220, 53, 69, 0.04)',
-                                                borderColor: '#dc3545'
-                                            }
-                                        }}
-                                    >
-                                        Pedidos borrados
-                                    </Button>
-                                )}
-                            </Box>
+                            
                         </Box>
                     )}
                 </Grid>

@@ -235,98 +235,96 @@ const RightSideOrder = () => {
             />
 
             <Grid container sx={{ marginX: 4, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
-                <Grid size={{ xs: 12, sm: 12, md: 6 }}>
-                    {!filteredOrders || filteredOrders.length === 0 ? (
-                        <EmptyOrderComponent />
-                    ) : (
-                        filteredOrders.map((order) => (
-                            <Card 
-                                key={order._id} 
-                                sx={{ 
-                                    marginBottom: 2, 
-                                    borderRadius: 2,
-                                    border: '1px solid #f0f0f0',
-                                    '&:hover': {
-                                        boxShadow: '0 4px 12px rgba(121, 80, 242, 0.1)',
-                                        borderColor: '#7950f2'
-                                    }
-                                }}
-                            >
-                                <CardContent>
-                                    {/* Header de la orden */}
-                                    <Box sx={{ 
-                                        display: 'flex', 
-                                        justifyContent: 'space-between', 
-                                        alignItems: 'flex-start',
-                                        mb: 2 
-                                    }}>
-                                        <Box>
-                                            {getStatusChip(order)}
-                                            <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                <Typography 
-                                                    variant="h6" 
-                                                    sx={{ 
-                                                        fontWeight: 'bold',
-                                                        color: '#333',
-                                                        fontSize: '1rem'
-                                                    }}
-                                                >
-                                                    Pedido efectuado el: {formatDate(order.createdAt)}
-                                                </Typography>
+                {
+                    filteredOrders.length === 0?(
+                        <EmptyOrderComponent/>
+                    ):(
+                        <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+                            {
+                                filteredOrders.map((order) => (
+                                    <Card 
+                                        key={order._id} 
+                                        sx={{ 
+                                            marginBottom: 2, 
+                                            borderRadius: 2,
+                                            border: '1px solid #f0f0f0',
+                                            '&:hover': {
+                                                boxShadow: '0 4px 12px rgba(121, 80, 242, 0.1)',
+                                                borderColor: '#7950f2'
+                                            }
+                                        }}
+                                    >
+                                        <CardContent>
+                                            {/* Header de la orden */}
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                alignItems: 'flex-start',
+                                                mb: 2 
+                                            }}>
+                                                <Box>
+                                                    {getStatusChip(order)}
+                                                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                        <Typography 
+                                                            variant="h6" 
+                                                            sx={{ 
+                                                                fontWeight: 'bold',
+                                                                color: '#333',
+                                                                fontSize: '1rem'
+                                                            }}
+                                                        >
+                                                            Pedido efectuado el: {formatDate(order.createdAt)}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Typography 
+                                                        variant="body2" 
+                                                        sx={{ 
+                                                            color: 'text.secondary',
+                                                            fontSize: '0.875rem',
+                                                            mt: 0.5
+                                                        }}
+                                                    >
+                                                        N° de pedido: {order.orderNumber}
+                                                        <Button
+                                                            size="small"
+                                                            sx={{ 
+                                                                ml: 1, 
+                                                                minWidth: 'auto',
+                                                                color: '#7950f2',
+                                                                textTransform: 'none',
+                                                                fontSize: '0.875rem'
+                                                            }}
+                                                        >
+                                                            Copiar
+                                                        </Button>
+                                                    </Typography>
+                                                </Box>
+                                                
+                                                <Box sx={{ textAlign: 'right' }}>
+                                                    <Link href={`/compras/${order._id}`}>
+                                                        <Button
+                                                            variant="outlined"
+                                                            size="small"
+                                                            sx={{
+                                                                color: '#7950f2',
+                                                                borderColor: '#7950f2',
+                                                                textTransform: 'none',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(121, 80, 242, 0.04)',
+                                                                    borderColor: '#7950f2'
+                                                                }
+                                                            }}
+                                                        >
+                                                            Detalles del pedido
+                                                        </Button>
+                                                    </Link>
+                                                </Box>
                                             </Box>
-                                            <Typography 
-                                                variant="body2" 
-                                                sx={{ 
-                                                    color: 'text.secondary',
-                                                    fontSize: '0.875rem',
-                                                    mt: 0.5
-                                                }}
-                                            >
-                                                N° de pedido: {order.orderNumber}
-                                                <Button
-                                                    size="small"
-                                                    sx={{ 
-                                                        ml: 1, 
-                                                        minWidth: 'auto',
-                                                        color: '#7950f2',
-                                                        textTransform: 'none',
-                                                        fontSize: '0.875rem'
-                                                    }}
-                                                >
-                                                    Copiar
-                                                </Button>
-                                            </Typography>
-                                        </Box>
-                                        
-                                        <Box sx={{ textAlign: 'right' }}>
-                                            <Link href={`/compras/${order._id}`}>
-                                                <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    sx={{
-                                                        color: '#7950f2',
-                                                        borderColor: '#7950f2',
-                                                        textTransform: 'none',
-                                                        '&:hover': {
-                                                            backgroundColor: 'rgba(121, 80, 242, 0.04)',
-                                                            borderColor: '#7950f2'
-                                                        }
-                                                    }}
-                                                >
-                                                    Detalles del pedido
-                                                </Button>
-                                            </Link>
-                                        </Box>
-                                    </Box>
 
-                                    <Divider sx={{ my: 2 }} />
+                                            <Divider sx={{ my: 2 }} />
 
-                                    {/* Items de la orden */}
-                                    <Box>
-                                        {!order.items || order.items.length === 0 ? (
-                                            <Typography>No hay productos en esta orden</Typography>
-                                        ) : (
-                                            <>
+                                            {/* Items de la orden */}
+                                            <Box>
                                                 {order.items
                                                     .slice(0, expandedOrders.has(order._id) ? order.items.length : 2)
                                                     .map((item, index) => (
@@ -420,7 +418,6 @@ const RightSideOrder = () => {
                                                         </Grid>
                                                     ))}
 
-                                                {/* Botón Ver más/menos */}
                                                 {order.items.length > 2 && (
                                                     <Box sx={{ textAlign: 'center', mt: 2 }}>
                                                         <Button
@@ -438,41 +435,42 @@ const RightSideOrder = () => {
                                                         </Button>
                                                     </Box>
                                                 )}
-                                            </>
-                                        )}
-                                    </Box>
+                                            </Box>
 
-                                    {/* Footer con total */}
-                                    <Divider sx={{ my: 2 }} />
-                                    
-                                    <Box sx={{ 
-                                        display: 'flex', 
-                                        justifyContent: 'space-between', 
-                                        alignItems: 'center',
-                                        pt: 1
-                                    }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Package size={16} color="#666" />
-                                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                {order.items.length} producto{order.items.length !== 1 ? 's' : ''}
-                                            </Typography>
-                                        </Box>
-                                        
-                                        <Typography 
-                                            variant="h6" 
-                                            sx={{ 
-                                                fontWeight: 'bold',
-                                                color: '#333'
-                                            }}
-                                        >
-                                            Total: S/ {order.totalAmount.toFixed(2)}
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        ))
-                    )}
-                </Grid>
+                                            {/* Footer con total */}
+                                            <Divider sx={{ my: 2 }} />
+                                            
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                alignItems: 'center',
+                                                pt: 1
+                                            }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Package size={16} color="#666" />
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                        {order.items.length} producto{order.items.length !== 1 ? 's' : ''}
+                                                    </Typography>
+                                                </Box>
+                                                
+                                                <Typography 
+                                                    variant="h6" 
+                                                    sx={{ 
+                                                        fontWeight: 'bold',
+                                                        color: '#333'
+                                                    }}
+                                                >
+                                                    Total: S/ {order.totalAmount.toFixed(2)}
+                                                </Typography>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            }
+                        </Grid>
+                    )
+                }
+                
             </Grid>
 
             {/* Notificaciones */}
