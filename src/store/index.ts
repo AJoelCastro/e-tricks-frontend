@@ -6,16 +6,18 @@ import { combineReducers } from 'redux';
 
 import authReducer from './slices/authSlice';
 import categorySelectionReducer  from './slices/categorySelectionSlice';
+import marcaSelectionReducer from './slices/marcaSelectionSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   category: categorySelectionReducer,
+  marca: marcaSelectionReducer
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['category'], // ← solo esta parte del estado se persistirá
+  whitelist: ['category', 'marca'], // ← solo esta parte del estado se persistirá
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
