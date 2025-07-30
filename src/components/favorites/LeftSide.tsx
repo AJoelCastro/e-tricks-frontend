@@ -22,7 +22,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 const style = {
   p: 0,
   width: '100%',
-  maxWidth: 360,
   borderRadius: 2,
   borderColor: 'divider',
   backgroundColor: 'background.paper',

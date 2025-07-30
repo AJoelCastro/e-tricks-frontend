@@ -260,7 +260,6 @@ const RightSidePayment = () => {
         throw new Error('No se recibió el ID de preferencia');
       }
     } catch (error) {
-      console.error('Error creating preference:', error);
       showError('Error al crear la preferencia de pago');
       return null;
     } finally {
