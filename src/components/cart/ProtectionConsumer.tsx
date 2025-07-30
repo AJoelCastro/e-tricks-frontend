@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material'
+import Image from 'next/image'
 import React from 'react'
 
 const ProtectionConsumer = () => {
@@ -7,13 +8,14 @@ const ProtectionConsumer = () => {
         <Box sx={{ mt: 3, mb: 2}}>
             <Box sx={{ marginBottom:1}}>
                 <Typography variant="h7" sx={{ fontWeight: 'semibold' }}>
-                    Paga con
+                    Ahora puedes pagar con <strong>Yape</strong>
                 </Typography>
             </Box>
 
             <Box sx={{
                 display: 'flex',
                 gap: 1,
+                marginBottom: 1,
                 flexWrap: 'wrap',
                 alignItems: 'center'
             }}>
@@ -74,8 +76,6 @@ const ProtectionConsumer = () => {
                     }} />
                 </Box>
 
-
-
                 {/* American Express */}
                 <Box sx={{
                     width: 50,
@@ -94,44 +94,14 @@ const ProtectionConsumer = () => {
                         AMEX
                     </Typography>
                 </Box>
-            </Box>
-        </Box>
-
-        {/* Sección de Protección del Comprador */}
-        <Box sx={{
-            mt: 3,
-            mb: { xs: 4, sm: 2, md: 0 },
-            p: 2,
-            backgroundColor: '#f8f9fa',
-            borderRadius: 2,
-            border: '1px solid #e9ecef'
-        }}>
-            <Typography variant='h7' sx={{ color:'#414142ff' }}>
-                Protección del comprador
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                <Box sx={{
-                    width: 20,
-                    height: 20,
-                    backgroundColor: '#28a745',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    mt: 0.2,
-                }}>
-                    <Typography sx={{
-                        color: 'white',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                    }}>
-                        ✓
-                    </Typography>
+                <Box>
+                    <Image
+                        src="https://imgs.search.brave.com/cIm__eRvkfQK61DHoU-3aq9ad9EArvbEjpIjw1z1_k4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tYXJr/ZXRpbmctcGVydS5i/ZWdsb2JhbC5iaXov/d3AtY29udGVudC91/cGxvYWRzL2VsZW1l/bnRvci90aHVtYnMv/eWFwZS1sb2dvLWZv/bmRvLXRyYW5zcGFy/ZW50ZS1yMHl3aW9r/MXV6N2N3bXh6bWpp/bDdjbDdydWRpNHpp/Y2d1eHlwcWpubHcu/cG5n"
+                        alt="Yape"
+                        width={45}
+                        height={45}
+                    />
                 </Box>
-                <Typography variant='marcaCard' color='text.secondary'>
-                    Recibe un reembolso de tu dinero si el artículo no llega o es diferente al de la descripción.
-                </Typography>
             </Box>
         </Box>
     </>

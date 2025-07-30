@@ -501,7 +501,7 @@ const RightSidePayment = () => {
                 💳 Proceso de Pago
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Al hacer clic en "Continuar", se abrirá una ventana con las opciones de pago de MercadoPago. 
+                Al hacer clic en "Pagar", se abrirá una ventana con las opciones de pago de MercadoPago. 
                 Podrás pagar con tarjeta de crédito, débito, efectivo, o tu cuenta de MercadoPago.
               </Typography>
             </Box>
@@ -665,7 +665,7 @@ const RightSidePayment = () => {
                         <Typography variant="h7">Procesando...</Typography>
                       </Box>
                     ) : (
-                      <Typography variant="h7">💳 Pagar con MercadoPago</Typography>
+                      <Typography variant="h7">Pagar</Typography>
                     )}
                   </Button>
                   
