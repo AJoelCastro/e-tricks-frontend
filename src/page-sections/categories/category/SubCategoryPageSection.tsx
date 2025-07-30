@@ -64,7 +64,8 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
     try {
       setIsLoading(true);
       const data = await BrandService.getBrandsWithProductCategories();
-      setProductCategories(data.find((marca: IBrandWithCategories) => marca.brand._id === marcaId)?.brand.productcategories || []);
+      const prodCat = data.find((marca: IBrandWithCategories) => marca.brand._id === marcaId)?.categories;
+      setProductCategories(prodCat);
     } catch (error) {
       throw error;
     }finally {
