@@ -118,6 +118,7 @@ const RightSidePayment = () => {
   useEffect(() => {
     const handlePaymentResult = async () => {
       const urlParams = new URLSearchParams(window.location.search);
+      console.log("urlparams",urlParams);
       const paymentId = urlParams.get('payment_id');
       const status = urlParams.get('status');
       const merchantOrderId = urlParams.get('merchant_order_id');
@@ -244,18 +245,23 @@ const RightSidePayment = () => {
 
       const preferenceData: ICreatePreferenceData = {
         userId: user.id,
+        addressId: selectedPickup
+          ? selectedPickup._id
+          : selectedAddress && selectedAddress._id
+            ? selectedAddress._id
+            : '', 
         couponCode: appliedCoupon?.code,
-        total:total,
-        subtotal:subtotal
+        orderType:deliveryType === 'pickup' ? 'pickup' :'standard'
       };
 
       console.log('Creating preference with data:', preferenceData);
 
       const response = await OrderService.getPreferenceId(token, preferenceData);
-      
-      if (response) {
+      console.log("response front",response.data)
+      if (response.success) {
         console.log('Preference created successfully:', response);
-        return response.preferenceId;
+         setOrderId(response.data.orderId);
+        return response.data.preferenceId;
       } else {
         throw new Error('No se recibió el ID de preferencia');
       }
