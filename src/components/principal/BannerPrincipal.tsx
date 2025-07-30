@@ -13,7 +13,9 @@ interface BannerPrincipalProps {
 const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Se considera "móvil o tablet" hasta 'md'
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   if (!banner) return null;
 
@@ -28,7 +30,7 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
     >
       {/* Imagen de fondo según dispositivo */}
       <Image
-        src={isMobile ? banner.imageMobile : banner.image}
+        src={isMobileOrTablet ? banner.imageMobile : banner.image}
         alt="Banner Principal"
         fill
         style={{
@@ -46,7 +48,6 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(0, 0, 0, 0.4)',
           zIndex: 1,
         }}
       />
@@ -59,7 +60,7 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
+          flexDirection: isMobileOrTablet ? 'column' : 'row',
           gap: 2,
           justifyContent: 'center',
           zIndex: 2,
@@ -82,7 +83,7 @@ const BannerPrincipal = ({ banner }: BannerPrincipalProps) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', // leve fondo al hover
                 borderColor: '#fff',
               },
-              width: isMobile ? '200px' : 'auto',
+              width: isMobileOrTablet ? '200px' : 'auto',
             }}
             onClick={() => router.push(link.link)}
           >

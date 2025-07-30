@@ -54,18 +54,14 @@ const RightSideOrder = () => {
         searchTerm: ''
     });
 
-    const [menuAnchor, setMenuAnchor] = useState<{
-        anchor: HTMLElement | null;
-        itemId: string | null;
-    }>({ anchor: null, itemId: null });
-
-    const { isLoading } = useCart();
+    const { isLoading, setIsLoading } = useCart();
     const { getToken } = useAuth();
     const { user } = useUser();
 
     // Función para obtener las órdenes
     const getOrders = async () => {
         try {
+            setIsLoading(true);
             const token = await getToken();
             if (!token) {
                 throw new Error('No se pudo obtener el token de autenticación');
@@ -76,21 +72,22 @@ const RightSideOrder = () => {
             setDataOrders(data.data);
         } catch (error) {
             showError('Error al cargar las órdenes');
+        }finally{
+            setIsLoading(false);
         }
     };
 
-    // Función para aplicar filtros
+    // Función para aplicar filtros - CORREGIDA
     const applyFilters = useMemo(() => {
         let filtered = [...dataOrders];
 
-        // Filtro por tipo/estado
+        // Filtro por tipo/estado - CORREGIDO
         if (filter.type !== 'todo') {
             filtered = filtered.filter(order => {
                 switch (filter.type) {
-                    case 'pending':
-                        return order.status === 'pending' || order.paymentStatus === 'pending';
                     case 'processing':
-                        return order.status === 'processing';
+                        // A enviar: órdenes en processing o con pago pendiente
+                        return order.status === 'processing' || order.paymentStatus === 'pending';
                     case 'shipped':
                         return order.deliveryStatus === 'shipped';
                     case 'delivered':
@@ -124,11 +121,11 @@ const RightSideOrder = () => {
         return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }, [dataOrders, filter]);
 
-    // Contadores para los botones de filtro
+    // Contadores para los botones de filtro - CORREGIDOS
     const filterCounts = useMemo(() => {
         return {
             todo: dataOrders.length,
-            pending: dataOrders.filter(o => o.status === 'pending' || o.paymentStatus === 'pending').length,
+            pending: dataOrders.filter(o => o.status === 'processing' || o.paymentStatus === 'pending').length,
             shipped: dataOrders.filter(o => o.deliveryStatus === 'shipped').length,
             delivered: dataOrders.filter(o => o.deliveryStatus === 'delivered').length,
             cancelled: dataOrders.filter(o => o.status === 'cancelled').length,
@@ -177,7 +174,7 @@ const RightSideOrder = () => {
         });
     };
 
-    // Función para obtener el estado visual
+    // Función para obtener el estado visual - CORREGIDA
     const getStatusChip = (order: IOrder) => {
         let label = '';
         let color: string = '#7950f2';
@@ -197,9 +194,12 @@ const RightSideOrder = () => {
         } else if (order.status === 'pending' || order.paymentStatus === 'pending') {
             label = 'A pagar';
             color = '#7950f2';
-        } else {
+        } else if (order.status === 'completed') {
             label = 'Procesado';
             color = '#9c27b0';
+        } else {
+            label = 'Pendiente';
+            color = '#757575';
         }
 
         return <Chip label={label} sx={{backgroundColor:color, color:'white'}}  size="small" />;
@@ -214,7 +214,7 @@ const RightSideOrder = () => {
         });
     };
 
-    if (isLoading) {
+    if (isLoading ) {
         return (
             <Grid size={{ xs: 12, sm: 12, md: 12 }} sx={{ textAlign: 'center', mt: 4 }}>
                 <CircularProgress sx={{ color: '#7950f2' }} />
@@ -234,7 +234,7 @@ const RightSideOrder = () => {
                 counts={filterCounts}
             />
 
-            <Grid container sx={{ marginX: 4, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
+            <Grid container sx={{ mx: { xs:2, sm:2, md:4}, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
                 {
                     filteredOrders.length === 0?(
                         <EmptyOrderComponent/>

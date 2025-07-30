@@ -42,6 +42,7 @@ const MainComponent = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   // Usar el hook personalizado para toda la l?gica de productos
   const {
@@ -161,7 +162,7 @@ const MainComponent = () => {
         <Box>
           <Swiper
             spaceBetween={16}
-            slidesPerView={isMobile ? 1.2 : 4}
+            slidesPerView={isMobile ? 1.2 : isTablet ? 2 : 4}
             style={{ paddingBottom: '2rem' }}
             pagination={{ clickable: true }}
             modules={[Pagination]}
@@ -191,7 +192,7 @@ const MainComponent = () => {
             scrollbar={{
               hide: false,
             }}
-            slidesPerView={isMobile ? 1.2 : 4}
+            slidesPerView={isMobile ? 1.2 : isTablet ? 2 : 4}
             modules={[Scrollbar]}
             className="mySwiper"
             style={{ paddingBottom: '2rem' }}
@@ -204,7 +205,7 @@ const MainComponent = () => {
                     sx={{
                       position: 'relative',
                       width: '100%',
-                      height: { xs: '400px', sm: '450px', md: '500px' }, // Altura fija responsiva
+                      height: { xs: '450px', sm: '500px', md: '550px', lg: '600px' }, // Altura fija responsiva
                       overflow: 'hidden',
                       cursor: 'pointer',
                       '&:hover': {
@@ -261,10 +262,10 @@ const MainComponent = () => {
             Novedades
           </Typography>
         </Box>
-        <Box>
+        <Box >
           <Swiper
             spaceBetween={16}
-            slidesPerView={isMobile ? 1.2 : 4}
+            slidesPerView={isMobile ? 1.2 : isTablet ? 2 : 4}
             pagination={{ clickable: true }}
             modules={[Pagination]}
             style={{ paddingBottom: '2rem' }} 

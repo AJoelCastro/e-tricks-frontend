@@ -161,8 +161,6 @@ const ProductCard: React.FC<Props> = ({
 
   return (
     <Box sx={{ height: '100%' }}>
-
-
       <Card
         sx={{
           position: 'relative',

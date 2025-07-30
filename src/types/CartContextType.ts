@@ -19,6 +19,7 @@ export interface CartContextType {
   selectedPickup:IPickUp | null;
   setSelectedPickup:React.Dispatch<React.SetStateAction<IPickUp | null>>;
   isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   etapa: number;
   setEtapa: React.Dispatch<React.SetStateAction<number>>;
   pickUps: IPickUp[];
