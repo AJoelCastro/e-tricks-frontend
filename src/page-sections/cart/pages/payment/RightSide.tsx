@@ -307,7 +307,7 @@ const RightSidePayment = () => {
       // Abrir el checkout directamente
       mp.checkout({
         preference: {
-          id: preferenceId,
+          id: preferenceIdCreated,
         },
         autoOpen: true, // Se abre automáticamente
         renderMode: 'modal', // o 'blank' para redirección completa
