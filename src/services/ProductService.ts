@@ -67,6 +67,15 @@ const ProductService = {
             throw error;
         }
     },
+    GetProductsByIdMarca : async (idMarca : string) => {
+        try {
+            const response = await axios.get(`${API_URL}/product/${idMarca}/products`);
+            return response.data;
+        }catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
 
     GetNewProducts : async () => {
         try {

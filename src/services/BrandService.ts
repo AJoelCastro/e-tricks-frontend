@@ -74,6 +74,16 @@ const BrandService = {
             console.error('Error fetching brands with product categories:', error);
             throw error;
         }
+    },
+
+    getBrandsWithProductCategoriesWithProducts: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/brand/getCategoryWithBrandsWithProducts`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching brands with product categories:', error);
+            throw error;
+        }
     }
 };
 

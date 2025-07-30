@@ -1,6 +1,6 @@
 'use client';
 import { SplashScreen } from '@/components/splash-screen';
-import SubCategoryPageSection from '@/page-sections/category/SubCategoryPageSection'
+import SubCategoryPageSection from '@/page-sections/women/category/SubCategoryPageSection'
 import GroupCategoryService from '@/services/GroupCategoryService';
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
