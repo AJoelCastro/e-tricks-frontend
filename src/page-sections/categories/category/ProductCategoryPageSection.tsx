@@ -20,11 +20,14 @@ import { useAuth } from '@clerk/nextjs';
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {
-  idGroup: string;
-  idSub: string;
-  idProduct: string
+  idGroup?: string;
+  idSub?: string;
+  idProduct?: string;
+  marcaId?: string;
+  marca?: boolean;
+  women?: boolean;
 }
-const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}) => {
+const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct, marcaId, marca, women}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([])
   const pathname = usePathname();
@@ -51,10 +54,22 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
   const subcategoria = capitalize(segments[1] || '');
   const productcategoria = capitalize(segments[2] || '');
 
-  const getProducts = async () => {
+  const getProductsWomen = async () => {
     try {
       setIsLoading(true);
-      const data = await ProductService.GetProductsByIdGroupAndIdSubCategoryAndIdCategory(idGroup, idSub, idProduct);
+      const data = await ProductService.GetProductsByIdGroupAndIdSubCategoryAndIdCategory(idGroup!, idSub!, idProduct!);
+      setProducts(data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  const getProductsMarca = async () => {
+    try {
+      setIsLoading(true);
+      const data = await ProductService.GetProductsByIdMarcaAndIdCategory(marcaId!, idProduct!);
+      console.log('data', data)
       setProducts(data);
     } catch (error) {
       throw error;
@@ -77,7 +92,11 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct}
   };
 
   useEffect(() => {
-    getProducts();
+    if (women) {
+      getProductsWomen();
+    }else if (marca) {
+      getProductsMarca();
+    }
   }, [])
   if (isLoading) {
     return (

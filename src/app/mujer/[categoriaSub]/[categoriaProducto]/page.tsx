@@ -41,7 +41,7 @@ const ProductCategoryPage = () => {
     if (!idGroup || !idSub || !idProduct) return <SplashScreen/>;
   return (
     <>
-      <ProductCategoryPageSection idGroup={idGroup!} idSub={idSub!} idProduct={idProduct!}/>
+      <ProductCategoryPageSection women idGroup={idGroup!} idSub={idSub!} idProduct={idProduct!}/>
     </>
   )
 }
