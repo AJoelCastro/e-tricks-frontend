@@ -180,29 +180,29 @@ const RightSideOrder = () => {
     // Función para obtener el estado visual
     const getStatusChip = (order: IOrder) => {
         let label = '';
-        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        let color: string = '#7950f2';
 
         if (order.status === 'cancelled') {
             label = 'Cancelado';
-            color = 'error';
+            color = '#d32f2f';
         } else if (order.deliveryStatus === 'delivered') {
             label = 'Finalizado';
-            color = 'success';
+            color = '#2e7d32';
         } else if (order.deliveryStatus === 'shipped') {
             label = 'Enviado';
-            color = 'info';
+            color = '#0288d1';
         } else if (order.status === 'processing') {
             label = 'A enviar';
-            color = 'warning';
+            color = '#ed6c02';
         } else if (order.status === 'pending' || order.paymentStatus === 'pending') {
             label = 'A pagar';
-            color = 'primary';
+            color = '#7950f2';
         } else {
             label = 'Procesado';
-            color = 'secondary';
+            color = '#9c27b0';
         }
 
-        return <Chip label={label} color={color} size="small" />;
+        return <Chip label={label} sx={{backgroundColor:color, color:'white'}}  size="small" />;
     };
 
     // Función para formatear fecha
@@ -235,7 +235,7 @@ const RightSideOrder = () => {
             />
 
             <Grid container sx={{ marginX: 4, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
-                <Grid size={{ xs: 12, sm: 12, md: 8 }}>
+                <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                     {!filteredOrders || filteredOrders.length === 0 ? (
                         <EmptyOrderComponent />
                     ) : (

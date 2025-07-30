@@ -339,7 +339,11 @@ const RightSidePayment = () => {
 
       const orderData: ICreateOrderData = {
         userId: user.id,
-        addressId: selectedPickup ? selectedPickup._id : selectedAddress?._id,
+        addressId: selectedPickup
+          ? selectedPickup._id
+          : selectedAddress && selectedAddress._id
+            ? selectedAddress._id
+            : '', // fallback to empty string if undefined
         couponCode: appliedCoupon?.code,
       };
 
