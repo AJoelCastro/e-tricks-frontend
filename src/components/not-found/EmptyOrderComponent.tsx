@@ -25,7 +25,7 @@ const EmptyOrderComponent = ({ onReset }: { onReset?: () => void }) => {
       />
 
       <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#3f3f40ff' }}>
-        Aún no tienes compras realizadas 
+        Esta sección esta vacia
       </Typography>
       <Link href={'/'}>
         <Typography variant="body1" sx={{ mt: 1, color: '#666', maxWidth: 400 }}>

@@ -145,7 +145,7 @@ const OrderSuccessPage = () => {
       <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
         <Button 
           variant="contained" 
-          onClick={() => router.push('/orders')}
+          onClick={() => router.push('/compras')}
           sx={{
             backgroundColor: '#7950f2',
             '&:hover': {

@@ -1,6 +1,6 @@
 export interface ICreateOrderData {
     userId: string;
-    addressId: string;
+    addressId: string ;
     couponCode?: string; 
 }
 
@@ -65,4 +65,12 @@ export interface IOrder extends Document {
     deliveryStatus?:string;
     createdAt: Date;
     updatedAt: Date;
+}
+
+
+export interface ICreatePreferenceData {
+    userId: string;
+    couponCode?: string; 
+    total:number;
+    subtotal:number;
 }

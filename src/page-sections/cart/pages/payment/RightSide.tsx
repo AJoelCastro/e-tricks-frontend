@@ -14,16 +14,7 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import YapeCard from '../../../../components/cart/YapeCard';
 import { useCart } from '../../CartContext';
 import { useRouter } from 'next/navigation';
-import {
-  Payment,
-  StatusScreen,
-  CardNumber,
-  CardPayment,
-  Wallet, 
-  initMercadoPago, 
-  Brand
-} from '@mercadopago/sdk-react';
-import { ICreateOrderData } from '@/interfaces/Order';
+import { ICreateOrderData, ICreatePreferenceData } from '@/interfaces/Order';
 import { ICoupon } from '@/interfaces/Coupon';
 import CustomCardPayment from '@/components/cards/CustomCardPayment';
 import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
@@ -34,6 +25,13 @@ import ErrorNotification from '@/components/ErrorNotification';
 interface MPError {
   message: string;
   type: string;
+}
+
+// Declarar MercadoPago globalmente
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
 }
 
 const style = {
@@ -56,18 +54,12 @@ const RightSidePayment = () => {
   const router = useRouter();
   const { notification, showError, closeNotification, showSuccess, showInfo, showWarning } = useNotification(); 
   
-  // Estados existentes
-  const modalRef = useRef(null)
-  const [showModalWebPay, setShowModalWebPay] = useState<boolean>(false);
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'payment' | 'yape' | null>(null);
-
   // Estados para MercadoPago
-  const mpInitialized = useRef(false);
-  const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [showMercadoPagoModal, setShowMercadoPagoModal] = useState(false);
+  const [isCreatingPreference, setIsCreatingPreference] = useState(false);
+  const [mpLoaded, setMpLoaded] = useState(false);
 
   // Estados para cupón de descuento
   const [showCouponField, setShowCouponField] = useState(false);
@@ -75,30 +67,81 @@ const RightSidePayment = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<ICoupon | null>(null);
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
-  // Estados para MercadoPago - NUEVOS ESTADOS PARA EVITAR RE-RENDERS
-  const [cardPaymentKey, setCardPaymentKey] = useState(0);
-  const [mpReady, setMpReady] = useState(false);
-
   const { getToken } = useAuth();
   const { user } = useUser();
   const { carrito, isLoading, deliveryType, selectedAddress, selectedPickup } = useCart();
-  console.log('User:', user);
 
-  // Inicializar MercadoPago solo una vez
+  // Cargar el SDK de MercadoPago dinámicamente
   useEffect(() => {
-    if (typeof window !== 'undefined' && !mpInitialized.current) {
-      try {
-        initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || '');
-        mpInitialized.current = true;
-        setMpReady(true);
-      } catch (error) {
-        console.error('Error initializing MercadoPago:', error);
-        showError('Error al inicializar el sistema de pagos');
+    const loadMercadoPagoSDK = () => {
+      return new Promise<void>((resolve, reject) => {
+        // Si ya está cargado, resolver inmediatamente
+        if (window.MercadoPago) {
+          setMpLoaded(true);
+          resolve();
+          return;
+        }
+
+        // Crear el script tag
+        const script = document.createElement('script');
+        script.src = 'https://sdk.mercadopago.com/js/v2';
+        script.async = true;
+        
+        script.onload = () => {
+          console.log('MercadoPago SDK loaded successfully');
+          setMpLoaded(true);
+          resolve();
+        };
+        
+        script.onerror = () => {
+          console.error('Failed to load MercadoPago SDK');
+          showError('Error al cargar MercadoPago SDK');
+          reject(new Error('Failed to load MercadoPago SDK'));
+        };
+
+        document.head.appendChild(script);
+      });
+    };
+
+    loadMercadoPagoSDK().catch(console.error);
+
+    // Cleanup function
+    return () => {
+      const existingScript = document.querySelector('script[src="https://sdk.mercadopago.com/js/v2"]');
+      if (existingScript) {
+        existingScript.remove();
       }
+    };
+  }, []);
+
+  // Manejar el retorno de MercadoPago
+  useEffect(() => {
+    const handlePaymentResult = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentId = urlParams.get('payment_id');
+      const status = urlParams.get('status');
+      const merchantOrderId = urlParams.get('merchant_order_id');
+
+      if (paymentId && status === 'approved') {
+        console.log('Payment approved, creating order...', { paymentId, merchantOrderId });
+        showSuccess('¡Pago aprobado! Creando tu orden...');
+        await handleCreateOrder(paymentId);
+      } else if (paymentId && status === 'rejected') {
+        showError('El pago fue rechazado. Intenta con otro método de pago.');
+        setIsProcessingPayment(false);
+      } else if (paymentId && status === 'pending') {
+        showWarning('El pago está pendiente de confirmación.');
+        setIsProcessingPayment(false);
+      }
+    };
+
+    // Solo ejecutar si hay parámetros de pago en la URL
+    if (window.location.search.includes('payment_id')) {
+      handlePaymentResult();
     }
   }, []);
 
-  // Calcular totales (mantenemos la misma lógica)
+  // Calcular totales
   const calculateTotals = useCallback(() => {
     const subtotal = carrito.reduce((sum, item) => {
       return sum + item.product.price * item.quantity;
@@ -124,30 +167,6 @@ const RightSidePayment = () => {
   }, [carrito, appliedCoupon]);
 
   const { subtotal, discount, couponDiscount, total } = calculateTotals();
-
-  // CONFIGURACIÓN ESTABLE PARA MERCADOPAGO
-  const cardPaymentConfig = useMemo(() => {
-    if (!mpReady || !user?.primaryEmailAddress?.emailAddress) {
-      return null;
-    }
-
-    return {
-      initialization: {
-        amount: total,
-        payer: {
-          email: user?.primaryEmailAddress?.emailAddress
-        }
-      },
-      customization: {
-        visual: {
-          hidePaymentButton: true,
-        },
-        paymentMethods: {
-          // Puedes agregar configuraciones específicas aquí
-        }
-      }
-    };
-  }, [total, user?.primaryEmailAddress?.emailAddress, mpReady]);
 
   const handleContinueByWhatsApp = () => {
     const carritoTexto = carrito.map((item, index) => {
@@ -208,14 +227,109 @@ const RightSidePayment = () => {
     showInfo('Cupón removido correctamente');
   };
 
-  const handleCreateOrder = async () => {
+  // Crear preferencia de pago
+  const createPreference = async () => {
     try {
-      console.log('Creating order...');
-       if (!user?.id) {
+      if (!user?.id) {
         showError('No se pudo obtener el ID del usuario');
         return null;
       }
-      console.log("pasa por aqui")
+
+      setIsCreatingPreference(true);
+      const token = await getToken();
+
+      if (!token) {
+        throw new Error('No se pudo obtener el token de autenticación');
+      }
+
+      const preferenceData: ICreatePreferenceData = {
+        userId: user.id,
+        couponCode: appliedCoupon?.code,
+        total:total,
+        subtotal:subtotal
+      };
+
+      console.log('Creating preference with data:', preferenceData);
+
+      const response = await OrderService.getPreferenceId(token, preferenceData);
+      
+      if (response) {
+        console.log('Preference created successfully:', response);
+        return response.preferenceId;
+      } else {
+        throw new Error('No se recibió el ID de preferencia');
+      }
+    } catch (error) {
+      console.error('Error creating preference:', error);
+      showError('Error al crear la preferencia de pago');
+      return null;
+    } finally {
+      setIsCreatingPreference(false);
+    }
+  };
+
+  // Manejar el botón continuar - crear preferencia y abrir checkout directo
+  const handleContinuePayment = async () => {
+    if (!mpLoaded) {
+      showError('El sistema de pagos aún no está listo. Intenta nuevamente.');
+      return;
+    }
+
+    if (!user?.id) {
+      showError('No se pudo obtener el ID del usuario');
+      return;
+    }
+
+    if (!selectedAddress && !selectedPickup) {
+      showError('Debes seleccionar una dirección de entrega o punto de recojo');
+      return;
+    }
+
+    // Crear la preferencia
+    const preferenceIdCreated = await createPreference();
+    console.log(" preferenceIdCreated", preferenceIdCreated)
+    if (!preferenceIdCreated) {
+      showError('No se pudo crear la preferencia de pago');
+      return;
+    }
+
+    setPreferenceId(preferenceIdCreated);
+
+    try {
+      // Inicializar MercadoPago con tu public key
+      const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!, {
+        locale: 'es-PE',
+      });
+
+      console.log("mercadopago",mp)
+      console.log("Opening checkout with preference:", preferenceIdCreated);
+
+      // Abrir el checkout directamente
+      mp.checkout({
+        preference: {
+          id: preferenceId,
+        },
+        autoOpen: true, // Se abre automáticamente
+        renderMode: 'modal', // o 'blank' para redirección completa
+      });
+
+      showInfo('Abriendo ventana de pago...');
+
+    } catch (error) {
+      console.error('Error opening checkout:', error);
+      showError("Error al abrir el checkout de MercadoPago");
+    }
+  };
+
+  // Crear orden después de confirmar el pago
+  const handleCreateOrder = async (paymentId: string) => {
+    try {
+      if (!user?.id) {
+        showError('No se pudo obtener el ID del usuario');
+        return null;
+      }
+
+      console.log('Creating order...');
       setIsProcessingPayment(true);
       const token = await getToken();
 
@@ -223,19 +337,33 @@ const RightSidePayment = () => {
         throw new Error('No se pudo obtener el token de autenticación');
       }
 
-      const orderData = {
+      const orderData: ICreateOrderData = {
         userId: user.id,
-        addressId: selectedPickup ? selectedPickup._id : selectedAddress,
-        couponCode: appliedCoupon?.code
+        addressId: selectedPickup ? selectedPickup._id : selectedAddress?._id,
+        couponCode: appliedCoupon?.code,
       };
-      console.log("order data",orderData)
 
-      const response = await OrderService.createOrder(token, orderData as ICreateOrderData);
+      console.log("Order data:", orderData);
+
+      const response = await OrderService.createOrder(token, orderData);
 
       if (response.success) {
         const createdOrderId = response.data.order._id;
         setOrderId(createdOrderId);
-        showSuccess('Orden creada correctamente');
+        
+        // Confirmar el pago con la orden creada
+        await OrderService.confirmPayment(token, {
+          orderId: createdOrderId,
+          paymentId: paymentId
+        });
+
+        showSuccess('Orden creada y pago confirmado correctamente');
+        
+        // Redirigir a página de éxito
+        setTimeout(() => {
+          router.push(`/order/success?orderId=${createdOrderId}`);
+        }, 2000);
+
         return createdOrderId;
       }
       return null;
@@ -247,115 +375,6 @@ const RightSidePayment = () => {
       setIsProcessingPayment(false);
     }
   };
-
-  const handleCardPaymentSubmit = async (paymentData: any) => {
-    try {
-      setIsProcessingPayment(true);
-      
-      // Crear orden primero
-      let currentOrderId = orderId;
-      if (!currentOrderId) {
-        currentOrderId = await handleCreateOrder();
-      }
-      
-      if (currentOrderId && paymentData?.id) {
-        await handlePaymentSuccess(paymentData, currentOrderId);
-      } else {
-        throw new Error('No se pudo procesar el pago');
-      }
-    } catch (error) {
-      console.error('Error in payment process:', error);
-      handlePaymentError(error as MPError);
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentData: any, orderIdToUse: string) => {
-    try {
-      const token = await getToken();
-      if (token && orderIdToUse && paymentData.id) {
-        await OrderService.confirmPayment(token, {
-          orderId: orderIdToUse,
-          paymentId: paymentData.id.toString()
-        });
-        showSuccess('Pago confirmado correctamente');
-        setTimeout(() => {
-          router.push(`/order/success?orderId=${orderIdToUse}`);
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('Error confirming payment:', error);
-      showError('Error al confirmar el pago');
-    }
-  };
-
-  const handlePaymentError = (error: MPError) => {
-    console.error('Payment error:', error);
-    showError('Error en el pago: ' + (error.message || 'Error desconocido'));
-  };
-
-  const handleUploadComprobante = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      console.log('Comprobante subido:', file.name);
-      showSuccess('Comprobante subido correctamente');
-      setShowModalWebPay(false);
-    }
-  };
-
-  // Función para abrir modal de MercadoPago
-  const openMercadoPagoModal = async () => {
-    if (!mpReady) {
-      showError('El sistema de pagos no está listo. Intenta nuevamente.');
-      return;
-    }
-
-    try {
-      console.log('Opening payment modal...');
-      // Crear orden antes de abrir el modal
-      const createdOrderId = await handleCreateOrder();
-      if (createdOrderId) {
-        console.log('Created order ID:', createdOrderId);
-        // Forzar re-render del componente CardPayment
-        setCardPaymentKey(prev => prev + 1);
-        setShowMercadoPagoModal(true);
-      }
-    } catch (error) {
-      console.error('Error opening payment modal:', error);
-      showError('Error al abrir el modal de pagos');
-    }
-  };
-
-  const renderPaymentMethodCard = (method: string, title: string, description: string, icon: string, selected: boolean) => (
-    <Box
-      sx={{
-        border: selected ? '2px solid #7950f2' : '1px solid #e0e0e0',
-        borderRadius: 2,
-        p: 2,
-        mb: 2,
-        cursor: 'pointer',
-        backgroundColor: selected ? '#f8f6ff' : 'white',
-        transition: 'all 0.2s ease'
-      }}
-      onClick={() => setPaymentMethod(method as any)}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Image
-          src={icon}
-          alt={title}
-          width={40}
-          height={40}
-        />
-        <Box>
-          <Typography variant="h6">{title}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            {description}
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
 
   // Función para renderizar la información de entrega
   const renderDeliveryInfo = () => {
@@ -460,25 +479,27 @@ const RightSidePayment = () => {
               {renderDeliveryInfo()}
             </Box>
 
-            {/* Métodos de pago */}
-            <Box>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="leftside">Métodos de pago</Typography>
+            {/* Estado de MercadoPago */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body2">Estado del sistema de pagos:</Typography>
+                <Chip
+                  label={mpLoaded ? 'Listo' : 'Cargando...'}
+                  size="small"
+                  color={mpLoaded ? 'success' : 'warning'}
+                />
               </Box>
+            </Box>
 
-              {renderPaymentMethodCard(
-                'card',
-                'Tarjeta de Crédito/Débito',
-                'Paga con tu tarjeta de crédito o débito, Mastercard, American Express',
-                'https://st2.depositphotos.com/1102480/10686/i/450/depositphotos_106860552-stock-photo-collection-of-popular-payment-system.jpg',
-                paymentMethod === 'card'
-              )}
-
-              {/* Yape Card */}
-              <YapeCard
-                selected={paymentMethod === 'yape'}
-                onSelect={() => setPaymentMethod('yape')}
-              />
+            {/* Información sobre el proceso */}
+            <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                💳 Proceso de Pago
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Al hacer clic en "Continuar", se abrirá una ventana con las opciones de pago de MercadoPago. 
+                Podrás pagar con tarjeta de crédito, débito, efectivo, o tu cuenta de MercadoPago.
+              </Typography>
             </Box>
           </Grid>
 
@@ -626,21 +647,21 @@ const RightSidePayment = () => {
                     color="primary"
                     fullWidth
                     sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
-                    onClick={() => {
-                      if (paymentMethod === 'yape') {
-                        setShowModalWebPay(true);
-                      } else if (paymentMethod === 'card') {
-                        openMercadoPagoModal();
-                      } else {
-                        showWarning('Seleccione un método de pago');
-                      }
-                    }}
-                    disabled={isProcessingPayment}
+                    onClick={handleContinuePayment}
+                    disabled={isCreatingPreference || !mpLoaded || isProcessingPayment}
                   >
-                    {isProcessingPayment ? (
-                      <CircularProgress size={24} color="inherit" />
+                    {isCreatingPreference ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CircularProgress size={20} color="inherit" />
+                        <Typography variant="h7">Preparando pago...</Typography>
+                      </Box>
+                    ) : isProcessingPayment ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CircularProgress size={20} color="inherit" />
+                        <Typography variant="h7">Procesando...</Typography>
+                      </Box>
                     ) : (
-                      <Typography variant="h7">Continuar</Typography>
+                      <Typography variant="h7">💳 Pagar con MercadoPago</Typography>
                     )}
                   </Button>
                   
@@ -667,190 +688,6 @@ const RightSidePayment = () => {
         </>
       </Grid>
 
-      {/* Modal de MercadoPago MEJORADO */}
-      <Modal
-        open={showMercadoPagoModal}
-        onClose={() => {
-          setShowMercadoPagoModal(false);
-          // NO resetear orderId aquí para mantener la orden creada
-        }}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={showMercadoPagoModal}>
-          <Box sx={style}>
-            <Typography variant="h6" sx={{ mb: 3, textAlign: 'center' }}>
-              Confirmar pago - S/ {total.toFixed(2)}
-            </Typography>
-
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 'bold' }}>
-                Método seleccionado:
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Tarjeta de Crédito/Débito
-              </Typography>
-            </Box>
-
-            <Box sx={{
-              border: '1px solid #e0e0e0',
-              borderRadius: 2,
-              p: 2,
-              mb: 3,
-              backgroundColor: '#f9f9f9'
-            }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>{deliveryType === 'pickup' ? 'Punto de recojo:' : 'Dirección de entrega:'}</strong>
-              </Typography>
-              {deliveryType === 'pickup' && selectedPickup ? (
-                <>
-                  <Typography variant="body2">
-                    {selectedPickup.city} - {selectedPickup.cc}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Stand: {selectedPickup.stand}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedPickup.address}
-                  </Typography>
-                </>
-              ) : selectedAddress ? (
-                <>
-                  <Typography variant="body2">
-                    {selectedAddress.name} - {selectedAddress.street} {selectedAddress.number}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedAddress.city}, {selectedAddress.state}
-                  </Typography>
-                </>
-              ) : null}
-            </Box>
-
-            {/* Brand de MercadoPago */}
-            <Brand />
-
-            {/* CardPayment con key estable */}
-            {cardPaymentConfig && mpReady && (
-              <CardPayment
-                key={cardPaymentKey}
-                initialization={cardPaymentConfig.initialization}
-                customization={cardPaymentConfig.customization}
-                onSubmit={handleCardPaymentSubmit}
-                onReady={() => {
-                  console.log('Card payment ready');
-                }}
-                onError={handlePaymentError}
-              />
-            )}
-
-            <Button
-              onClick={() => {
-                setShowMercadoPagoModal(false);
-                // Resetear estados si es necesario
-                setOrderId(null);
-                setCardPaymentKey(prev => prev + 1);
-              }}
-              sx={{ mt: 2, width: '100%' }}
-              variant="outlined"
-            >
-              Cancelar
-            </Button>
-          </Box>
-        </Fade>
-      </Modal>
-
-      {/* Modal de Yape (sin cambios) */}
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={showModalWebPay}
-        onClose={() => setShowModalWebPay(false)}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={showModalWebPay}>
-          <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
-              Pasos para realizar tu compra vía Yape
-            </Typography>
-
-            <Box sx={{
-              border: '1px solid #e0e0e',
-              borderRadius: 2,
-              p: 2,
-              mb: 3,
-              backgroundColor: '#f9f9f9'
-            }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Total a pagar: S/ {total.toFixed(2)}</strong>
-              </Typography>
-              <Typography variant="body2">
-                {deliveryType === 'pickup' && selectedPickup ? (
-                  `Recojo: ${selectedPickup.city} - ${selectedPickup.cc}`
-                ) : selectedAddress ? (
-                  `Dirección: ${selectedAddress.name} - ${selectedAddress.street}`
-                ) : ''}
-              </Typography>
-            </Box>
-
-            <Typography variant="body2" id="transition-modal-description" sx={{ mt: 2, mb: 2 }}>
-              1. Escanea el código QR con tu app de Yape.
-              <br />
-              2. Ingresa el monto exacto: <strong>S/ {total.toFixed(2)}</strong>
-              <br />
-              3. En el mensaje de Yape, escribe tu nombre o número de pedido si lo tienes.
-              <br />
-              4. Realiza el pago y toma una captura del comprobante.
-              <br />
-              5. Luego de pagar, presiona el botón <strong>Subir Comprobante</strong> para cargar la imagen.
-            </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
-              <Image
-                src={'https://sodastereobucket.s3.us-east-2.amazonaws.com/qryape.jpg'}
-                alt='Código QR de Yape'
-                width={300}
-                height={300}
-                style={{ borderRadius: 12 }}
-              />
-            </Box>
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
-                Recuerda subir el comprobante para confirmar tu compra.
-              </Typography>
-
-              <Button
-                variant="contained"
-                color="primary"
-                component="label"
-                sx={{ borderRadius: 2, textTransform: 'none', width: '100%' }}
-              >
-                Subir Comprobante
-                <input hidden accept="image/*" type="file" onChange={handleUploadComprobante} />
-              </Button>
-
-              <Button
-                onClick={() => setShowModalWebPay(false)}
-                sx={{ width: '100%' }}
-                variant="outlined"
-              >
-                Cancelar
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal>
       <ErrorNotification
         open={notification.open}
         onClose={closeNotification}

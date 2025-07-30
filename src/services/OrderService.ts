@@ -1,8 +1,10 @@
-import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse } from '@/interfaces/Order';
+import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse, ICreatePreferenceData } from '@/interfaces/Order';
 import axios from 'axios';
 import { store } from '@/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+
 
 const OrderService = {
     /**
@@ -23,13 +25,35 @@ const OrderService = {
         }
     },
 
+
+    getPreferenceId: async (token: string, data: ICreatePreferenceData): Promise<{ preferenceId: string } | null> => {
+        try {
+            const response = await axios.post(`${API_URL}/order/checkout/preference`, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // Asegúrate de que retorne un objeto con preferenceId
+            return {
+                preferenceId: response.data.preferenceId 
+            };
+        } catch (error) {
+            console.error('Error creating preference in service:', error);
+            throw error;
+        }
+    },
+
+
+
     /**
      * Confirmar pago manualmente (para UX mejorada)
      */
     confirmPayment: async (token: string, data: IConfirmPaymentData) => {
         try {
-            const response = await axios.post(`${API_URL}/order/checkout/payment/confirm`, 
-                data, 
+            const response = await axios.post(`${API_URL}/order/checkout/payment/confirm`,
+                data,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -66,7 +90,7 @@ const OrderService = {
      */
     getUserOrders: async (token: string) => {
         try {
-            const { userId} = store.getState().auth;
+            const { userId } = store.getState().auth;
             if (!userId || !token) {
                 throw new Error('Faltan credenciales del usuario');
             }
@@ -125,27 +149,27 @@ const OrderService = {
      * Polling para verificar estado del pago
      */
     pollPaymentStatus: async (
-        token: string, 
-        orderId: string, 
+        token: string,
+        orderId: string,
         maxAttempts: number = 30,
         interval: number = 2000
     ): Promise<any> => {
         return new Promise((resolve, reject) => {
             let attempts = 0;
-            
+
             const checkStatus = async () => {
                 try {
                     attempts++;
                     const result = await OrderService.checkPaymentStatus(token, orderId);
-                    
+
                     // Si el pago fue aprobado o rechazado, terminar polling
-                    if (result.order.paymentStatus === 'approved' || 
+                    if (result.order.paymentStatus === 'approved' ||
                         result.order.paymentStatus === 'rejected' ||
                         result.order.paymentStatus === 'cancelled') {
                         resolve(result);
                         return;
                     }
-                    
+
                     // Si alcanzamos el máximo de intentos
                     if (attempts >= maxAttempts) {
                         resolve({
@@ -155,14 +179,14 @@ const OrderService = {
                         });
                         return;
                     }
-                    
+
                     setTimeout(checkStatus, interval);
-                    
+
                 } catch (error) {
                     reject(error);
                 }
             };
-            
+
             checkStatus();
         });
     }

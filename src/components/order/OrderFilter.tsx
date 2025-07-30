@@ -66,7 +66,6 @@ const OrderFilter: React.FC<OrderFilterProps> = ({
 
     const filterButtons = [
         { key: 'todo', label: 'Ver todo', count: counts.todo },
-        { key: 'pending', label: 'A pagar', count: counts.pending },
         { key: 'processing', label: 'A enviar', count: counts.pending },
         { key: 'shipped', label: 'Enviado', count: counts.shipped },
         { key: 'delivered', label: 'Finalizado', count: counts.delivered },
