@@ -1,6 +1,6 @@
 'use client';
 import { SplashScreen } from '@/components/splash-screen';
-import ProductCategoryPageSection from '@/page-sections/women/category/ProductCategoryPageSection'
+import ProductCategoryPageSection from '@/page-sections/categories/category/ProductCategoryPageSection'
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react'
 import GroupCategoryService from '@/services/GroupCategoryService';

@@ -25,9 +25,13 @@ import { IBrandWithCategories } from '@/interfaces/Brand';
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {
-  marcaId: string;
+  groupId?: string;
+  subId?: string;
+  marcaId?: string;
+  women?: boolean;
+  marca?: boolean;
 }
-const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
+const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women, marca}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [productCategories, setProductCategories] = useState<IProductCategory[]>([]);
@@ -55,9 +59,8 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
   } = useProductLogic();
   
   const categoria = capitalize(segments[0] || '');
-  const marcaName = capitalize(segments[1] || '');
-  
-  const getProductCategories = async () => {
+  const subcategoria = capitalize(segments[1] || '');
+  const getProductCategoriesMarca = async () => {
     try {
       setIsLoading(true);
       const data = await BrandService.getBrandsWithProductCategories();
@@ -69,10 +72,33 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
     }
   }
   
-  const getProducts = async () => {
+  const getProductsMarca = async () => {
     try {
       setIsLoading(true);
-      const data = await ProductService.GetProductsByIdMarca(marcaId);
+      const data = await ProductService.GetProductsByIdMarca(marcaId!);
+      setProducts(data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  const getProductCategoriesWomen = async () => {
+    try {
+      setIsLoading(true);
+      const data = await SubCategoryService.getCategoriesFromGroup(subId!);
+      setProductCategories(data.data);
+    } catch (error) {
+      throw error;
+    }finally {
+      setIsLoading(false);
+    }
+  }
+  
+  const getProductsWomen = async () => {
+    try {
+      setIsLoading(true);
+      const data = await ProductService.GetProductsByIdGroupAndIdSubCategory(groupId!, subId!);
       setProducts(data);
     } catch (error) {
       throw error;
@@ -108,8 +134,13 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
   };
   
   useEffect(() => {
-    getProductCategories();
-    getProducts();
+    if (women) {
+      getProductCategoriesWomen();
+      getProductsWomen();
+    } else if (marca) {
+      getProductCategoriesMarca();
+      getProductsMarca();
+    }
   }, [])
   
   if (isLoading) {
@@ -160,7 +191,7 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
           </Link>
           <Typography variant='marcaCard' sx={{color: '#7c3aed'}}>/</Typography>
           <Typography variant='sideBarSubCategories' sx={{color: '#7c3aed'}}>
-            {marcaName}
+            {subcategoria}
           </Typography>
         </Box>
         
@@ -178,7 +209,7 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
         <Box sx={{ paddingX: 3, paddingY: 4, backgroundColor: 'white'}}>
           <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
             <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
-              {marcaName}
+              {subcategoria}
             </Typography>
             <Typography variant='h6' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
               [{products.length}]
@@ -191,7 +222,7 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
                   key={productCategory._id}
                   onClick={() => {
                     dispatch(setProductCategoryId(productCategory._id));
-                    router.push(`/${categoria.toLowerCase()}/${marcaName.toLowerCase()}/${productCategory.routeLink}`)
+                    router.push(`/${categoria.toLowerCase()}/${subcategoria.toLowerCase()}/${productCategory.routeLink}`)
                   }}
                   sx={{color: 'black', ":hover": {borderColor: '#7c3aed', color:'#7c3aed'}, borderColor:'black'}}
                   variant='outlined'
@@ -233,4 +264,4 @@ const MarcaPageSection: React.FC<Props> = ({marcaId}) => {
   )
 }
 
-export default MarcaPageSection
+export default SubCategoryPageSection
