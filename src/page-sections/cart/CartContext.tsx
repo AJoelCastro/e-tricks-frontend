@@ -64,8 +64,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     getPickUps();
-    getCartItems();
     getAddresses();
+    getCartItems();
   }, []);
 
   return (
@@ -86,6 +86,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         selectedPickup,
         setSelectedPickup,
         isLoading,
+        setIsLoading,
         etapa,
         setEtapa,
         pickUps,

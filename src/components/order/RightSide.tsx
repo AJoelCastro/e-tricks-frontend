@@ -54,18 +54,14 @@ const RightSideOrder = () => {
         searchTerm: ''
     });
 
-    const [menuAnchor, setMenuAnchor] = useState<{
-        anchor: HTMLElement | null;
-        itemId: string | null;
-    }>({ anchor: null, itemId: null });
-
-    const { isLoading } = useCart();
+    const { isLoading, setIsLoading } = useCart();
     const { getToken } = useAuth();
     const { user } = useUser();
 
     // Función para obtener las órdenes
     const getOrders = async () => {
         try {
+            setIsLoading(true);
             const token = await getToken();
             if (!token) {
                 throw new Error('No se pudo obtener el token de autenticación');
@@ -76,6 +72,8 @@ const RightSideOrder = () => {
             setDataOrders(data.data);
         } catch (error) {
             showError('Error al cargar las órdenes');
+        }finally{
+            setIsLoading(false);
         }
     };
 
@@ -216,7 +214,7 @@ const RightSideOrder = () => {
         });
     };
 
-    if (isLoading) {
+    if (isLoading ) {
         return (
             <Grid size={{ xs: 12, sm: 12, md: 12 }} sx={{ textAlign: 'center', mt: 4 }}>
                 <CircularProgress sx={{ color: '#7950f2' }} />
