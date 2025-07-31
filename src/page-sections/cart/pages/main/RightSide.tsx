@@ -11,12 +11,11 @@ import { LucideArrowLeft } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import EmptyCartComponent from '@/components/not-found/EmptyCartComponent';
 import ErrorNotification from '@/components/ErrorNotification';
-import { useProductLogic } from '@/hooks/useProductLogic'; // Importa tu hook de producto
+import { useProductLogic } from '@/hooks/useProductLogic';
 import { useCart } from '../../CartContext';
 import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
 
 const RightSideCart = () => {
-    // Usar tu hook de producto que ya incluye las notificaciones
     const {
         notification,
         closeNotification,
@@ -26,15 +25,21 @@ const RightSideCart = () => {
         loading: productLoading
     } = useProductLogic();
 
-    // Estados locales específicos del componente
     const [menuAnchor, setMenuAnchor] = useState<{
         anchor: HTMLElement | null;
         itemId: string | null;
     }>({ anchor: null, itemId: null });
     const [isRemoving, setIsRemoving] = useState<boolean>(false);
 
-    // Context del carrito
-    const { carrito, setCarrito, getCartItems, isLoading } = useCart();
+    // Context del carrito con las nuevas funciones
+    const { 
+        carrito, 
+        setCarrito, 
+        refreshCartItems, // Usar refreshCartItems en lugar de getCartItems
+        isLoading,
+        dataLoaded 
+    } = useCart();
+    
     const router = useRouter();
     const pathname = usePathname();
     const open = Boolean(menuAnchor.anchor);
@@ -55,10 +60,9 @@ const RightSideCart = () => {
             setIsRemoving(true);
             if (!menuAnchor.itemId) return;
             
-            // Usar tu hook para remover del carrito (esto maneja la llamada al backend)
             await handleRemoveFromCart(menuAnchor.itemId);
             
-            // Actualizar el estado local del carrito sin recargar toda la página
+            // Actualizar el estado local del carrito
             setCarrito(prev => prev.filter(item => item._id !== menuAnchor.itemId));
             
             showSuccess("Producto eliminado del carrito");
@@ -81,9 +85,6 @@ const RightSideCart = () => {
             };
             return updated;
         });
-
-        // Si quieres persistirlo en la base de datos también:
-        // await UserService.updateCartItemQuantity(itemId, newQuantity);
     };
 
     const handleChangeEtapa = async () => {
@@ -97,23 +98,16 @@ const RightSideCart = () => {
             showError(`${error}`);
         }
     }
+
+    // Efecto que se ejecuta solo en la ruta del carrito y solo si no se han cargado los datos
     useEffect(() => {
-    if (pathname === '/carrito') {
-      getCartItems();
-    }
+        if (pathname === '/carrito') {
+            refreshCartItems();
+        }
+    }, []);
 
-    const handleFocus = () => {
-      if (pathname === '/carrito') getCartItems();
-        };
-
-        window.addEventListener('focus', handleFocus);
-
-        return () => {
-        window.removeEventListener('focus', handleFocus);
-        };
-    }, [pathname, getCartItems]);
-
-    if (isLoading) {
+    // Mostrar loading solo si estamos cargando y no tenemos datos del carrito
+    if (isLoading && !dataLoaded.cart) {
         return (
             <Grid size={{
                 xs: 12, sm: 12, md: 12
@@ -296,73 +290,69 @@ const RightSideCart = () => {
                             </Typography>
                         </Box>
                         <Box sx={{ px: 1, marginBottom:3 }}>
-                            {/* Subtotal */}
-                            {
-                                carrito.length > 0 && (
-                                    <>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="h7">Productos ({carrito.length})</Typography>
-                                            <Typography variant="h7">
-                                                S/ {
-                                                    carrito.reduce((sum, item) => {
-                                                        const precioUnitario = item.product.descuento
-                                                            ? item.product.price
-                                                            : item.product.price;
-                                                        return sum + precioUnitario * item.quantity;
-                                                    }, 0).toFixed(2)
-                                                }
-                                            </Typography>
-                                        </Box>
+                            {carrito.length > 0 && (
+                                <>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="h7">Productos ({carrito.length})</Typography>
+                                        <Typography variant="h7">
+                                            S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    const precioUnitario = item.product.descuento
+                                                        ? item.product.price
+                                                        : item.product.price;
+                                                    return sum + precioUnitario * item.quantity;
+                                                }, 0).toFixed(2)
+                                            }
+                                        </Typography>
+                                    </Box>
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="h7">Descuentos ({carrito.length})</Typography>
-                                            <Typography variant="h7" color="error">
-                                                - S/ {
-                                                    carrito.reduce((sum, item) => {
-                                                        if (item.product.descuento) {
-                                                            const descuento = (item.product.price * item.product.descuento) / 100;
-                                                            return sum + descuento * item.quantity;
-                                                        }
-                                                        return sum;
-                                                    }, 0).toFixed(2)
-                                                }
-                                            </Typography>
-                                        </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="h7">Descuentos ({carrito.length})</Typography>
+                                        <Typography variant="h7" color="error">
+                                            - S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    if (item.product.descuento) {
+                                                        const descuento = (item.product.price * item.product.descuento) / 100;
+                                                        return sum + descuento * item.quantity;
+                                                    }
+                                                    return sum;
+                                                }, 0).toFixed(2)
+                                            }
+                                        </Typography>
+                                    </Box>
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
-                                            <Typography variant="h7">Total</Typography>
-                                            <Typography variant="h7">
-                                                S/ {
-                                                    carrito.reduce((sum, item) => {
-                                                        const descuento = item.product.descuento
-                                                            ? (item.product.price * item.product.descuento) / 100
-                                                            : 0;
-                                                        return sum + (item.product.price - descuento) * item.quantity;
-                                                    }, 0).toFixed(2)
-                                                }
-                                            </Typography>
-                                        </Box>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            fullWidth
-                                            sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
-                                            onClick={handleChangeEtapa}
-                                        >
-                                            <Typography variant="h7">
-                                                Continuar compra
-                                            </Typography>
-                                        </Button>
-                                        <ProtectionConsumer/>
-                                    </>
-                                )
-                            }
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, py: 1, borderTop: '1px solid #e0e0e0' }}>
+                                        <Typography variant="h7">Total</Typography>
+                                        <Typography variant="h7">
+                                            S/ {
+                                                carrito.reduce((sum, item) => {
+                                                    const descuento = item.product.descuento
+                                                        ? (item.product.price * item.product.descuento) / 100
+                                                        : 0;
+                                                    return sum + (item.product.price - descuento) * item.quantity;
+                                                }, 0).toFixed(2)
+                                            }
+                                        </Typography>
+                                    </Box>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        fullWidth
+                                        sx={{ mt: 3, borderRadius: 2, mb: { xs: 4, sm: 2, md: 0 } }}
+                                        onClick={handleChangeEtapa}
+                                    >
+                                        <Typography variant="h7">
+                                            Continuar compra
+                                        </Typography>
+                                    </Button>
+                                    <ProtectionConsumer/>
+                                </>
+                            )}
                         </Box>
                     </Grid>
                 </>
             </Grid>
 
-            {/* Notificaciones usando tu hook de producto */}
             <ErrorNotification
                 open={notification.open}
                 onClose={closeNotification}

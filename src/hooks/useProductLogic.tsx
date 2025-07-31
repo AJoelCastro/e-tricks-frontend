@@ -138,8 +138,6 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       if (!token) throw new Error('No token available');
       
       await UserService.removeFavorite(token, id);
-      console.log("Favorite removed:", id);
-      
       // Actualizar estado local
       setFavoriteIds(prev => prev.filter(favId => favId !== id));
       showSuccess('Producto removido de favoritos');
@@ -177,8 +175,6 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
           quantity
         });
         setCartNotificationOpen(true);
-        console.log('Cart notification should be open:', true);
-        console.log('Last added product:', { product, size, quantity });
       } else {
         console.warn('No product provided to handleAddToCart - modal will not show');
       }
@@ -189,7 +185,6 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       }
       
     } catch (error) {
-      console.error('Error adding to cart:', error);
       showError('Error al agregar al carrito');
       throw error;
     } finally {
@@ -226,7 +221,6 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
       const cartItemId = cartItem._id || cartItem.id;
       
       await UserService.removeCartItem(token, cartItemId);
-      console.log("Product removed from cart:", productId);
       
       // Actualizar estado local
       setCartItems(prev => prev.filter(item => {
@@ -241,7 +235,6 @@ export const useProductLogic = (): ProductLogicState & ProductLogicActions => {
         (window as any).refreshNavbarCartCount();
       }
     } catch (error) {
-      console.error('Error removing from cart:', error);
       showError('Error al remover del carrito');
       throw error;
     } finally {

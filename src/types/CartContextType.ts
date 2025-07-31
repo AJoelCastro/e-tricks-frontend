@@ -1,7 +1,7 @@
 // types/CartContextType.ts
-import { ICartItem } from "@/interfaces/CartItem";
-import { IAddress } from "@/interfaces/Address";
-import { IPickUp } from "@/interfaces/PickUp";
+import { ICartItem } from '@/interfaces/CartItem';
+import { IAddress } from '@/interfaces/Address';
+import { IPickUp } from '@/interfaces/PickUp';
 
 export interface CartContextType {
   carrito: ICartItem[];
@@ -14,13 +14,25 @@ export interface CartContextType {
   paymentMethod: 'card' | 'yape' | null;
   setPaymentMethod: React.Dispatch<React.SetStateAction<'card' | 'yape' | null>>;
   getCartItems: () => Promise<void>;
-  selectedAddress:IAddress | null;
-  setSelectedAddress:React.Dispatch<React.SetStateAction<IAddress | null>>;
-  selectedPickup:IPickUp | null;
-  setSelectedPickup:React.Dispatch<React.SetStateAction<IPickUp | null>>;
+  selectedAddress: IAddress | null;
+  setSelectedAddress: React.Dispatch<React.SetStateAction<IAddress | null>>;
+  selectedPickup: IPickUp | null;
+  setSelectedPickup: React.Dispatch<React.SetStateAction<IPickUp | null>>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   etapa: number;
   setEtapa: React.Dispatch<React.SetStateAction<number>>;
   pickUps: IPickUp[];
+  
+  // Nuevas funciones para refrescar datos específicos
+  refreshCartItems: () => Promise<void>;
+  refreshAddresses: () => Promise<void>;
+  refreshPickups: () => Promise<void>;
+  
+  // Estados de carga
+  dataLoaded: {
+    cart: boolean;
+    addresses: boolean;
+    pickups: boolean;
+  };
 }

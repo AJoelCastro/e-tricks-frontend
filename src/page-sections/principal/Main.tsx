@@ -27,12 +27,15 @@ import WhatsAppFloat from '@/components/whatsapp/WhatsAppFloat';
 import BannerPrincipalService from '@/services/BannerPrincipalService';
 import { IBannerPrincipal } from '@/interfaces/BannerPrincipal';
 import BannerPrincipal from '@/components/principal/BannerPrincipal';
+import ProductCategoryService from '@/services/ProductCategoryService';
+import { IProductCategory } from '@/interfaces/ProductCategory';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();
   const [dataProducts, setDataProducts] = useState<Array<IProduct>>([]);
   const [dataBannersPr, setDataBannersPr] = useState<Array<IBannerPrincipal>>([]);
   const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
+  const [categoriesWithDescuento, setCategoriesWithDescuento] = useState<Array<IProductCategory>>([]);
   const { 
     notification, 
     closeNotification, 
@@ -86,10 +89,21 @@ const MainComponent = () => {
     }
   }
 
+  const getAllCategoriesWithDescuentos = async()=>{
+    try {
+      const data = await ProductCategoryService.getAllCategoryWithDescuentos();
+      setCategoriesWithDescuento(data);
+    } catch (error) {
+      showError(`${error}`)
+    }
+
+  }
+
   // Cargar datos iniciales
   useEffect(() => {
     getAllBannersPrincipales();
     fetchBrandsWithCategories();
+    getAllCategoriesWithDescuentos();
     getProducts();
   }, []);
 
@@ -124,36 +138,129 @@ const MainComponent = () => {
           </Swiper>
         )}
         <Box sx={{height: 16}}></Box>
-        {
-          isMobile ? (
-            <Box>
-              <Swiper
-                spaceBetween={4}
-                scrollbar={{
-                  hide: false,
-                }}
-                slidesPerView={isMobile ? 1.2 : 4}
-                modules={[Scrollbar]}
-                className="mySwiper"
-                style={{ paddingBottom: '2rem' }}
-              >
-                {imagesPrueba.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <ThreeImages image={image} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </Box>
-          ) : (
-            <Grid container>
-              {imagesPrueba.map((image, index) => (
-                <Grid size={{xs:12, sm:6, md:4}} key={index}>
-                  <ThreeImages image={image} />
-                </Grid>
+        {/* DESCUENTOS TRICKS */}
+        <Box>
+          <Swiper
+            spaceBetween={4}
+            scrollbar={{
+              hide: false,
+            }}
+            slidesPerView={isMobile ? 1.2 : isTablet ? 2 : 4}
+            modules={[Scrollbar]}
+            className="mySwiper"
+            style={{ paddingBottom: '2rem' }}
+          >
+            {categoriesWithDescuento.map((category) => (
+                <SwiperSlide key={category._id} onClick={()=>router.push(`/mujer/calzados/${category.routeLink}`)}>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      height: { xs: '450px', sm: '500px', md: '550px', lg: '600px' },
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        transition: 'transform 0.3s ease'
+                      }
+                    }}
+                  >
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      style={{
+                        objectFit: 'cover',
+                      }}
+                    />
+                    
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                          transition: 'background-color 0.3s ease'
+                        }
+                      }}
+                    >
+                      {/* Texto de descuento encima del nombre */}
+                      {category.maxDescuento && (
+                        <Box
+                          sx={{
+                            top: 16,
+                            right: 16,
+                            backgroundColor: '#f81c1cff',
+                            color: 'white',
+                            padding: '4px 12px',
+                            borderRadius: '5px',
+                            fontSize: { xs: '0.75rem', sm: '0.75rem' },
+                            fontWeight: 'bold',
+                            zIndex: 2,
+                            marginBottom:'0.4rem',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                          }}
+                        >
+                          HASTA {category.maxDescuento}% OFF
+                        </Box>
+                      )}
+                      
+                      <Typography
+                        sx={{
+                          color: '#fff',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          px: 1,
+                          fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.25rem' },
+                        }}
+                      >
+                        {category.name.toUpperCase()}
+                      </Typography>
+                      
+                      {/* Botón transparente */}
+                      <Box
+                        sx={{
+                          border: '2px solid rgba(255, 255, 255, 0.8)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          backdropFilter: 'blur(10px)',
+                          padding: '8px 24px',
+                          borderRadius: 2,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            border: '2px solid rgba(255, 255, 255, 1)',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 15px rgba(255, 255, 255, 0.3)'
+                          }
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            color: '#fff',
+                            fontWeight: '600',
+                            fontSize: { xs: '0.875rem', sm: '0.8rem' },
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                          }}
+                        >
+                          Ver Descuentos
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </SwiperSlide>
               ))}
-            </Grid>
-          )
-        }
+          </Swiper>
+        </Box>
         <Box sx={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', marginY:3}}>
           <Typography variant='subtitleMain' sx={{ marginY:2, color: primary.subtitleMain}}>
             Descuentos

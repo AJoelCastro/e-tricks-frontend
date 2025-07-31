@@ -8,7 +8,6 @@ const ProductCategoryService = {
             const response = await axios.get(`${API_URL}/product-category/get`);
             return response.data;
         } catch (error) {
-            console.error('Error fetching categories:', error);
             throw error;
         }
     },
@@ -18,7 +17,15 @@ const ProductCategoryService = {
             const response = await axios.get(`${API_URL}/product-category/${id}/get`);
             return response.data;
         } catch (error) {
-            console.error('Error fetching category:', error);
+            throw error;
+        }
+    },
+
+    getAllCategoryWithDescuentos: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/product-category/getAllWithDescuento`);
+            return response.data;
+        } catch (error) {
             throw error;
         }
     },
@@ -33,7 +40,6 @@ const ProductCategoryService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Error creating category:', error);
             throw error;
         }
     },
@@ -48,7 +54,6 @@ const ProductCategoryService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Error updating category:', error);
             throw error;
         }
     },

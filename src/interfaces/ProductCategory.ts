@@ -6,4 +6,5 @@ export interface IProductCategory {
   image: string;
   routeLink?: string;
   createdAt?: string;
+  maxDescuento?: number;
 }
