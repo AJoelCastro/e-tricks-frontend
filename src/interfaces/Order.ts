@@ -1,8 +1,20 @@
 export interface ICreateOrderData {
     userId: string;
     addressId: string ;
-    couponCode?: string; 
+    couponCode?: string;
+     
 }
+
+export interface ICreatePreferenceResponse {
+    success: boolean; 
+    data: {
+        orderId: string;
+        preferenceId: string;
+        init_point: string;
+        sandbox_init_point: string;
+    };
+}
+
 
 export interface ICreateOrderResponse {
     success: boolean;
@@ -17,7 +29,7 @@ export interface ICreateOrderResponse {
                 name: string;
                 price: number;
                 quantity: number;
-                size: string;
+                size: number;
             }>;
             subtotalAmount: number;
             totalAmount: number;
@@ -43,34 +55,36 @@ export interface IOrderItem {
     name: string;
     price: number;
     quantity: number;
-    size: string;
+    size: number;
     image:string;
+    itemStatus?: string;
 }
 
 export interface IOrder extends Document {
     _id: string;
     userId: string;
-    orderNumber:string;
+    orderNumber: string;
     items: IOrderItem[];
-    subtotalAmount: number;
+    subtotalAmount: number; 
     totalAmount: number;
-    discountAmount: number;
+    discountAmount?: number; 
     couponCode?: string;
     addressId: string;
     status: string;
-    orderType:string;
-    paymentId: string;
+    orderType: string;
+    paymentId?: string; 
     paymentStatus: string;
     paymentMethod: string;
-    deliveryStatus?:string;
+    deliveryStatus?: string;
+    preferenceId?: string; 
+    preferenceCreatedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
 
-
 export interface ICreatePreferenceData {
     userId: string;
+    addressId: string ;
     couponCode?: string; 
-    total:number;
-    subtotal:number;
+    orderType:string;
 }

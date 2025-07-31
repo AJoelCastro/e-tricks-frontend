@@ -1,4 +1,4 @@
-import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse, ICreatePreferenceData } from '@/interfaces/Order';
+import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse, ICreatePreferenceData,ICreatePreferenceResponse } from '@/interfaces/Order';
 import axios from 'axios';
 import { store } from '@/store';
 
@@ -26,7 +26,7 @@ const OrderService = {
     },
 
 
-    getPreferenceId: async (token: string, data: ICreatePreferenceData): Promise<{ preferenceId: string } | null> => {
+    getPreferenceId: async (token: string, data: ICreatePreferenceData): Promise<ICreatePreferenceResponse > => {
         try {
             const response = await axios.post(`${API_URL}/order/checkout/preference`, data, {
                 headers: {
@@ -34,13 +34,34 @@ const OrderService = {
                     'Content-Type': 'application/json'
                 }
             });
-
-            // Asegúrate de que retorne un objeto con preferenceId
-            return {
-                preferenceId: response.data.preferenceId 
-            };
-        } catch (error) {
+            console.log("service",response.data);
+            return response.data;
+        } catch (error : any) {
             console.error('Error creating preference in service:', error);
+            if (error.response) {
+            console.error('📋 Full Error Details:', {
+                status: error.response.status,
+                statusText: error.response.statusText,
+                data: error.response.data, // This is the key - shows server error message
+                headers: error.response.headers,
+                url: error.config?.url,
+                method: error.config?.method,
+                requestData: error.config?.data ? JSON.parse(error.config.data) : null
+            });
+            
+            // Log the specific error message from your backend
+            if (error.response.data?.message) {
+                console.error('🚨 Backend Error Message:', error.response.data.message);
+            }
+            
+            if (error.response.data?.error) {
+                console.error('🚨 Backend Error Details:', error.response.data.error);
+            }
+        } else if (error.request) {
+            console.error('📡 Network Error - No response received:', error.request);
+        } else {
+            console.error('⚙️ Request Setup Error:', error.message);
+        }
             throw error;
         }
     },
