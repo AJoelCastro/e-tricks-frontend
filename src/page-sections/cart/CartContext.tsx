@@ -1,5 +1,5 @@
 // components/cart/CartContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { CartContextType } from '@/types/CartContextType';
 import { ICartItem } from '@/interfaces/CartItem';
 import { IAddress } from '@/interfaces/Address';
@@ -24,7 +24,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedAddress,setSelectedAddress] = useState<IAddress | null>(null);
   const [selectedPickup,setSelectedPickup] = useState<IPickUp | null>(null);
 
-  const getCartItems = async () => {
+  const getCartItems = useCallback(async () => {
     setIsLoading(true);
     try {
       const token = await getToken();
@@ -37,11 +37,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       );
       setCarrito(cartWithProducts);
     } catch (error) {
-      throw error
+      console.error(error);
     } finally {
-      setIsLoading(false); // ⬅️ termina la carga
+      setIsLoading(false);
     }
-  };
+  }, [getToken]);
 
   const getPickUps = async () => {
     try {
@@ -66,7 +66,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     getPickUps();
     getAddresses();
     getCartItems();
-  }, []);
+  }, [getCartItems]);
 
   return (
     <CartContext.Provider

@@ -1,6 +1,6 @@
 'use client';
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SelectableAddressard from '../../../../components/addresses/SelectableAddressCard';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { LucideArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import EmptyCartComponent from '@/components/not-found/EmptyCartComponent';
 import ErrorNotification from '@/components/ErrorNotification';
 import { useProductLogic } from '@/hooks/useProductLogic'; // Importa tu hook de producto
@@ -36,7 +36,7 @@ const RightSideCart = () => {
     // Context del carrito
     const { carrito, setCarrito, getCartItems, isLoading } = useCart();
     const router = useRouter();
-
+    const pathname = usePathname();
     const open = Boolean(menuAnchor.anchor);
 
     const handleClickListItem = (event: React.MouseEvent<HTMLElement>, itemId: string) => {
@@ -97,6 +97,21 @@ const RightSideCart = () => {
             showError(`${error}`);
         }
     }
+    useEffect(() => {
+    if (pathname === '/carrito') {
+      getCartItems();
+    }
+
+    const handleFocus = () => {
+      if (pathname === '/carrito') getCartItems();
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+        window.removeEventListener('focus', handleFocus);
+        };
+    }, [pathname, getCartItems]);
 
     if (isLoading) {
         return (
