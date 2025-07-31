@@ -29,6 +29,7 @@ import { IBannerPrincipal } from '@/interfaces/BannerPrincipal';
 import BannerPrincipal from '@/components/principal/BannerPrincipal';
 import ProductCategoryService from '@/services/ProductCategoryService';
 import { IProductCategory } from '@/interfaces/ProductCategory';
+import { SplashScreen } from '@/components/splash-screen';
 
 const MainComponent = () => {
   const { isSignedIn } = useAuth();
@@ -36,6 +37,7 @@ const MainComponent = () => {
   const [dataBannersPr, setDataBannersPr] = useState<Array<IBannerPrincipal>>([]);
   const [brandsWithCategories, setBrandsWithCategories] = useState<IBrandWithCategories[]>([]);
   const [categoriesWithDescuento, setCategoriesWithDescuento] = useState<Array<IProductCategory>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { 
     notification, 
     closeNotification, 
@@ -81,11 +83,14 @@ const MainComponent = () => {
   }
   const getProducts = async () => {
     try{
+      setIsLoading(true);
       const data = await ProductService.GetProducts();
       setDataProducts(data);
     }catch(error){
       console.error('Error getting products:', error);
       showError('Error al cargar las categor?as de marcas');
+    }finally{
+      setIsLoading(false);
     }
   }
 
@@ -106,6 +111,9 @@ const MainComponent = () => {
     getAllCategoriesWithDescuentos();
     getProducts();
   }, []);
+  if(isLoading){
+    return <SplashScreen/>
+  }
 
   // Funcion mejorada para agregar al carrito con producto completo
   const handleAddToCartWithProduct = async (productId: string, size: string, quantity: number) => {
