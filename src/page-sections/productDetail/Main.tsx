@@ -467,65 +467,154 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                             </Box>
                         </Grid>
                     </Grid>
-                    {/* cuadro de caracteristicas */}
-                    <Grid size={{xs:12, sm:12, md:8}} sx={{ backgroundColor: '#f8f9fa', borderRadius: 2, p: 3, mt: 4, mx:{xs:1,sm:2,md:4}, mb:{xs:2,sm:2,md:4} }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                            Características del producto
+                    
+                </>
+            </Grid>
+            <Grid container sx={{backgroundColor:'white', mx:{xs: 1, sm: 4, md: 8 }, borderRadius:4, marginBottom:4}}>
+                <Grid size={{xs:12, sm:12, md:12}} sx={{ borderRadius: 2, p: 3, mt: 4, mx:{xs:1,sm:2,md:4}, mb:{xs:2,sm:2,md:4} }}>
+                    
+                    <Grid container spacing={4}>
+                    {/* Columna de Especificaciones */}
+                    <Grid size={{xs:12, sm:12, md:6}}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+                        Especificaciones
                         </Typography>
-
+                        
+                        {/* Separador */}
+                        <Box sx={{ width: '100%', height: 2, backgroundColor: '#e0e0e0', mb: 3 }} />
+                        
+                        {/* Tabla de especificaciones con efecto de recorte y blur */}
                         <Box
-                            sx={{
-                            maxHeight: expanded ? 'none' : 160,
-                            overflow: 'hidden',
+                        sx={{
                             position: 'relative',
-                            transition: 'max-height 0.3s ease',
-                            filter: expanded ? 'none' : 'blur(2px)',
-                            pr: 1
+                            maxHeight: expanded ? 'none' : 240,
+                            overflow: 'hidden',
+                            transition: 'max-height 0.3s ease, filter 0.3s ease',
+                        }}
+                        >
+                        <Box 
+                            sx={{ 
+                            borderRadius: 2, 
+                            overflow: 'hidden', 
+                            border: '1px solid #e0e0e0',
+                            filter: expanded ? 'none' : 'blur(1px)',
+                            transition: 'filter 0.3s ease',
                             }}
                         >
-                            <Grid container spacing={1}>
-                                {product?.caracteristicas?.map((item, index) => (
-                                    <Grid size={{xs:12, sm:6}}  key={index}>
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                                            <CheckCircle size={18} color="#5f3dc4" />
-                                            <Typography variant='marcaDetail' sx={{ fontSize: 14 }}>
-                                                {item.nombre}: 
-                                            </Typography>
-                                            <Typography sx={{ fontSize: 14 }}>
-                                                {item.valor}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-                                ))}
-                            </Grid>
-
-                            {!expanded && (
+                            {product?.caracteristicas?.map((item, index) => (
                             <Box
+                                key={index}
                                 sx={{
+                                display: 'flex',
+                                backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white',
+                                minHeight: 48,
+                                alignItems: 'center'
+                                }}
+                            >
+                                {/* Nombre de la característica */}
+                                <Box sx={{ 
+                                flex: '0 0 40%', 
+                                p: 2, 
+                                borderRight: '1px solid #e0e0e0'
+                                }}>
+                                <Typography variant="body2" sx={{ fontSize: 14, color: '#333', fontWeight: 'bold' }}>
+                                    {item.nombre.replace(/\*\*/g, '')}
+                                </Typography>
+                                </Box>
+                                
+                                {/* Valor de la característica */}
+                                <Box sx={{ flex: 1, p: 2 }}>
+                                <Typography variant="body2" sx={{ fontSize: 14, color: '#666' }}>
+                                    {item.valor}
+                                </Typography>
+                                </Box>
+                            </Box>
+                            ))}
+                        </Box>
+
+                        {/* Overlay gradiente para las especificaciones */}
+                        {!expanded && (
+                            <Box
+                            sx={{
                                 position: 'absolute',
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
-                                height: '100%',
-                                background: 'linear-gradient(to bottom, rgba(248,249,250,0.0), rgba(248,249,250,1))',
-                                }}
+                                height: '80px',
+                                background: 'linear-gradient(to bottom, rgba(255,255,255,0.0), rgba(255,255,255,0.7), rgba(255,255,255,1))',
+                                pointerEvents: 'none',
+                            }}
                             />
-                            )}
-                        </Box>
-
-                        <Box sx={{ textAlign: 'center', mt: 2 }}>
-                            <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => setExpanded(prev => !prev)}
-                            sx={{ textTransform: 'none', fontWeight: 500 }}
-                            >
-                            {expanded ? 'Ver menos' : 'Ver todas las características'}
-                            </Button>
+                        )}
                         </Box>
                     </Grid>
-                </>
-            </Grid>
+
+                    {/* Columna de Información Adicional */}
+                    <Grid size={{xs:12, sm:12, md:6}}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+                        Información adicional
+                        </Typography>
+                        
+                        {/* Separador */}
+                        <Box sx={{ width: '100%', height: 2, backgroundColor: '#e0e0e0', mb: 3 }} />
+                        
+                        {/* Descripción del producto con efecto de recorte y blur */}
+                        <Box
+                        sx={{
+                            position: 'relative',
+                            maxHeight: expanded ? 'none' : 120,
+                            overflow: 'hidden',
+                            transition: 'max-height 0.3s ease, filter 0.3s ease',
+                        }}
+                        >
+                        <Typography variant="body2" sx={{ 
+                            fontSize: 14, 
+                            lineHeight: 1.6, 
+                            color: '#666',
+                            textAlign: 'justify',
+                            filter: expanded ? 'none' : 'blur(1px)',
+                            transition: 'filter 0.3s ease',
+                        }}>
+                            {product?.description || 'Información del producto no disponible'}
+                        </Typography>
+                        
+                        {/* Overlay gradiente para la descripción */}
+                        {!expanded && (
+                            <Box
+                            sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: '60px',
+                                background: 'linear-gradient(to bottom, rgba(255,255,255,0.0), rgba(255,255,255,0.7), rgba(255,255,255,1))',
+                                pointerEvents: 'none',
+                            }}
+                            />
+                        )}
+                        </Box>
+                    </Grid>
+                    </Grid>
+
+                    {/* Botón Ver más centrado para ambas columnas */}
+                    <Box sx={{ textAlign: 'center', mt: 4 }}>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setExpanded(prev => !prev)}
+                        sx={{ 
+                        textTransform: 'none', 
+                        fontWeight: 500,
+                        borderRadius: '50px',
+                        px: 4,
+                        py: 1
+                        }}
+                    >
+                        {expanded ? 'Ver menos' : 'Ver más'}
+                    </Button>
+                    </Box>
+                </Grid>
+                </Grid>
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}
