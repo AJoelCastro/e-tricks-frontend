@@ -224,6 +224,8 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
             );
         }
     });
+    // ✅ AGREGAR ESTA LÍNEA DESPUÉS DEL COMPONENTE
+    AddressComponent.displayName = 'AddressComponent';
 
     // Efecto principal - solo se ejecuta una vez cuando cambia el ID
     useEffect(() => {
