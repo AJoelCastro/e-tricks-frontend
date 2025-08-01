@@ -1,15 +1,15 @@
 'use client';
-import { 
-    Backdrop, 
-    Box, 
-    Button, 
-    CircularProgress, 
-    Fade, 
-    Grid, 
-    IconButton, 
-    Menu, 
-    MenuItem, 
-    Modal, 
+import {
+    Backdrop,
+    Box,
+    Button,
+    CircularProgress,
+    Fade,
+    Grid,
+    IconButton,
+    Menu,
+    MenuItem,
+    Modal,
     Typography,
     Chip,
     Card,
@@ -44,7 +44,7 @@ const RightSideOrder = () => {
         showError,
         showSuccess,
     } = useProductLogic();
-    
+
     const [dataOrders, setDataOrders] = useState<Array<IOrder>>([]);
     const [filteredOrders, setFilteredOrders] = useState<Array<IOrder>>([]);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
@@ -68,11 +68,11 @@ const RightSideOrder = () => {
             }
 
             const data = await OrderService.getUserOrders(token);
-            console.log("data",data)
+            console.log("data", data)
             setDataOrders(data.data);
         } catch (error) {
             showError('Error al cargar las órdenes');
-        }finally{
+        } finally {
             setIsLoading(false);
         }
     };
@@ -105,14 +105,14 @@ const RightSideOrder = () => {
             const now = new Date();
             const monthsBack = parseInt(filter.selectedPeriod);
             const dateLimit = new Date(now.getFullYear(), now.getMonth() - monthsBack, now.getDate());
-            
+
             filtered = filtered.filter(order => new Date(order.createdAt) >= dateLimit);
         }
 
         // Filtro por búsqueda
         if (filter.searchTerm) {
             const searchLower = filter.searchTerm.toLowerCase();
-            filtered = filtered.filter(order => 
+            filtered = filtered.filter(order =>
                 order.orderNumber.toLowerCase().includes(searchLower) ||
                 order.items.some(item => item.name.toLowerCase().includes(searchLower))
             );
@@ -174,6 +174,7 @@ const RightSideOrder = () => {
         });
     };
 
+
     // Función para obtener el estado visual - CORREGIDA
     const getStatusChip = (order: IOrder) => {
         let label = '';
@@ -202,7 +203,7 @@ const RightSideOrder = () => {
             color = '#757575';
         }
 
-        return <Chip label={label} sx={{backgroundColor:color, color:'white'}}  size="small" />;
+        return <Chip label={label} sx={{ backgroundColor: color, color: 'white' }} size="small" />;
     };
 
     // Función para formatear fecha
@@ -214,7 +215,7 @@ const RightSideOrder = () => {
         });
     };
 
-    if (isLoading ) {
+    if (isLoading) {
         return (
             <Grid size={{ xs: 12, sm: 12, md: 12 }} sx={{ textAlign: 'center', mt: 4 }}>
                 <CircularProgress sx={{ color: '#7950f2' }} />
@@ -234,40 +235,37 @@ const RightSideOrder = () => {
                 counts={filterCounts}
             />
 
-            <Grid container sx={{ mx: { xs:2, sm:2, md:4}, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
+            <Grid container sx={{ mx: { xs: 2, sm: 2, md: 4 }, marginBottom: 4, mt: 2, paddingY: 1 }} spacing={2}>
                 {
-                    filteredOrders.length === 0?(
-                        <EmptyOrderComponent/>
-                    ):(
-                        <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+                    filteredOrders.length === 0 ? (
+                        <EmptyOrderComponent />
+                    ) : (
+                        <Grid size={{ xs: 12, sm: 12, md: 12 }}>
                             {
                                 filteredOrders.map((order) => (
-                                    <Card 
-                                        key={order._id} 
-                                        sx={{ 
-                                            marginBottom: 2, 
+                                    <Card
+                                        key={order._id}
+                                        sx={{
+                                            marginBottom: 2,
                                             borderRadius: 2,
                                             border: '1px solid #f0f0f0',
-                                            '&:hover': {
-                                                boxShadow: '0 4px 12px rgba(121, 80, 242, 0.1)',
-                                                borderColor: '#7950f2'
-                                            }
+
                                         }}
                                     >
                                         <CardContent>
                                             {/* Header de la orden */}
-                                            <Box sx={{ 
-                                                display: 'flex', 
-                                                justifyContent: 'space-between', 
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
                                                 alignItems: 'flex-start',
-                                                mb: 2 
+                                                mb: 2
                                             }}>
                                                 <Box>
                                                     {getStatusChip(order)}
                                                     <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                        <Typography 
-                                                            variant="h6" 
-                                                            sx={{ 
+                                                        <Typography
+                                                            variant="h6"
+                                                            sx={{
                                                                 fontWeight: 'bold',
                                                                 color: '#333',
                                                                 fontSize: '1rem'
@@ -276,9 +274,9 @@ const RightSideOrder = () => {
                                                             Pedido efectuado el: {formatDate(order.createdAt)}
                                                         </Typography>
                                                     </Box>
-                                                    <Typography 
-                                                        variant="body2" 
-                                                        sx={{ 
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{
                                                             color: 'text.secondary',
                                                             fontSize: '0.875rem',
                                                             mt: 0.5
@@ -287,19 +285,25 @@ const RightSideOrder = () => {
                                                         N° de pedido: {order.orderNumber}
                                                         <Button
                                                             size="small"
-                                                            sx={{ 
-                                                                ml: 1, 
+                                                            sx={{
+                                                                ml: 1,
                                                                 minWidth: 'auto',
                                                                 color: '#7950f2',
                                                                 textTransform: 'none',
                                                                 fontSize: '0.875rem'
+                                                            }}
+                                                            onClick={() => {
+                                                                if (order?.orderNumber) {
+                                                                    navigator.clipboard.writeText(order.orderNumber);
+                                                                    showSuccess('Número de orden copiado');
+                                                                }
                                                             }}
                                                         >
                                                             Copiar
                                                         </Button>
                                                     </Typography>
                                                 </Box>
-                                                
+
                                                 <Box sx={{ textAlign: 'right' }}>
                                                     <Link href={`/compras/${order._id}`}>
                                                         <Button
@@ -331,7 +335,7 @@ const RightSideOrder = () => {
                                                         <Grid
                                                             container
                                                             key={`${item.productId}-${index}`}
-                                                            sx={{ 
+                                                            sx={{
                                                                 marginY: 1,
                                                                 padding: 1,
                                                                 borderRadius: 1,
@@ -341,9 +345,9 @@ const RightSideOrder = () => {
                                                             }}
                                                         >
                                                             <Grid size={{ xs: 3, sm: 2, md: 2 }}>
-                                                                <Box sx={{ 
-                                                                    display: 'flex', 
-                                                                    justifyContent: 'center', 
+                                                                <Box sx={{
+                                                                    display: 'flex',
+                                                                    justifyContent: 'center',
                                                                     alignItems: 'center',
                                                                     height: '100%'
                                                                 }}>
@@ -352,27 +356,27 @@ const RightSideOrder = () => {
                                                                         alt={item.name}
                                                                         width={80}
                                                                         height={80}
-                                                                        style={{ 
-                                                                            objectFit: 'contain', 
+                                                                        style={{
+                                                                            objectFit: 'contain',
                                                                             borderRadius: 8,
                                                                             border: '1px solid #f0f0f0'
                                                                         }}
                                                                     />
                                                                 </Box>
                                                             </Grid>
-                                                            
+
                                                             <Grid size={{ xs: 9, sm: 10, md: 10 }}>
-                                                                <Box sx={{ 
-                                                                    display: 'flex', 
+                                                                <Box sx={{
+                                                                    display: 'flex',
                                                                     flexDirection: 'column',
                                                                     height: '100%',
                                                                     justifyContent: 'center',
                                                                     pl: 2
                                                                 }}>
                                                                     <Link href={`/producto/${item.productId}`}>
-                                                                        <Typography 
-                                                                            variant="subtitle1" 
-                                                                            sx={{ 
+                                                                        <Typography
+                                                                            variant="subtitle1"
+                                                                            sx={{
                                                                                 color: '#333',
                                                                                 fontWeight: '500',
                                                                                 mb: 0.5,
@@ -384,28 +388,28 @@ const RightSideOrder = () => {
                                                                             {item.name}
                                                                         </Typography>
                                                                     </Link>
-                                                                    
-                                                                    <Box sx={{ 
-                                                                        display: 'flex', 
-                                                                        gap: 2, 
+
+                                                                    <Box sx={{
+                                                                        display: 'flex',
+                                                                        gap: 2,
                                                                         flexWrap: 'wrap',
                                                                         alignItems: 'center'
                                                                     }}>
-                                                                        <Typography 
-                                                                            variant="body2" 
+                                                                        <Typography
+                                                                            variant="body2"
                                                                             sx={{ color: 'text.secondary' }}
                                                                         >
                                                                             Cantidad: {item.quantity}
                                                                         </Typography>
-                                                                        <Typography 
-                                                                            variant="body2" 
+                                                                        <Typography
+                                                                            variant="body2"
                                                                             sx={{ color: 'text.secondary' }}
                                                                         >
                                                                             Talla: {item.size} US
                                                                         </Typography>
-                                                                        <Typography 
-                                                                            variant="body1" 
-                                                                            sx={{ 
+                                                                        <Typography
+                                                                            variant="body1"
+                                                                            sx={{
                                                                                 fontWeight: 'bold',
                                                                                 color: '#7950f2'
                                                                             }}
@@ -428,8 +432,8 @@ const RightSideOrder = () => {
                                                                 fontSize: '0.875rem'
                                                             }}
                                                         >
-                                                            {expandedOrders.has(order._id) 
-                                                                ? `Ver menos` 
+                                                            {expandedOrders.has(order._id)
+                                                                ? `Ver menos`
                                                                 : `Ver ${order.items.length - 2} productos más`
                                                             }
                                                         </Button>
@@ -439,10 +443,10 @@ const RightSideOrder = () => {
 
                                             {/* Footer con total */}
                                             <Divider sx={{ my: 2 }} />
-                                            
-                                            <Box sx={{ 
-                                                display: 'flex', 
-                                                justifyContent: 'space-between', 
+
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
                                                 alignItems: 'center',
                                                 pt: 1
                                             }}>
@@ -452,10 +456,10 @@ const RightSideOrder = () => {
                                                         {order.items.length} producto{order.items.length !== 1 ? 's' : ''}
                                                     </Typography>
                                                 </Box>
-                                                
-                                                <Typography 
-                                                    variant="h6" 
-                                                    sx={{ 
+
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
                                                         fontWeight: 'bold',
                                                         color: '#333'
                                                     }}
@@ -470,7 +474,7 @@ const RightSideOrder = () => {
                         </Grid>
                     )
                 }
-                
+
             </Grid>
 
             {/* Notificaciones */}

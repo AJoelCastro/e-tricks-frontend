@@ -16,11 +16,14 @@ const MainOrder= () => {
         }}>
           <LeftSide />
         </Grid>
-        <Grid size={{
-          xs:12, sm:7, md:9
-        }}>
+        <Grid size={{xs:12, sm:7, md:7 }}>
             <RightSideOrder/>
         </Grid>
+         <Grid  size={{ xs:0 ,sm:0, md:3 }} sx={{
+          display: { xs: 'none', sm: 'none', md: 'block' }
+        }}>
+         </Grid>
+     
       </Grid>
       <FooterComponent/>
     </>

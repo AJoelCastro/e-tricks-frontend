@@ -98,38 +98,51 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getPickUps]);
 
   // Función para determinar qué datos cargar según la ruta
-  const loadDataByRoute = useCallback(async () => {
-    // Rutas que necesitan carrito
-    const cartRoutes = ['/carrito', '/carrito/delivery', '/carrito/pagos'];
-    
-    // Rutas que necesitan direcciones
-    const addressRoutes = ['/carrito/delivery', '/carrito/pagos', '/direcciones'];
-    
-    // Rutas que necesitan puntos de recojo
-    const pickupRoutes = ['/carrito/delivery', '/carrito/pagos'];
+const loadDataByRoute = useCallback(async () => {
+  if (!pathname) return;
 
-    // Cargar carrito si es necesario
-    if (cartRoutes.some(route => pathname?.startsWith(route))) {
-      await getCartItems();
-    }
+  // Rutas que necesitan carrito (comparación exacta o prefijo)
+  const needsCart = [
+    '/carrito',          // Exact match
+    '/carrito/delivery', // Exact match
+    '/carrito/pagos'     // Exact match
+  ].some(route => pathname === route);
 
-    // Cargar direcciones si es necesario
-    if (addressRoutes.some(route => pathname?.startsWith(route))) {
-      await getAddresses();
-    }
+  // Rutas que necesitan direcciones
+  const needsAddress = [
+    '/carrito/delivery', // Exact match
+    '/carrito/pagos',    // Exact match
+    '/direcciones',      // Exact match
+    '/compras/'          // Dynamic route prefix
+  ].some(route => 
+    route.endsWith('/') 
+      ? pathname.startsWith(route) 
+      : pathname === route
+  );
 
-    // Cargar pickups si es necesario
-    if (pickupRoutes.some(route => pathname?.startsWith(route))) {
-      await getPickUps();
-    }
-  }, [pathname, getCartItems, getAddresses, getPickUps]);
+  // Rutas que necesitan puntos de recojo
+  const needsPickup = [
+    '/carrito/delivery', // Exact match
+    '/carrito/pagos',    // Exact match
+    '/compras/'          // Dynamic route prefix
+  ].some(route => 
+    route.endsWith('/') 
+      ? pathname.startsWith(route) 
+      : pathname === route
+  );
 
-  // Efecto que se ejecuta cuando cambia la ruta
-  useEffect(() => {
-    if (pathname) {
-      loadDataByRoute();
-    }
-  }, [pathname, loadDataByRoute]);
+  // Carga condicional en paralelo para mejor performance
+  await Promise.all([
+    needsCart && getCartItems(),
+    needsAddress && getAddresses(),
+    needsPickup && getPickUps()
+  ]);
+}, [pathname, getCartItems, getAddresses, getPickUps]);
+
+// Efecto que se ejecuta cuando cambia la ruta
+useEffect(() => {
+  loadDataByRoute();
+}, [pathname, loadDataByRoute]);
 
   return (
     <CartContext.Provider
