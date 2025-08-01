@@ -10,26 +10,14 @@ import {
     Grid,
     IconButton,
     Typography,
-    Paper,
     List,
     ListItem,
     ListItemText,
-    Avatar,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    FormControl,
-    FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
     Alert
 } from '@mui/material';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, MapPin, CreditCard, Package, Calendar, Phone, Store, Copy, Star, RefreshCw } from 'lucide-react';
+import { ArrowLeft, MapPin,  Package, Calendar, Phone, Store, Copy, Star, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
@@ -42,6 +30,7 @@ import { useProductLogic } from '@/hooks/useProductLogic';
 import { SplashScreen } from '@/components/splash-screen';
 import { useCart } from '@/page-sections/cart/CartContext';
 import { useUser } from '@clerk/nextjs';
+import RefundRequestModal from '@/components/modal/RefundRequestModal';
 
 type Props = {
     id: string;
@@ -66,7 +55,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
     const [pickupLocation, setPickupLocation] = useState<IPickUp | null>(null);
     const [loading, setLoading] = useState(true);
     const [dataLoaded, setDataLoaded] = useState(false);
-    
+
     // Estados para el modal de reembolso
     const [refundModal, setRefundModal] = useState({
         open: false,
@@ -80,7 +69,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
     // Función para obtener los detalles de la orden (solo una vez)
     const getOrderDetails = useCallback(async () => {
         if (dataLoaded || !id) return;
-
+        console.log("addresses", addresses)
         try {
             setLoading(true);
             const token = await getToken();
@@ -146,18 +135,20 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
 
             const fullReason = `${refundType}: ${refundReason}`;
 
-            console.log("refundModal.itemId",refundModal.itemId)
-            
+            console.log("refundModal.orderId",  
+                order._id,"refundModal.itemId ",
+                refundModal.itemId)
+
             await OrderService.requestItemRefund(
-                token, 
-                order._id, 
-                refundModal.itemId, 
+                token,
+                order._id,
+                refundModal.itemId,
                 fullReason
             );
 
             showSuccess('Solicitud de reembolso enviada correctamente');
             closeRefundModal();
-            
+
             // Recargar los detalles de la orden
             setDataLoaded(false);
             getOrderDetails();
@@ -200,10 +191,10 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                     <Typography variant="body1" sx={{ fontWeight: '600', mb: 0.5 }}>
                         {pickupLocation?.city} - {pickupLocation?.stand}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: '400', mb: 1 }}>
                         {pickupLocation?.cc} - {pickupLocation?.contactNumber}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: '400', mb: 1 }}>
                         {pickupLocation?.address}
                     </Typography>
                 </Box>
@@ -297,7 +288,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
             color = 'default';
         }
 
-        return <Chip label={label} color={color} size="medium" />;
+        return <Chip label={label} color={color} size="small" />;
     }, []);
 
     // Función para formatear fecha
@@ -454,30 +445,14 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                         primary={
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    Envío completado en:
+                                                    Estado del pedido:
                                                 </Typography>
-                                                <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.deliveryStatus === 'delivered' ? formatDate(order.updatedAt) : 'En proceso'}
-                                                </Typography>
+                                                {getStatusChip(order)}
                                             </Box>
                                         }
                                     />
                                 </ListItem>
 
-                                <ListItem sx={{ px: 0, py: 1 }}>
-                                    <ListItemText
-                                        primary={
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    Pedido completado en:
-                                                </Typography>
-                                                <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.status === 'completed' ? formatDate(order.updatedAt) : 'En proceso'}
-                                                </Typography>
-                                            </Box>
-                                        }
-                                    />
-                                </ListItem>
 
                                 <ListItem sx={{ px: 0, py: 1 }}>
                                     <ListItemText
@@ -487,7 +462,10 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Estado del pago:
                                                 </Typography>
                                                 <Chip
-                                                    label={order.paymentStatus || 'Pendiente'}
+                                                    label={order.paymentStatus === 'approved' ? 'Aprobado' :
+                                                        order.paymentStatus === 'rejected' ? 'Rechazado' :
+                                                            order.paymentStatus === 'pending' ? 'Pendiente' :
+                                                                order.paymentStatus === 'refunded' ? 'Rembolso' : 'Pendiente'}
                                                     size="small"
                                                     color={
                                                         order.paymentStatus === 'approved' ? 'success' :
@@ -508,7 +486,9 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Estado de entrega:
                                                 </Typography>
                                                 <Chip
-                                                    label={order.deliveryStatus}
+                                                    label={order.deliveryStatus === 'delivered' ? 'Entregado' :
+                                                        order.deliveryStatus === 'shipped' ? 'Enviado' :
+                                                            order.deliveryStatus === 'returned' ? 'Devuelto' : 'Pendiente'}
                                                     size="small"
                                                     color={
                                                         order.deliveryStatus === 'delivered' ? 'success' :
@@ -534,6 +514,38 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                         }
                                     />
                                 </ListItem>
+
+                                <ListItem sx={{ px: 0, py: 1 }}>
+                                    <ListItemText
+                                        primary={
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Envío completado en:
+                                                </Typography>
+                                                <Typography variant="body1" sx={{ fontWeight: '600' }}>
+                                                    {order.deliveryStatus === 'delivered' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                    />
+                                </ListItem>
+
+                                <ListItem sx={{ px: 0, py: 1 }}>
+                                    <ListItemText
+                                        primary={
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Pedido completado en:
+                                                </Typography>
+                                                <Typography variant="body1" sx={{ fontWeight: '600' }}>
+                                                    {order.status === 'completed' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                    />
+                                </ListItem>
+
+
                             </List>
                         </CardContent>
                     </Card>
@@ -541,10 +553,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
 
                 {/* Productos y Resumen */}
                 <Grid size={{ xs: 12, md: 6 }}>
-                    {/* Estado de la Orden */}
-                    <Box sx={{ mb: 3, textAlign: 'center' }}>
-                        {getStatusChip(order)}
-                    </Box>
+
 
                     {/* Información de Entrega */}
                     <Card sx={{ mb: 3, borderRadius: 2, border: '1px solid #e0e0e0' }}>
@@ -660,9 +669,9 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     color: '#ffa000',
                                                     textTransform: 'none',
                                                     fontSize: '0.75rem',
-                                                    '&:hover': { 
-                                                        borderColor: '#ffc107', 
-                                                        backgroundColor: 'rgba(255, 193, 7, 0.04)' 
+                                                    '&:hover': {
+                                                        borderColor: '#ffc107',
+                                                        backgroundColor: 'rgba(255, 193, 7, 0.04)'
                                                     }
                                                 }}
                                                 onClick={() => {
@@ -673,32 +682,32 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                             </Button>
 
                                             {/* Botón de Solicitar Reembolso */}
-                                        {/*    {canRequestRefund(item.itemStatus!) && ( */}
-                                                <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    startIcon={<RefreshCw size={16} />}
-                                                    sx={{
-                                                        borderColor: '#ff6b6b',
-                                                        color: '#ff6b6b',
-                                                        textTransform: 'none',
-                                                        fontSize: '0.75rem',
-                                                        '&:hover': { 
-                                                            borderColor: '#ff5252', 
-                                                            backgroundColor: 'rgba(255, 107, 107, 0.04)' 
-                                                        }
-                                                    }}
-                                                    onClick={() => openRefundModal(item._id , item.name)}
-                                                >
-                                                    Solicitar Reembolso
-                                                </Button>
-                                            {/* )}    */}
+                                              {canRequestRefund(item.itemStatus!) && ( 
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                startIcon={<RefreshCw size={16} />}
+                                                sx={{
+                                                    borderColor: '#ff6b6b',
+                                                    color: '#ff6b6b',
+                                                    textTransform: 'none',
+                                                    fontSize: '0.75rem',
+                                                    '&:hover': {
+                                                        borderColor: '#ff5252',
+                                                        backgroundColor: 'rgba(255, 107, 107, 0.04)'
+                                                    }
+                                                }}
+                                                onClick={() => openRefundModal(item._id, item.name)}
+                                            >
+                                                Solicitar Reembolso
+                                            </Button>
+                                            )}    
 
                                             {/* Mensaje para items que no pueden solicitar reembolso */}
-                                           {!canRequestRefund(item.itemStatus!) && item.itemStatus === 'return_requested' && (
-                                                <Box sx={{ 
-                                                    display: 'flex', 
-                                                    alignItems: 'center', 
+                                            {!canRequestRefund(item.itemStatus!) && item.itemStatus === 'return_requested' && (
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
                                                     gap: 1,
                                                     backgroundColor: '#fff3cd',
                                                     border: '1px solid #ffeaa7',
@@ -713,16 +722,16 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                 </Box>
                                             )}
 
-                                            {!canRequestRefund(item.itemStatus) && 
-                                             !['return_requested', 'returned', 'refunded'].includes(item.itemStatus) && (
-                                                <Typography variant="caption" sx={{ 
-                                                    color: '#666', 
-                                                    alignSelf: 'center',
-                                                    fontStyle: 'italic'
-                                                }}>
-                                                    Reembolso no disponible
-                                                </Typography>
-                                            )}
+                                            {!canRequestRefund(item.itemStatus) &&
+                                                !['return_requested', 'returned', 'refunded'].includes(item.itemStatus) && (
+                                                    <Typography variant="caption" sx={{
+                                                        color: '#666',
+                                                        alignSelf: 'center',
+                                                        fontStyle: 'italic'
+                                                    }}>
+                                                        Reembolso no disponible
+                                                    </Typography>
+                                                )}
                                         </Box>
 
                                         {index < order.items.length - 1 && <Divider sx={{ mt: 2 }} />}
@@ -738,7 +747,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
                                 Resumen del pedido
                             </Typography>
-
+                            {/*  
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                 <Typography variant="body2" color="text.secondary">
                                     Envío
@@ -747,6 +756,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                     PEN7.66
                                 </Typography>
                             </Box>
+                            */}
 
                             {/* Mostrar descuento si existe */}
                             {order.discountAmount && (
@@ -775,7 +785,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                             {order.items.some(item => item.itemStatus === 'return_requested') && (
                                 <Alert severity="info" sx={{ mt: 2 }}>
                                     <Typography variant="body2">
-                                        <strong>Solicitudes de reembolso pendientes:</strong> Recibirás una notificación por email 
+                                        <strong>Solicitudes de reembolso pendientes:</strong> Recibirás una notificación por email
                                         cuando se procesen tus solicitudes de reembolso.
                                     </Typography>
                                 </Alert>
@@ -786,101 +796,17 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
             </Grid>
 
             {/* Modal de Reembolso */}
-            <Dialog 
-                open={refundModal.open} 
+            <RefundRequestModal
+                open={refundModal.open}
                 onClose={closeRefundModal}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: { borderRadius: 2 }
-                }}
-            >
-                <DialogTitle sx={{ pb: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <RefreshCw size={20} color="#ff6b6b" />
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                            Solicitar Reembolso
-                        </Typography>
-                    </Box>
-                </DialogTitle>
-
-                <DialogContent sx={{ pt: 2 }}>
-                    <Alert severity="info" sx={{ mb: 3 }}>
-                        Vas a solicitar el reembolso para: <strong>{refundModal.itemName}</strong>
-                    </Alert>
-
-                    <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
-                        <FormLabel component="legend" sx={{ mb: 2, fontWeight: 'bold' }}>
-                            Motivo del reembolso:
-                        </FormLabel>
-                        <RadioGroup
-                            value={refundType}
-                            onChange={(e) => setRefundType(e.target.value)}
-                        >
-                            {refundReasons.map((option) => (
-                                <FormControlLabel
-                                    key={option.value}
-                                    value={option.value}
-                                    control={<Radio size="small" />}
-                                    label={option.label}
-                                    sx={{ mb: 0.5 }}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
-
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        label="Descripción detallada"
-                        placeholder="Explica en detalle el motivo de tu solicitud de reembolso..."
-                        value={refundReason}
-                        onChange={(e) => setRefundReason(e.target.value)}
-                        required
-                        helperText="Por favor, proporciona una descripción clara del problema"
-                        sx={{ mb: 2 }}
-                    />
-
-                    <Alert severity="warning" sx={{ mt: 2 }}>
-                        <Typography variant="body2">
-                            • Tu solicitud será revisada en un plazo de 24-48 horas
-                            <br />
-                            • El reembolso puede tardar de 3-7 días hábiles
-                            <br />
-                            • Te notificaremos por email sobre el estado de tu solicitud
-                        </Typography>
-                    </Alert>
-                </DialogContent>
-
-                <DialogActions sx={{ p: 3, pt: 2 }}>
-                    <Button 
-                        onClick={closeRefundModal}
-                        variant="outlined"
-                        disabled={refundModal.loading}
-                        sx={{ 
-                            borderColor: '#e0e0e0',
-                            color: '#666',
-                            '&:hover': { borderColor: '#ccc' }
-                        }}
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        onClick={handleRefundConfirm}
-                        variant="contained"
-                        disabled={refundModal.loading || !refundReason.trim()}
-                        startIcon={refundModal.loading ? <CircularProgress size={16} /> : <RefreshCw size={16} />}
-                        sx={{
-                            backgroundColor: '#ff6b6b',
-                            '&:hover': { backgroundColor: '#ff5252' },
-                            '&:disabled': { backgroundColor: '#ffcdd2' }
-                        }}
-                    >
-                        {refundModal.loading ? 'Procesando...' : 'Confirmar Solicitud'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                onSubmit={handleRefundConfirm}
+                itemName={refundModal.itemName}
+                loading={refundModal.loading}
+                refundReason={refundReason}
+                setRefundReason={setRefundReason}
+                refundType={refundType}
+                setRefundType={setRefundType}
+            />
 
             {/* Notificaciones */}
             <ErrorNotification
