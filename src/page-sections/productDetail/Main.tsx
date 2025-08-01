@@ -82,6 +82,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
         try {
             setLoading(true);
             const dataProduct = await ProductService.GetProductById(id);
+            console.log('dataProduct', dataProduct);
             setProduct(dataProduct);
             setImages(dataProduct?.images || []);
             setSelectedImage(dataProduct?.images[0]);
@@ -476,7 +477,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     <Grid container spacing={4}>
                         {/* Columna de Especificaciones */}
                         <Grid size={{xs:12, sm:12, md:6}}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+                            <Typography variant="h6" sx={{ mb: 3 }}>
                             Especificaciones
                             </Typography>
                             
@@ -551,7 +552,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
 
                         {/* Columna de Información Adicional */}
                         <Grid size={{xs:12, sm:12, md:6}}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
+                            <Typography variant="h6" sx={{  mb: 3 }}>
                             Información adicional
                             </Typography>
                             
@@ -615,9 +616,190 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     </Box>
                 </Grid>
             </Grid>
+            {/* aqui va la seccion de reseñas */}
             <Grid container sx={{backgroundColor:'white', mx:{xs: 1, sm: 4, md: 8 }, borderRadius:4, marginBottom:4}}>
                 <Grid size={{xs:12, sm:12, md:12}} sx={{ borderRadius: 2, p: 3, mt: 4, mx:{xs:1,sm:2,md:4}, mb:{xs:2,sm:2,md:4} }}>
+                    
+                    {/* Título de la sección */}
+                    <Typography variant="h6" sx={{  mb: 3 }}>
+                        Comentarios de este producto
+                    </Typography>
+                    
+                    {/* Separador */}
+                    <Box sx={{ width: '100%', height: 2, backgroundColor: '#e0e0e0', mb: 4 }} />
+                    
+                    <Grid container spacing={4}>
+                        {/* Columna izquierda - Resumen de calificaciones */}
+                        <Grid size={{xs:12, sm:12, md:4}}>
+                            <Box sx={{ textAlign: 'center', mb: 4 }}>
+                                {/* Promedio y estrellas */}
+                                <Typography variant="h2" sx={{ fontWeight: 'bold', fontSize: '3rem', mb: 1 }}>
+                                    {promedio.toFixed(1)}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    /5
+                                </Typography>
+                                
+                                <Rating 
+                                    value={promedio} 
+                                    precision={0.1} 
+                                    readOnly 
+                                    sx={{ fontSize: '1.5rem', mb: 2 }}
+                                />
+                                
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                                    {product?.resenias?.length || 0} comentarios
+                                </Typography>
 
+                                {/* Distribución de estrellas */}
+                                <Box sx={{ mt: 3 }}>
+                                    {[5, 4, 3, 2, 1].map((stars) => {
+                                        const count = product?.resenias?.filter(r => r.valoracion === stars).length || 0;
+                                        const percentage = product?.resenias?.length ? (count / product.resenias.length) * 100 : 0;
+                                        
+                                        return (
+                                            <Box key={stars} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="body2" sx={{ minWidth: 20 }}>
+                                                    {stars}
+                                                </Typography>
+                                                <Box sx={{ width: 16, height: 16, mx: 1 }}>
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffd700">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                </Box>
+                                                <Box sx={{ flex: 1, mx: 2, height: 8, backgroundColor: '#f0f0f0', borderRadius: 4 }}>
+                                                    <Box 
+                                                        sx={{ 
+                                                            width: `${percentage}%`, 
+                                                            height: '100%', 
+                                                            backgroundColor: '#ffd700', 
+                                                            borderRadius: 4 
+                                                        }} 
+                                                    />
+                                                </Box>
+                                                <Typography variant="body2" sx={{ minWidth: 30, textAlign: 'right' }}>
+                                                    {count}
+                                                </Typography>
+                                            </Box>
+                                        );
+                                    })}
+                                </Box>
+
+                                {/* Badge de recomendación */}
+                                {product?.resenias && product.resenias.length > 0 && (
+                                    <Box sx={{ 
+                                        mt: 3, 
+                                        p: 2, 
+                                        backgroundColor: '#e8f5e8', 
+                                        borderRadius: 2,
+                                        border: '1px solid #c3e6c3'
+                                    }}>
+                                        <Typography variant="body2" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
+                                            {Math.round((product.resenias.filter(r => r.valoracion >= 4).length / product.resenias.length) * 100)}% de los clientes recomiendan este producto.
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Box>
+                        </Grid>
+
+                        {/* Columna derecha - Lista de comentarios */}
+                        <Grid size={{xs:12, sm:12, md:8}}>
+                            {product?.resenias && product.resenias.length > 0 ? (
+                                <Box>
+                                    {product.resenias.slice(0, 5).map((resenia, index) => (
+                                        <Box key={index} sx={{ mb: 4, pb: 3, borderBottom: '1px solid #f0f0f0' }}>
+                                            {/* Header del comentario */}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                                <Rating 
+                                                    value={resenia.valoracion} 
+                                                    readOnly 
+                                                    size="small"
+                                                    sx={{ mr: 2 }}
+                                                />
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                                                    hace {Math.floor(Math.random() * 30) + 1} días
+                                                </Typography>
+                                            </Box>
+
+                                            {/* Título del comentario (si existe) */}
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                                {resenia.valoracion === 5 ? 'Excelente' : 
+                                                resenia.valoracion === 4 ? 'Muy bueno' :
+                                                resenia.valoracion === 3 ? 'Bueno' :
+                                                resenia.valoracion === 2 ? 'Regular' : 'Malo'}
+                                            </Typography>
+
+                                            {/* Nombre del usuario */}
+                                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                                                por {(resenia as any).user?.name || 'Usuario anónimo'}
+                                            </Typography>
+
+                                            {/* Comentario */}
+                                            <Typography variant="body2" sx={{ lineHeight: 1.6, mb: 2 }}>
+                                                {resenia.comentario}
+                                            </Typography>
+
+                                            {/* Botones de útil/no útil
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Button 
+                                                    size="small" 
+                                                    variant="outlined" 
+                                                    sx={{ 
+                                                        minWidth: 'auto', 
+                                                        p: 1,
+                                                        borderColor: '#e0e0e0',
+                                                        color: 'text.secondary',
+                                                        fontSize: '0.75rem'
+                                                    }}
+                                                >
+                                                    👍
+                                                </Button>
+                                                <Button 
+                                                    size="small" 
+                                                    variant="outlined" 
+                                                    sx={{ 
+                                                        minWidth: 'auto', 
+                                                        p: 1,
+                                                        borderColor: '#e0e0e0',
+                                                        color: 'text.secondary',
+                                                        fontSize: '0.75rem'
+                                                    }}
+                                                >
+                                                    👎
+                                                </Button>
+                                            </Box> */}
+                                        </Box>
+                                    ))}
+
+                                    {/* Botón ver más comentarios */}
+                                    {product.resenias.length > 5 && (
+                                        <Box sx={{ textAlign: 'center', mt: 3 }}>
+                                            <Button 
+                                                variant="outlined" 
+                                                sx={{ 
+                                                    textTransform: 'none',
+                                                    borderRadius: '50px',
+                                                    px: 4,
+                                                    py: 1
+                                                }}
+                                            >
+                                                Ver más comentarios ({product.resenias.length - 5} restantes)
+                                            </Button>
+                                        </Box>
+                                    )}
+                                </Box>
+                            ) : (
+                                <Box sx={{ textAlign: 'center', py: 8 }}>
+                                    <Typography variant="h6" sx={{ color: 'text.secondary', mb: 2 }}>
+                                        Aún no hay comentarios
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                                        Sé el primero en comentar este producto al adquirirlo
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
             <Snackbar
