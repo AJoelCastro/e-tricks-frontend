@@ -51,13 +51,14 @@ export interface IConfirmPaymentData {
 }
 
 export interface IOrderItem {
+    _id:string;
     productId: string;
     name: string;
     price: number;
     quantity: number;
     size: number;
     image:string;
-    itemStatus?: string;
+    itemStatus: string;
 }
 
 export interface IOrder extends Document {
@@ -88,3 +89,26 @@ export interface ICreatePreferenceData {
     couponCode?: string; 
     orderType:string;
 }
+
+export interface IRequestRefundData {
+    reason?: string;
+}
+
+export interface IRefundResponse {
+    success: boolean;
+    message: string;
+    data: {
+        orderId: string;
+        itemId: string;
+        itemStatus: string;
+        reason: string | null;
+        requestedAt: Date;
+    };
+}
+
+export interface IRefundableItemsResponse {
+    success: boolean;
+    data: IOrder;
+    refundableCount: number;
+}
+
