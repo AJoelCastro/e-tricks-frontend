@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link';
 
 const MainMarcasPageSection = () => {
   const [brands, setBrands] = useState<Array<IBrand>>([]);
@@ -41,115 +42,118 @@ const MainMarcasPageSection = () => {
   }, []);
 
   const BrandCard = ({ brand }: { brand: IBrand }) => (
-    <Box 
-      sx={{ 
-        position: 'relative',
-        height: { xs: 450, sm: 500, md: 550 },
-        borderRadius: 1,
-        overflow: 'hidden',
-        transition: 'all 0.3s ease-in-out',
-        cursor: 'pointer',
-        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-        '&:hover': {
-          transform: 'translateY(-10px)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
-        },
-        '& .brand-name': {
-          transform: 'translateY(20px)',
-          opacity: 0,
-          transition: 'all 0.4s ease-in-out',
-        },
-        '&:hover .brand-name': {
-          transform: 'translateY(0px)',
-          opacity: 1,
-        }
-      }}
-    >
-      {/* Imagen de fondo completa */}
+    <Link href={`/marcas/${brand.name.toLocaleLowerCase()}`}>
       <Box 
         sx={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden'
-        }}
-      >
-        <Image
-          src={brand.image}
-          alt={`Marca ${brand.name}`}
-          fill
-          style={{
-            objectFit: 'cover',
-            transition: 'transform 0.4s ease-in-out'
-          }}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        
-        {/* Overlay gradiente */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%)',
-            transition: 'background 0.3s ease-in-out',
-          }}
-        />
-        
-        {/* Overlay hover más intenso */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0,0,0,0.2)',
+          position: 'relative',
+          height: { xs: 500, sm: 550, md: 600 },
+          borderRadius: 1,
+          overflow: 'hidden',
+          transition: 'all 0.3s ease-in-out',
+          cursor: 'pointer',
+          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+          '&:hover': {
+            transform: 'translateY(-10px)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
+          },
+          '& .brand-name': {
+            transform: 'translateY(20px)',
             opacity: 0,
-            transition: 'opacity 0.3s ease-in-out',
-            '.card:hover &': {
-              opacity: 1
-            }
-          }}
-        />
-      </Box>
-
-      {/* Nombre de la marca superpuesto */}
-      <Box 
-        className="brand-name"
-        sx={{ 
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          p: 4,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, transparent 100%)',
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'center',
-          minHeight: 120,
+            transition: 'all 0.4s ease-in-out',
+          },
+          '&:hover .brand-name': {
+            transform: 'translateY(0px)',
+            opacity: 1,
+          }
         }}
-      >
-        <Typography 
-          variant="h4" 
+      > 
+        {/* Imagen de fondo completa */}
+        <Box 
           sx={{ 
-            fontWeight: 900,
-            color: 'white',
-            textAlign: 'center',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-            lineHeight: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
           }}
         >
-          {brand.name}
-        </Typography>
+          <Image
+            src={brand.image}
+            alt={`Marca ${brand.name}`}
+            fill
+            style={{
+              objectFit: 'cover',
+              transition: 'transform 0.4s ease-in-out'
+            }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          
+          {/* Overlay gradiente */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%)',
+              transition: 'background 0.3s ease-in-out',
+            }}
+          />
+          
+          {/* Overlay hover más intenso */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0,0,0,0.2)',
+              opacity: 0,
+              transition: 'opacity 0.3s ease-in-out',
+              '.card:hover &': {
+                opacity: 1
+              }
+            }}
+          />
+        </Box>
+
+        {/* Nombre de la marca superpuesto */}
+        <Box 
+          className="brand-name"
+          sx={{ 
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            p: 4,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, transparent 100%)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            minHeight: 120,
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 900,
+              color: 'white',
+              textAlign: 'center',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
+              lineHeight: 1,
+            }}
+          >
+            {brand.name}
+          </Typography>
+        </Box>
       </Box>
-    </Box>
+    </Link>
+    
   );
 
 
