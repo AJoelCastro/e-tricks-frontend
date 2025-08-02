@@ -182,14 +182,30 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
         />
         
         <Box sx={{display: 'flex', alignItems: 'center', gap: 2, p: 2, backgroundColor: 'white'}}>
-          <IconButton onClick={()=>router.push(`/${categoria.toLowerCase()}`)}>
-            <KeyboardBackspaceIcon sx={{color: 'black', ":hover": {color: '#7c3aed'}}}/>
-          </IconButton>
-          <Link href={`/${categoria.toLowerCase()}`}>
-            <Typography variant='sideBarSubCategories' sx={{color: '#424142ff', ":hover": {color: '#7c3aed'}}}>
-              {categoria}
-            </Typography>
-          </Link>
+          {
+            women?(
+              <>
+                <IconButton>
+                  <KeyboardBackspaceIcon sx={{color: 'black', ":hover": {color: '#7c3aed'}}}/>
+                </IconButton>
+                <Typography variant='sideBarSubCategories' sx={{color: '#424142ff', ":hover": {color: '#7c3aed'}}}>
+                  {categoria}
+                </Typography>
+              </>
+            ):(
+              <>
+                <IconButton onClick={()=>router.push(`/${categoria.toLowerCase()}`)}>
+                  <KeyboardBackspaceIcon sx={{color: 'black', ":hover": {color: '#7c3aed'}}}/>
+                </IconButton>
+                <Link href={`/${categoria.toLowerCase()}`}>
+                  <Typography variant='sideBarSubCategories' sx={{color: '#424142ff', ":hover": {color: '#7c3aed'}}}>
+                    {categoria}
+                  </Typography>
+                </Link>
+              </>
+            )
+          }
+          
           <Typography variant='marcaCard' sx={{color: '#7c3aed'}}>/</Typography>
           <Typography variant='sideBarSubCategories' sx={{color: '#7c3aed'}}>
             {subcategoria}
