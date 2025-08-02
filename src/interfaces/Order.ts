@@ -8,7 +8,6 @@ export interface ICreateOrderData {
 export interface ICreatePreferenceResponse {
     success: boolean; 
     data: {
-        orderId: string;
         preferenceId: string;
         init_point: string;
         sandbox_init_point: string;

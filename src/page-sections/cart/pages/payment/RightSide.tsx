@@ -1,22 +1,17 @@
 'use client';
-
 import OrderService from '@/services/OrderService'
 import CouponService from '@/services/CouponService'
 import { Backdrop, Box, Button, CircularProgress, Fade, Grid, IconButton, Menu, MenuItem, Modal, Typography, TextField, FormControl, InputLabel, Select, Chip } from '@mui/material'
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import CartProgress from '../../../../components/cart/Stepper';
-
 import Image from 'next/image';
-
 import { LucideArrowLeft } from 'lucide-react';
 import { Snackbar, Alert } from '@mui/material';
 import { useAuth, useUser } from '@clerk/nextjs';
-import YapeCard from '../../../../components/cart/YapeCard';
 import { useCart } from '../../CartContext';
 import { useRouter } from 'next/navigation';
 import { ICreateOrderData, ICreatePreferenceData } from '@/interfaces/Order';
 import { ICoupon } from '@/interfaces/Coupon';
-import CustomCardPayment from '@/components/cards/CustomCardPayment';
 import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
 import { useNotification } from '@/hooks/useNotification';
 import ErrorNotification from '@/components/ErrorNotification';
@@ -114,33 +109,7 @@ const RightSidePayment = () => {
     };
   }, []);
 
-  // Manejar el retorno de MercadoPago
-  useEffect(() => {
-    const handlePaymentResult = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      console.log("urlparams",urlParams);
-      const paymentId = urlParams.get('payment_id');
-      const status = urlParams.get('status');
-      const merchantOrderId = urlParams.get('merchant_order_id');
 
-      if (paymentId && status === 'approved') {
-        console.log('Payment approved, creating order...', { paymentId, merchantOrderId });
-        showSuccess('¡Pago aprobado! Creando tu orden...');
-        await handleCreateOrder(paymentId);
-      } else if (paymentId && status === 'rejected') {
-        showError('El pago fue rechazado. Intenta con otro método de pago.');
-        setIsProcessingPayment(false);
-      } else if (paymentId && status === 'pending') {
-        showWarning('El pago está pendiente de confirmación.');
-        setIsProcessingPayment(false);
-      }
-    };
-
-    // Solo ejecutar si hay parámetros de pago en la URL
-    if (window.location.search.includes('payment_id')) {
-      handlePaymentResult();
-    }
-  }, []);
 
   // Calcular totales
   const calculateTotals = useCallback(() => {
@@ -260,7 +229,7 @@ const RightSidePayment = () => {
       console.log("response front",response.data)
       if (response.success) {
         console.log('Preference created successfully:', response);
-         setOrderId(response.data.orderId);
+      //   setOrderId(response.data.orderId);
         return response.data.preferenceId;
       } else {
         throw new Error('No se recibió el ID de preferencia');
@@ -326,64 +295,7 @@ const RightSidePayment = () => {
     }
   };
 
-  // Crear orden después de confirmar el pago
-  const handleCreateOrder = async (paymentId: string) => {
-    try {
-      if (!user?.id) {
-        showError('No se pudo obtener el ID del usuario');
-        return null;
-      }
 
-      console.log('Creating order...');
-      setIsProcessingPayment(true);
-      const token = await getToken();
-
-      if (!token) {
-        throw new Error('No se pudo obtener el token de autenticación');
-      }
-
-      const orderData: ICreateOrderData = {
-        userId: user.id,
-        addressId: selectedPickup
-          ? selectedPickup._id
-          : selectedAddress && selectedAddress._id
-            ? selectedAddress._id
-            : '', // fallback to empty string if undefined
-        couponCode: appliedCoupon?.code,
-      };
-
-      console.log("Order data:", orderData);
-
-      const response = await OrderService.createOrder(token, orderData);
-
-      if (response.success) {
-        const createdOrderId = response.data.order._id;
-        setOrderId(createdOrderId);
-        
-        // Confirmar el pago con la orden creada
-        await OrderService.confirmPayment(token, {
-          orderId: createdOrderId,
-          paymentId: paymentId
-        });
-
-        showSuccess('Orden creada y pago confirmado correctamente');
-        
-        // Redirigir a página de éxito
-        setTimeout(() => {
-          router.push(`/order/success?orderId=${createdOrderId}`);
-        }, 2000);
-
-        return createdOrderId;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error creating order:', error);
-      showError('Error al crear la orden');
-      return null;
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
 
   // Función para renderizar la información de entrega
   const renderDeliveryInfo = () => {
