@@ -44,8 +44,8 @@ const MainMarcasPageSection = () => {
     <Box 
       sx={{ 
         position: 'relative',
-        height: { xs: 400, sm: 450, md: 500 },
-        borderRadius: 3,
+        height: { xs: 450, sm: 500, md: 550 },
+        borderRadius: 1,
         overflow: 'hidden',
         transition: 'all 0.3s ease-in-out',
         cursor: 'pointer',
