@@ -111,17 +111,20 @@ const RightSide = () => {
             />
 
             {/* Componente de filtros reutilizable */}
-            <ProductFilter
-                filter={filter}
-                minPrice={minPrice}
-                maxPrice={maxPrice}
-                onFilterTypeChange={handleFilterTypeChange}
-                onPriceRangeChange={handlePriceRangeChange}
-                onSeasonChange={handleSeasonChange}
-                onBrandChange={handleBrandChange}
-                onCategoryChange={handleCategoryChange}
-                onClearFilters={clearFilters}
-            />
+            <Box sx={{ px:{xs: 2, md: 4}, mb:{xs: 2, md: 2}, mt:{xs: 2, md: 3}}}>
+                <ProductFilter
+                    filter={filter}
+                    minPrice={minPrice}
+                    maxPrice={maxPrice}
+                    onFilterTypeChange={handleFilterTypeChange}
+                    onPriceRangeChange={handlePriceRangeChange}
+                    onSeasonChange={handleSeasonChange}
+                    onBrandChange={handleBrandChange}
+                    onCategoryChange={handleCategoryChange}
+                    onClearFilters={clearFilters}
+                />
+            </Box>
+            
 
             {/* Grid de productos */}
             <Grid container sx={{ marginX: 4, marginBottom: 4 }} spacing={3}>

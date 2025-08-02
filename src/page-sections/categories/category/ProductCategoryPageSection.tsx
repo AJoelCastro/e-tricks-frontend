@@ -15,6 +15,8 @@ import ErrorNotification from '@/components/ErrorNotification';
 import CartNotificationModal from '@/components/cart/CartNotificationModal';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useAuth } from '@clerk/nextjs';
+import ProductFilter from '@/components/product/ProductFilter';
+import { useProductFilter } from '@/hooks/useProductFilter';
 
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -49,7 +51,18 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct,
     closeCartNotification,
     } = useProductLogic();
   const segments = pathname.split('/').filter(Boolean);
-
+  const {
+    filter,
+    filteredProducts,
+    minPrice,
+    maxPrice,
+    handleFilterTypeChange,
+    handlePriceRangeChange,
+    handleSeasonChange,
+    handleBrandChange,
+    handleCategoryChange,
+    clearFilters,
+  } = useProductFilter({ products: products });
   const categoria = capitalize(segments[0] || '');
   const subcategoria = capitalize(segments[1] || '');
   const productcategoria = capitalize(segments[2] || '');
@@ -163,7 +176,7 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct,
             style={{ objectFit: 'cover' }}
           />
         </Box>
-
+        
         {/* Productos */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2,paddingX: 3, paddingY: 4, backgroundColor: 'white'}}>
           <Typography variant='h5' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
@@ -172,6 +185,20 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct,
           <Typography variant='h6' sx={{color: '#3f3f40ff', fontWeight: 'bold'}}>
             [{products.length}]
           </Typography>
+          
+        </Box>
+        <Box sx={{ width: '100%' }}>
+          <ProductFilter
+            filter={filter}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onFilterTypeChange={handleFilterTypeChange}
+            onPriceRangeChange={handlePriceRangeChange}
+            onSeasonChange={handleSeasonChange}
+            onBrandChange={handleBrandChange}
+            onCategoryChange={handleCategoryChange}
+            onClearFilters={clearFilters}
+          />
         </Box>
         {
           products.length === 0 ?
