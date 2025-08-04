@@ -6,8 +6,7 @@ export const SEASONS = [
     { value: 'primavera', label: 'Primavera' },
     { value: 'verano', label: 'Verano' },
     { value: 'otono', label: 'Otoño' },
-    { value: 'invierno', label: 'Invierno' },
-    { value: 'todo_el_ano', label: 'Todo el año' }
+    { value: 'invierno', label: 'Invierno' }
 ];
 
 export const STATIC_BRANDS = [
@@ -114,21 +113,23 @@ export const useProductFilter = ({
                 filtered.sort((a: IProduct, b: IProduct) => a.brand.name.localeCompare(b.brand.name));
                 break;
                 
-            case 'categoria':
+            case 'material':
                 if (filter.selectedCategory) {
                     filtered = filtered.filter((item: IProduct) => 
-                        item.category.name.toLowerCase().includes(filter.selectedCategory.toLowerCase())
+                        item.material.name.toLowerCase().includes(filter.selectedCategory.toLowerCase())
                     );
                 }
-                filtered.sort((a: IProduct, b: IProduct) => a.category.name.localeCompare(b.category.name));
+                filtered.sort((a: IProduct, b: IProduct) => a.material.name.localeCompare(b.material.name));
                 break;
                 
             case 'temporada':
                 if (filter.selectedSeason) {
                     filtered = filtered.filter((item: IProduct) => {
-                        // Si tienes un campo season en tu producto, descomenta la siguiente línea
-                        // return item.season?.toLowerCase() === filter.selectedSeason.toLowerCase();
-                        return true; // Por ahora devuelve todos
+                        // Si el producto no tiene temporada definida o está vacía, no se filtra
+                        if (!item.season || item.season === '') {
+                            return false;
+                        }
+                        return item.season.toLowerCase() === filter.selectedSeason.toLowerCase();
                     });
                 }
                 break;
@@ -236,7 +237,7 @@ export const useProductFilter = ({
             descriptions.push(`Temporada: ${seasonLabel}`);
         }
         if (filter.selectedCategory) {
-            descriptions.push(`Categoría: ${filter.selectedCategory}`);
+            descriptions.push(`Material: ${filter.selectedCategory}`);
         }
         return descriptions.join(' • ');
     }, [filter]);

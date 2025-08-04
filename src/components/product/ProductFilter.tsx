@@ -79,9 +79,8 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
 
     const filterButtons = [
         { key: 'precio', label: 'Precio' },
-        { key: 'talla', label: 'Talla' },
         { key: 'marca', label: 'Marca' },
-        { key: 'color', label: 'Color' },
+        { key: 'temporada', label: 'Temporada' },
         { key: 'material', label: 'Material' }
     ];
 
@@ -171,7 +170,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                     }
                                 }}
                             >
-                                <Typography sx={{ fontSize: '15px' }}>
+                                <Typography sx={{ fontSize: '15px', ":hover":{color:'primary.main'} }}>
                                     {brand.label}
                                 </Typography>
                             </Box>
@@ -191,114 +190,117 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                 }
                             }}
                         >
-                            <Typography sx={{ fontSize: '15px', fontStyle: 'italic', color: '#666' }}>
+                            <Typography sx={{ fontSize: '15px', fontStyle: 'italic', color: '#666', ":hover":{color:'primary.main'} }}>
                                 Todas las marcas
                             </Typography>
                         </Box>
                     </Box>
                 );
 
-            case 'talla':
-                const tallas = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+            case 'temporada':
                 return (
                     <Box sx={{ p: 2 }}>
                         <Typography variant="subtitle2" gutterBottom sx={{ color: '#333', fontWeight: 600, px: 1, pb: 1 }}>
-                            Seleccionar talla
+                            Seleccionar temporada
                         </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {tallas.map((talla) => (
-                                <Button
-                                    key={talla}
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{
-                                        minWidth: '40px',
-                                        height: '40px',
-                                        borderColor: '#e0e0e0',
-                                        color: '#000',
-                                        '&:hover': {
-                                            borderColor: '#000',
-                                            backgroundColor: '#f8f9fa'
-                                        }
-                                    }}
-                                >
-                                    {talla}
-                                </Button>
-                            ))}
-                        </Box>
-                    </Box>
-                );
-
-            case 'color':
-                const colores = [
-                    { name: 'Negro', value: '#000000' },
-                    { name: 'Blanco', value: '#ffffff' },
-                    { name: 'Azul', value: '#0066cc' },
-                    { name: 'Rojo', value: '#cc0000' },
-                    { name: 'Verde', value: '#009900' },
-                    { name: 'Amarillo', value: '#ffcc00' }
-                ];
-                return (
-                    <Box sx={{ p: 2 }}>
-                        <Typography variant="subtitle2" gutterBottom sx={{ color: '#333', fontWeight: 600, px: 1, pb: 1 }}>
-                            Seleccionar color
-                        </Typography>
-                        {colores.map((color) => (
+                        {SEASONS.map((season) => (
                             <Box
-                                key={color.name}
+                                key={season.value}
+                                onClick={() => {
+                                    onSeasonChange({ target: { value: season.value } });
+                                    handleMenuClose();
+                                }}
                                 sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 2,
                                     p: 2,
                                     cursor: 'pointer',
                                     borderRadius: '8px',
+                                    backgroundColor: filter.selectedSeason === season.value ? '#f5f5f5' : 'transparent',
                                     '&:hover': {
                                         backgroundColor: '#f8f9fa'
                                     }
                                 }}
                             >
-                                <Box 
-                                    sx={{ 
-                                        width: 20, 
-                                        height: 20, 
-                                        borderRadius: '50%',
-                                        backgroundColor: color.value,
-                                        border: color.name === 'Blanco' ? '1px solid #ddd' : 'none'
-                                    }} 
-                                />
-                                <Typography sx={{ fontSize: '15px' }}>
-                                    {color.name}
+                                <Typography sx={{ fontSize: '15px', ":hover":{color:'primary.main'} }}>
+                                    {season.label}
                                 </Typography>
                             </Box>
                         ))}
+                        <Divider sx={{ my: 1 }} />
+                        <Box
+                            onClick={() => {
+                                onSeasonChange({ target: { value: '' } });
+                                handleMenuClose();
+                            }}
+                            sx={{
+                                p: 2,
+                                cursor: 'pointer',
+                                borderRadius: '8px',
+                                '&:hover': {
+                                    backgroundColor: '#f8f9fa'
+                                }
+                            }}
+                        >
+                            <Typography sx={{ fontSize: '15px', fontStyle: 'italic', color: '#666', ":hover":{color:'primary.main'} }}>
+                                Todas las temporadas
+                            </Typography>
+                        </Box>
                     </Box>
                 );
 
             case 'material':
-                const materiales = ['Cuero', 'Sintético', 'Tela', 'Lona'];
+                // Extraer materiales únicos de los productos
+                const materials = Array.from(new Set(
+                    customCategories.length > 0 
+                        ? customCategories.map(cat => cat.label)
+                        : ['Cuero', 'Charol', 'Sintético', 'Tela', 'Lona'] // materiales por defecto
+                ));
+                
                 return (
                     <Box sx={{ p: 2 }}>
                         <Typography variant="subtitle2" gutterBottom sx={{ color: '#333', fontWeight: 600, px: 1, pb: 1 }}>
                             Seleccionar material
                         </Typography>
-                        {materiales.map((material) => (
+                        {materials.map((material) => (
                             <Box
                                 key={material}
+                                onClick={() => {
+                                    onCategoryChange({ target: { value: material } });
+                                    handleMenuClose();
+                                }}
                                 sx={{
                                     p: 2,
                                     cursor: 'pointer',
                                     borderRadius: '8px',
+                                    backgroundColor: filter.selectedCategory === material ? '#f5f5f5' : 'transparent',
                                     '&:hover': {
                                         backgroundColor: '#f8f9fa'
                                     }
                                 }}
                             >
-                                <Typography sx={{ fontSize: '15px' }}>
+                                <Typography sx={{ fontSize: '15px', ":hover":{color:'primary.main'} }}>
                                     {material}
                                 </Typography>
                             </Box>
                         ))}
+                        <Divider sx={{ my: 1 }} />
+                        <Box
+                            onClick={() => {
+                                onCategoryChange({ target: { value: '' } });
+                                handleMenuClose();
+                            }}
+                            sx={{
+                                p: 2,
+                                cursor: 'pointer',
+                                borderRadius: '8px',
+                                '&:hover': {
+                                    backgroundColor: '#f8f9fa'
+                                }
+                            }}
+                        >
+                            <Typography sx={{ fontSize: '15px', fontStyle: 'italic', color: '#666', ":hover":{color:'primary.main'} }}>
+                                Todos los materiales
+                            </Typography>
+                        </Box>
                     </Box>
                 );
 
@@ -316,7 +318,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
             py: 1,
             px: 4,
             position: 'relative',
-            borderRadius:2,
+            borderRadius: 2,
             zIndex: 1
         }}>
             {/* Primera fila - Botones de filtro */}
@@ -340,7 +342,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                     transition: 'transform 0.2s ease'
                                 }} />}
                                 sx={{
-                                    color: activeFilter === button.key ? '#000' : '#666',
+                                    color: activeFilter === button.key ? 'primary.main' : '#666',
                                     backgroundColor: activeFilter === button.key ? '#f0f0f0' : 'transparent',
                                     textTransform: 'none',
                                     fontSize: '15px',
@@ -351,7 +353,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                     borderRadius: '8px',
                                     '&:hover': {
                                         backgroundColor: '#f0f0f0',
-                                        color: '#000'
+                                        color: 'primary.main'
                                     },
                                     '& .MuiButton-endIcon': {
                                         marginLeft: '6px'
@@ -359,7 +361,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                 }}
                             >
                                 {button.label}
-                                {button.key === 'material' && (
+                                {button.key === 'material' && filter.selectedCategory && (
                                     <Box component="span" sx={{ 
                                         fontSize: '11px', 
                                         verticalAlign: 'super',
@@ -373,7 +375,6 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                         </Box>
                     ))}
                 </Box>
-
             </Box>
 
             {/* Contenido del filtro activo - se muestra debajo de los botones */}
@@ -406,6 +407,87 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                         <Chip
                             label={filter.selectedBrand}
                             onDelete={() => onBrandChange({ target: { value: '' } })}
+                            deleteIcon={<CloseIcon sx={{ fontSize: '18px !important' }} />}
+                            sx={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '20px',
+                                height: '36px',
+                                fontSize: '14px',
+                                px: 1,
+                                '& .MuiChip-label': {
+                                    px: 2
+                                },
+                                '& .MuiChip-deleteIcon': {
+                                    fontSize: '18px',
+                                    color: '#666',
+                                    ml: 1,
+                                    '&:hover': {
+                                        color: '#000'
+                                    }
+                                }
+                            }}
+                        />
+                    )}
+                    
+                    {filter.selectedSeason && (
+                        <Chip
+                            label={SEASONS.find(s => s.value === filter.selectedSeason)?.label || filter.selectedSeason}
+                            onDelete={() => onSeasonChange({ target: { value: '' } })}
+                            deleteIcon={<CloseIcon sx={{ fontSize: '18px !important' }} />}
+                            sx={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '20px',
+                                height: '36px',
+                                fontSize: '14px',
+                                px: 1,
+                                '& .MuiChip-label': {
+                                    px: 2
+                                },
+                                '& .MuiChip-deleteIcon': {
+                                    fontSize: '18px',
+                                    color: '#666',
+                                    ml: 1,
+                                    '&:hover': {
+                                        color: '#000'
+                                    }
+                                }
+                            }}
+                        />
+                    )}
+
+                    {filter.selectedCategory && (
+                        <Chip
+                            label={filter.selectedCategory}
+                            onDelete={() => onCategoryChange({ target: { value: '' } })}
+                            deleteIcon={<CloseIcon sx={{ fontSize: '18px !important' }} />}
+                            sx={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '20px',
+                                height: '36px',
+                                fontSize: '14px',
+                                px: 1,
+                                '& .MuiChip-label': {
+                                    px: 2
+                                },
+                                '& .MuiChip-deleteIcon': {
+                                    fontSize: '18px',
+                                    color: '#666',
+                                    ml: 1,
+                                    '&:hover': {
+                                        color: '#000'
+                                    }
+                                }
+                            }}
+                        />
+                    )}
+
+                    {(filter.priceRange[0] !== minPrice || filter.priceRange[1] !== maxPrice) && (
+                        <Chip
+                            label={`S/ ${filter.priceRange[0]} - S/ ${filter.priceRange[1]}`}
+                            onDelete={() => onPriceRangeChange({} as Event, [minPrice, maxPrice])}
                             deleteIcon={<CloseIcon sx={{ fontSize: '18px !important' }} />}
                             sx={{
                                 backgroundColor: 'white',
@@ -464,10 +546,10 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                 borderBottom: '1px solid #e0e0e0',
                 py: 1,
                 px: 3,
-                borderRadius:2,
+                borderRadius: 2,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent:'center'
+                justifyContent: 'center'
             }}>
                 <Button
                     startIcon={<FilterListIcon />}
@@ -562,7 +644,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                 }}
                             >
                                 {button.label}
-                                {button.key === 'material' && (
+                                {button.key === 'material' && filter.selectedCategory && (
                                     <Box component="span" sx={{ 
                                         fontSize: '12px',
                                         ml: 1,
@@ -586,6 +668,28 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                     <Chip
                                         label={filter.selectedBrand}
                                         onDelete={() => onBrandChange({ target: { value: '' } })}
+                                        sx={{
+                                            height: '36px',
+                                            fontSize: '14px',
+                                            borderRadius: '18px'
+                                        }}
+                                    />
+                                )}
+                                {filter.selectedSeason && (
+                                    <Chip
+                                        label={SEASONS.find(s => s.value === filter.selectedSeason)?.label || filter.selectedSeason}
+                                        onDelete={() => onSeasonChange({ target: { value: '' } })}
+                                        sx={{
+                                            height: '36px',
+                                            fontSize: '14px',
+                                            borderRadius: '18px'
+                                        }}
+                                    />
+                                )}
+                                {filter.selectedCategory && (
+                                    <Chip
+                                        label={filter.selectedCategory}
+                                        onDelete={() => onCategoryChange({ target: { value: '' } })}
                                         sx={{
                                             height: '36px',
                                             fontSize: '14px',

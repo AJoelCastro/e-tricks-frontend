@@ -281,7 +281,7 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
           products.length === 0 ? 
             <NoProductsFound/>:
           (
-            <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
+            <Grid container spacing={1} sx={{paddingX: 2, paddingBottom: 4, paddingTop: 2}} >
               {
                 filteredProducts.map((product: IProduct) => (
                   <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
