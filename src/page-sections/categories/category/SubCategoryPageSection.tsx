@@ -23,6 +23,7 @@ import BrandService from '@/services/BrandService';
 import { IBrandWithCategories } from '@/interfaces/Brand';
 import ProductFilter from '@/components/product/ProductFilter';
 import { useProductFilter } from '@/hooks/useProductFilter';
+import WhatsAppFloat from '@/components/whatsapp/WhatsAppFloat';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -302,6 +303,7 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
           )
         }
       </Box>
+      <WhatsAppFloat />
       <FooterComponent/>
     </>
   )

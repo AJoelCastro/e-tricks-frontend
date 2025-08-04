@@ -239,31 +239,39 @@ const SidebarCategory = ({
                       {mobileActiveGroup.routeLink === 'marcas'
                         ? brandsWithCategories.map(({ brand }) => (
                             <li key={brand._id}>
-                              <button
-                                onClick={() => {
-                                  setSelectedBrandId(brand._id);
-                                  setShowCategories(true);
-                                }}
-                                className="w-full p-3 text-gray-800 hover:bg-gray-100 rounded-lg"
-                              >
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1}}>
-                                  <Typography variant="priceDetail" sx={{fontWeight: 'bold'}}>{brand.name}</Typography>
-                                  <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                              
+                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1, padding:2}}>
+                                  <Link href={`/${mobileActiveGroup.routeLink}/${brand.name.toLowerCase()}`}>
+                                    <Typography variant="priceDetail" sx={{fontWeight: 'bold', ":hover": {color: '#7950f2'}}}>{brand.name}</Typography>
+                                  </Link>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedBrandId(brand._id);
+                                      setShowCategories(true);
+                                    }}
+                                    className="text-gray-800 hover:bg-gray-100 rounded-lg"
+                                  >
+                                    <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                                  </button>
                                 </Box>
-                              </button>
                             </li>
                           ))
                         : allSubcategories.map((subcategory) => (
                             <li key={subcategory._id}>
-                              <button
-                                onClick={() => handleMobileSubcategoryClick(subcategory)}
-                                className="w-full p-3 text-gray-800 hover:bg-gray-100 rounded-lg"
-                              >
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1}}>
-                                  <Typography variant="priceDetail" sx={{fontWeight: 'bold'}}>{subcategory.name}</Typography>
-                                  <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                              
+                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap:1, padding:2}}>
+                                  <Link href={`/${mobileActiveGroup.routeLink}/${subcategory.routeLink}`}>
+                                    <Typography variant="priceDetail" sx={{fontWeight: 'bold', ":hover": {color: '#7950f2'}}}>
+                                      {subcategory.name}
+                                    </Typography>
+                                  </Link>
+                                  <button
+                                    onClick={() => handleMobileSubcategoryClick(subcategory)}
+                                    className="text-gray-800 hover:bg-gray-100 rounded-lg"
+                                  >
+                                    <ArrowForwardIcon sx={{fontWeight: 'extrabold'}}/>
+                                  </button>
                                 </Box>
-                              </button>
                             </li>
                           ))}
                     </ul>
@@ -337,7 +345,7 @@ const SidebarCategory = ({
                     <ul className="space-y-2">
                       {selectedSubCategory.productcategories.map((cat, i) => (
                         <li key={cat._id || i}>
-                          <Link href={`/${activeGroup.routeLink}/${selectedSubCategory.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
+                          <Link href={`/${mobileActiveGroup.routeLink}/${allSubcategories.find(s => s._id === selectedSubCategory._id)?.routeLink}/${cat.routeLink}`} onClick={onClose} className="block p-3 rounded-lg border border-gray-200">
                             <Typography variant="productCategory" sx={{ color: '#2b2a2aff', ":hover": { color: "#7950f2" } }}>
                               {cat.name}
                             </Typography>

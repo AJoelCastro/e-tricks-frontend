@@ -24,6 +24,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { CheckCircle } from 'lucide-react';
 import NavbarComponent from '@/components/principal/NavbarComponent';
 import FooterComponent from '@/components/principal/FooterComponent';
+import WhatsAppFloat from '@/components/whatsapp/WhatsAppFloat';
 type Props = {
     id: string;
 };
@@ -908,6 +909,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <WhatsAppFloat />
             <FooterComponent/>
         </>
     )

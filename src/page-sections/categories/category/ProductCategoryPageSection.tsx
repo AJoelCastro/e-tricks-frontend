@@ -17,6 +17,7 @@ import { useProductLogic } from '@/hooks/useProductLogic';
 import { useAuth } from '@clerk/nextjs';
 import ProductFilter from '@/components/product/ProductFilter';
 import { useProductFilter } from '@/hooks/useProductFilter';
+import WhatsAppFloat from '@/components/whatsapp/WhatsAppFloat';
 
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -225,6 +226,7 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct,
           )
         }
       </Box>
+      <WhatsAppFloat />
       <FooterComponent/>
     </>
   )
