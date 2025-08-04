@@ -21,6 +21,8 @@ import { useProductLogic } from '@/hooks/useProductLogic';
 import { useAuth } from '@clerk/nextjs';
 import BrandService from '@/services/BrandService';
 import { IBrandWithCategories } from '@/interfaces/Brand';
+import ProductFilter from '@/components/product/ProductFilter';
+import { useProductFilter } from '@/hooks/useProductFilter';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -40,7 +42,19 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
   const segments = pathname.split('/').filter(Boolean);
   const dispatch = useDispatch();
   const { isSignedIn } = useAuth();
-  
+
+  const {
+      filter,
+      filteredProducts,
+      minPrice,
+      maxPrice,
+      handleFilterTypeChange,
+      handlePriceRangeChange,
+      handleSeasonChange,
+      handleBrandChange,
+      handleCategoryChange,
+      clearFilters,
+    } = useProductFilter({ products: products });
   // Hook para la lógica de productos
   const {
     favoriteIds,
@@ -250,14 +264,26 @@ const SubCategoryPageSection: React.FC<Props> = ({groupId, subId, marcaId, women
             }
           </Box>
         </Box>
-        
+        <Box sx={{ width: '100%' }}>
+          <ProductFilter
+            filter={filter}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onFilterTypeChange={handleFilterTypeChange}
+            onPriceRangeChange={handlePriceRangeChange}
+            onSeasonChange={handleSeasonChange}
+            onBrandChange={handleBrandChange}
+            onCategoryChange={handleCategoryChange}
+            onClearFilters={clearFilters}
+          />
+        </Box>
         {
           products.length === 0 ? 
             <NoProductsFound/>:
           (
             <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
               {
-                products.map((product: IProduct) => (
+                filteredProducts.map((product: IProduct) => (
                   <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
                     <ProductCard 
                       products={product} 

@@ -206,7 +206,7 @@ const ProductCategoryPageSection: React.FC<Props> = ({idGroup, idSub, idProduct,
           (
             <Grid container spacing={1} sx={{paddingX: 2, paddingY: 4}} >
               {
-                products.map((product: IProduct) => (
+                filteredProducts.map((product: IProduct) => (
                   <Grid key={product._id} size={{xs:12, sm:6, md:3}}>
                     <ProductCard
                       products={product}
