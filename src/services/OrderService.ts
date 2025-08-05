@@ -154,6 +154,20 @@ const OrderService = {
         }
     },
 
+    getOrderByNumber: async (token: string, oNumber: string) => {
+        try {
+            const response = await axios.get(`${API_URL}/order/${oNumber}/onumber`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+            throw error;
+        }
+    },
+
     /**
      * Obtener todas las órdenes de un usuario
      */
