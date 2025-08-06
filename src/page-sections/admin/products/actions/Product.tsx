@@ -52,7 +52,7 @@ const MenuProps = {
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const categories = ['Camisetas', 'Pantalones', 'Vestidos', 'Zapatos', 'Accesorios'];
 
-const ProductsPanel = () => {
+const Product = () => {
   const [loading, setLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -407,4 +407,4 @@ const ProductsPanel = () => {
   );
 };
 
-export default ProductsPanel;
+export default Product;
