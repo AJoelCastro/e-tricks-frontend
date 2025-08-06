@@ -17,16 +17,11 @@ const RightSide = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [favorites, setFavorites] = useState<IProduct[]>([]);
     const { getToken } = useAuth();
-    
     const {
-        favoriteIds,
-        cartItems,
-        loading,
         cartNotificationOpen,
         lastAddedProduct,
         notification,
         closeNotification,
-        handleAddFavorite,
         handleRemoveFavorite,
         handleAddToCart,
         handleRemoveFromCart,

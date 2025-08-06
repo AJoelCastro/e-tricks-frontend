@@ -1,12 +1,19 @@
+import FooterComponent from '@/components/principal/FooterComponent'
+import NavbarComponent from '@/components/principal/NavbarComponent'
 import { Box } from '@mui/material'
 import React from 'react'
 
-const MainAdmin = () => {
+const MainAdminPageSection = () => {
   return (
-    <Box>
-      
-    </Box>
+    <>
+      <NavbarComponent/>
+      <Box sx={{height: '64px'}}/>
+      <Box minHeight={'100vh'} >
+
+      </Box>
+      <FooterComponent/>
+    </>
   )
 }
 
-export default MainAdmin
+export default MainAdminPageSection
