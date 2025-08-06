@@ -1,10 +1,10 @@
 'use client';
 import React, { useState } from 'react';
 import {Box} from '@mui/material';
-import Product from './Product';
 import { useRouter } from 'next/navigation';
 import ProductForm from './Product';
 import { IProduct } from '@/interfaces/Product';
+import NavbarComponent from '@/components/principal/NavbarComponent';
 
 const ProductRegisterPageSection = () => {
   const router = useRouter();
@@ -18,6 +18,7 @@ const ProductRegisterPageSection = () => {
   };
   return (
     <>
+      <NavbarComponent/>
       <ProductForm onSuccess={handleSuccess} onCancel={handleCancel} />
     </>
   );

@@ -96,6 +96,7 @@ const MainProductsPageSection = () => {
 
   const handleEditClick = (product: IProduct) => {
     // Aquí implementarías la lógica de edición
+    router.push(`/admin/productos/editar/${product._id}`);
     handleMenuClose();
   };
 

@@ -1,13 +1,10 @@
-'use client';
-import { usePathname } from 'next/navigation'
+import ProductEditPageSection from '@/page-sections/admin/products/actions/ProductEdit'
 import React from 'react'
 
 const EditarProductoPage = () => {
-    const pathname = usePathname();
-    console.log('paht', pathname)
     return (
         <>
-        
+            <ProductEditPageSection/>
         </>
     )
 }
