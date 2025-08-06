@@ -40,6 +40,7 @@ import {
   FiberNew as NewIcon,
   MoreVert as MoreVertIcon
 } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
 const MainProductsPageSection = () => {
   const [products, setProducts] = useState<Array<IProduct>>([]);
@@ -49,6 +50,7 @@ const MainProductsPageSection = () => {
   const [viewDialog, setViewDialog] = useState({ open: false, product: null as IProduct | null });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const router = useRouter();
 
   const getProducts = async () => {
     try {
@@ -94,7 +96,6 @@ const MainProductsPageSection = () => {
 
   const handleEditClick = (product: IProduct) => {
     // Aquí implementarías la lógica de edición
-    console.log('Editar producto:', product);
     handleMenuClose();
   };
 
@@ -154,7 +155,7 @@ const MainProductsPageSection = () => {
                     InputProps={{
                     startAdornment: (
                         <InputAdornment position="start">
-                        <SearchIcon />
+                            <SearchIcon />
                         </InputAdornment>
                     ),
                     }}
@@ -163,7 +164,7 @@ const MainProductsPageSection = () => {
                 <Fab
                     color="primary"
                     aria-label="add"
-                    onClick={() => console.log('Crear nuevo producto')}
+                    onClick={() => router.push('/admin/productos/crear')}
                 >
                     <AddIcon />
                 </Fab>

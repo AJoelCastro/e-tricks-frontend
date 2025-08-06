@@ -13,6 +13,7 @@ const ProductService = {
             throw error;
         }
     },
+
     GetProductById : async (id : string) => {
         try {
             const response = await axios.get(`${API_URL}/product/${id}/get`);
@@ -46,6 +47,28 @@ const ProductService = {
             return response.data;
         } catch (error) {
             console.error(error);
+            throw error;
+        }
+    },
+
+    UpdateProduct : async (token: string, id: string, productData: Partial<IProduct>) => {
+        if (!token) {
+            throw new Error('No hay token de autenticación');
+        }
+
+        if (!id) {
+            throw new Error('ID del producto es requerido');
+        }
+
+        try {
+            const response = await axios.put(`${API_URL}/product/${id}/update`, productData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data;
+        } catch (error) {
             throw error;
         }
     },

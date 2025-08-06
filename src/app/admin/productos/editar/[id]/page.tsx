@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-const AccionProductoPage = () => {
+const EditarProductoPage = () => {
     const pathname = usePathname();
     console.log('paht', pathname)
     return (
@@ -12,4 +12,4 @@ const AccionProductoPage = () => {
     )
 }
 
-export default AccionProductoPage
+export default EditarProductoPage
