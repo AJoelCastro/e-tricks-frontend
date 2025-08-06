@@ -19,7 +19,7 @@ export default function AuthTokenHandler({ children }: { children: React.ReactNo
         if (isSignedIn && user) {
           const token = await getToken();
           if (token) {
-            dispatch(setAuth({ userId: user.id }));
+            dispatch(setAuth({ userId: user.id, isAdmin: user.publicMetadata.role === 'admin' }));
             await UserService.verifyUser(token, user.id);
             setReady(true);
           }

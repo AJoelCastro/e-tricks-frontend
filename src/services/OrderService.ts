@@ -189,6 +189,10 @@ const OrderService = {
         }
     },
 
+    getAllOrders: async (token: string) => {
+        
+    },
+
     /**
      * Cancelar una orden
      */
