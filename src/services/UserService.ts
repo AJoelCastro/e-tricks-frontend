@@ -1,6 +1,7 @@
 import { store } from '@/store';
 import axios from 'axios';
 import { IAddress } from '@/interfaces/Address';
+import { ca } from 'date-fns/locale';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -170,6 +171,28 @@ const UserService = {
             return response.data;
         } catch (error) {
             console.error('Error in removeCartItem:', error);
+            throw error;
+        }
+    },
+
+    updateQuantityCartItem: async (token: string, idCartItem: string, quantity: number) => {
+        const { userId} = store.getState().auth;
+
+        if (!userId || !token) {
+            throw new Error('Faltan credenciales del usuario');
+        }
+
+        try {
+            const response = await axios.put(`${API_URL}/user/updateQuantityCartItem/${userId}`, {
+                idCartItem,
+                quantity
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        }catch (error) {
             throw error;
         }
     },

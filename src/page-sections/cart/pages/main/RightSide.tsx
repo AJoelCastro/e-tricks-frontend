@@ -14,6 +14,8 @@ import ErrorNotification from '@/components/ErrorNotification';
 import { useProductLogic } from '@/hooks/useProductLogic';
 import { useCart } from '../../CartContext';
 import ProtectionConsumer from '@/components/cart/ProtectionConsumer';
+import UserService from '@/services/UserService';
+import { useAuth } from '@clerk/nextjs';
 
 const RightSideCart = () => {
     const {
@@ -42,6 +44,7 @@ const RightSideCart = () => {
     
     const router = useRouter();
     const pathname = usePathname();
+    const { getToken } = useAuth();
     const open = Boolean(menuAnchor.anchor);
 
     const handleClickListItem = (event: React.MouseEvent<HTMLElement>, itemId: string) => {
@@ -74,8 +77,16 @@ const RightSideCart = () => {
         }
     };
 
-    const handleChangeQuantity = (index: number, newQuantity: number) => {
+    const handleChangeQuantity = async(index: number, newQuantity: number, productId: string) => {
         if (newQuantity < 1 || newQuantity > 12) return;
+
+        try {
+            const token = await getToken();
+            const quantityUpdated = await UserService.updateQuantityCartItem(token as string, productId, newQuantity);
+            console.log(quantityUpdated);
+        } catch (error) {
+            throw error
+        }
 
         setCarrito(prev => {
             const updated = [...prev];
@@ -213,7 +224,7 @@ const RightSideCart = () => {
                                                     <Button
                                                         size="small"
                                                         sx={{ minWidth: 0, padding: '4px 8px' }}
-                                                        onClick={() => handleChangeQuantity(index, item.quantity - 1)}
+                                                        onClick={() => handleChangeQuantity(index, item.quantity - 1, item._id)}
                                                     >
                                                         -
                                                     </Button>
@@ -223,7 +234,7 @@ const RightSideCart = () => {
                                                     <Button
                                                         size="small"
                                                         sx={{ minWidth: 0, padding: '2px 8px' }}
-                                                        onClick={() => handleChangeQuantity(index, item.quantity + 1)}
+                                                        onClick={() => handleChangeQuantity(index, item.quantity + 1, item._id)}
                                                     >
                                                         +
                                                     </Button>
