@@ -1,8 +1,7 @@
 export interface ICreateOrderData {
     userId: string;
-    addressId: string ;
+    addressId: string;
     couponCode?: string;
-     
 }
 
 export interface ICreatePreferenceResponse {
@@ -13,7 +12,6 @@ export interface ICreatePreferenceResponse {
         sandbox_init_point: string;
     };
 }
-
 
 export interface ICreateOrderResponse {
     success: boolean;
@@ -39,7 +37,6 @@ export interface ICreateOrderResponse {
             status: string;
             paymentStatus: string;
             paymentId?: string;
-
         }
     };
 }
@@ -49,44 +46,111 @@ export interface IConfirmPaymentData {
     paymentId: string;
 }
 
+// INTERFACES ACTUALIZADAS SEGÚN TU JSON:
+
+export interface IProductDetails {
+    _id: string;
+    name: string;
+    description: string;
+    price: number;
+    stockPorTalla: Array<{
+        talla: number;
+        stock: number;
+    }>;
+    material: string;
+    category: string;
+    subCategory: string;
+    groupCategory: string;
+    images: string[];
+    descuento: number;
+    caracteristicas: Array<{
+        nombre: string;
+        valor: string;
+    }>;
+    brand: string;
+    resenias: any[];
+    isNewProduct: boolean;
+    isTrending: boolean;
+    season: string;
+    createdAt: string;
+    __v: number;
+}
+
 export interface IOrderItem {
-    _id:string;
-    productId: string;
+    _id: string;
+    productId: IProductDetails; // Cambiado: ahora es el objeto completo del producto
     name: string;
     price: number;
     quantity: number;
     size: number;
-    image:string;
+    image: string;
     itemStatus: string;
 }
 
-export interface IOrder extends Document {
+// Nueva interface para detalles de pago
+export interface IPaymentDetails {
+    status_detail: string;
+    transaction_amount: number;
+    currency_id: string;
+    payment_method_id: string;
+    payment_type_id: string;
+    processed_at: string;
+}
+
+// Nueva interface para metadata
+export interface IOrderMetadata {
+    stockReserved: boolean;
+    reservedAt: string;
+    stockConfirmed: boolean;
+    confirmedAt: string;
+    paymentConfirmed: boolean;
+}
+
+export interface IOrder {
     _id: string;
     userId: string;
     orderNumber: string;
     items: IOrderItem[];
-    subtotalAmount: number; 
-    totalAmount: number;
+    totalAmount: number; 
     discountAmount?: number; 
     couponCode?: string;
     addressId: string;
-    status: string;
-    orderType: string;
-    paymentId?: string; 
-    paymentStatus: string;
+    status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed';
+    orderType: 'standard' | 'pickup';
+    paymentId?: string;
+    paymentStatus: 'pending' | 'approved' | 'authorized' | 'in_process' | 'in_mediation' | 'rejected' | 'cancelled' | 'refunded';
     paymentMethod: string;
-    deliveryStatus?: string;
-    preferenceId?: string; 
+    deliveryStatus: 'pending' | 'shipped' | 'delivered' | 'returned';
+    preferenceId?: string;
     preferenceCreatedAt?: Date;
-    createdAt: Date;
-    updatedAt: Date;
+    confirmedAt?: Date;
+    failedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+    
+    // Campos opcionales según el esquema:
+    paymentDetails?: IPaymentDetails;
+    metadata?: IOrderMetadata;
+}
+
+// Interface para actualizaciones de orden
+export interface IUpdateOrderData {
+    status?: IOrder['status'];
+    paymentStatus?: IOrder['paymentStatus'];
+    deliveryStatus?: IOrder['deliveryStatus'];
+    paymentMethod?: string;
+}
+
+// Interface para actualizaciones de items
+export interface IUpdateOrderItemData {
+    itemStatus: 'pending' | 'shipped' | 'delivered' | 'cancelled' | 'return_requested' | 'returned' | 'refunded';
 }
 
 export interface ICreatePreferenceData {
     userId: string;
-    addressId: string ;
+    addressId: string;
     couponCode?: string; 
-    orderType:string;
+    orderType: string;
 }
 
 export interface IRequestRefundData {
@@ -110,4 +174,3 @@ export interface IRefundableItemsResponse {
     data: IOrder;
     refundableCount: number;
 }
-

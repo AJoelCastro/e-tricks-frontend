@@ -433,7 +433,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Pedido efectuado el:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.createdAt ? formatDate(order.createdAt) : ''}
+                                                    {order.createdAt ? formatDate(new Date(order.createdAt)) : ''}
                                                 </Typography>
                                             </Box>
                                         }
@@ -523,7 +523,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Envío completado en:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.deliveryStatus === 'delivered' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                    {order.deliveryStatus === 'delivered' ? formatDate(new Date(order.updatedAt)) : 'En proceso'}
                                                 </Typography>
                                             </Box>
                                         }
@@ -538,7 +538,7 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
                                                     Pedido completado en:
                                                 </Typography>
                                                 <Typography variant="body1" sx={{ fontWeight: '600' }}>
-                                                    {order.status === 'completed' ? formatDate(order.updatedAt) : 'En proceso'}
+                                                    {order.status === 'completed' ? formatDate(new Date(order.updatedAt)) : 'En proceso'}
                                                 </Typography>
                                             </Box>
                                         }

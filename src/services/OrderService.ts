@@ -1,6 +1,7 @@
 import { IConfirmPaymentData, ICreateOrderData, ICreateOrderResponse, ICreatePreferenceData, ICreatePreferenceResponse } from '@/interfaces/Order';
 import axios from 'axios';
 import { store } from '@/store';
+import { tr } from 'date-fns/locale';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -190,7 +191,16 @@ const OrderService = {
     },
 
     getAllOrders: async (token: string) => {
-        
+        try {
+            const response = await axios.get(`${API_URL}/order/getAll`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            return response.data
+        }catch (error) {
+            throw error
+        }
     },
 
     /**
