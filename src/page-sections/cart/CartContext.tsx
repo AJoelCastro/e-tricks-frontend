@@ -98,46 +98,48 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [getPickUps]);
 
   // Función para determinar qué datos cargar según la ruta
-const loadDataByRoute = useCallback(async () => {
-  if (!pathname) return;
+  const loadDataByRoute = useCallback(async () => {
+    if (!pathname) return;
 
-  // Rutas que necesitan carrito (comparación exacta o prefijo)
-  const needsCart = [
-    '/carrito',          // Exact match
-    '/carrito/delivery', // Exact match
-    '/carrito/pagos'     // Exact match
-  ].some(route => pathname === route);
+    // Rutas que necesitan carrito (comparación exacta o prefijo)
+    const needsCart = [
+      '/carrito',          // Exact match
+      '/carrito/delivery', // Exact match
+      '/carrito/pagos'     // Exact match
+    ].some(route => pathname === route);
 
-  // Rutas que necesitan direcciones
-  const needsAddress = [
-    '/carrito/delivery', // Exact match
-    '/carrito/pagos',    // Exact match
-    '/direcciones',      // Exact match
-    '/compras/'          // Dynamic route prefix
-  ].some(route => 
-    route.endsWith('/') 
-      ? pathname.startsWith(route) 
-      : pathname === route
-  );
+    // Rutas que necesitan direcciones
+    const needsAddress = [
+      '/carrito/delivery', // Exact match
+      '/carrito/pagos',    // Exact match
+      '/direcciones',      // Exact match
+      '/compras/',          // Dynamic route prefix
+      '/admin/ordenes/detalle/'
+    ].some(route => 
+      route.endsWith('/') 
+        ? pathname.startsWith(route) 
+        : pathname === route
+    );
 
-  // Rutas que necesitan puntos de recojo
-  const needsPickup = [
-    '/carrito/delivery', // Exact match
-    '/carrito/pagos',    // Exact match
-    '/compras/'          // Dynamic route prefix
-  ].some(route => 
-    route.endsWith('/') 
-      ? pathname.startsWith(route) 
-      : pathname === route
-  );
+    // Rutas que necesitan puntos de recojo
+    const needsPickup = [
+      '/carrito/delivery', // Exact match
+      '/carrito/pagos',    // Exact match
+      '/compras/',          // Dynamic route prefix
+      '/admin/ordenes/detalle/'
+    ].some(route => 
+      route.endsWith('/') 
+        ? pathname.startsWith(route) 
+        : pathname === route
+    );
 
-  // Carga condicional en paralelo para mejor performance
-  await Promise.all([
-    needsCart && getCartItems(),
-    needsAddress && getAddresses(),
-    needsPickup && getPickUps()
-  ]);
-}, [pathname, getCartItems, getAddresses, getPickUps]);
+    // Carga condicional en paralelo para mejor performance
+    await Promise.all([
+      needsCart && getCartItems(),
+      needsAddress && getAddresses(),
+      needsPickup && getPickUps()
+    ]);
+  }, [pathname, getCartItems, getAddresses, getPickUps]);
 
 // Efecto que se ejecuta cuando cambia la ruta
 useEffect(() => {

@@ -36,7 +36,7 @@ type Props = {
     id: string;
 };
 
-const OrderDetailPage: React.FC<Props> = ({ id }) => {
+const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
     const router = useRouter();
     const { getToken } = useAuth();
     const {
@@ -816,4 +816,4 @@ const OrderDetailPage: React.FC<Props> = ({ id }) => {
     );
 };
 
-export default OrderDetailPage; 
+export default OrderDetailPageAdmin; 
