@@ -16,6 +16,7 @@ import { IBrandWithCategories } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { store } from '@/store';
+import { AdminPanelSettings, AdminPanelSettingsOutlined } from '@mui/icons-material';
 
 type Props = {
   main?: boolean;
@@ -355,6 +356,17 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
                           <Heart className="text-gray-700" size={20} />
                           <span className="text-sm text-gray-700">Favoritos</span>
                         </Link>
+                        {/* ADMIN */}
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            className="block p-3 flex items-center space-x-3 hover:bg-gray-50 transition-colors"
+                            onClick={() => setIsFabOpen(false)}
+                          >
+                            <AdminPanelSettingsOutlined fontSize='medium'/>
+                            <span className="text-sm text-gray-700">Admin</span>
+                          </Link>
+                        )}
                       </motion.div>
                     </>
                   )}
