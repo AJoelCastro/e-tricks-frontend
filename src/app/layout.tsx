@@ -69,9 +69,7 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   
-  // Manifest
-  manifest: '/manifest.json',
-  
+
   // Otros
   alternates: {
     canonical: 'https://tricks.pe',
@@ -80,6 +78,30 @@ export const metadata: Metadata = {
   // Verificación de redes sociales
   verification: {
     // google: 'tu-codigo-de-google-search-console',
+  },
+  other: {
+    // Meta tags para redes sociales
+    'social:instagram': 'https://www.instagram.com/calzadostricks',
+    'social:tiktok': 'https://www.tiktok.com/@tricks.calzados',
+    
+    'business:contact_data:street_address': 'Av España 1050',
+    'business:contact_data:locality': 'Trujillo',
+    'business:contact_data:region': 'La Libertad',
+    'business:contact_data:country_name': 'Peru',
+    'business:contact_data:phone_number': '+51-954-236-150',
+    
+    'breadcrumb': 'Inicio > Calzados para Mujer',
+    
+    // Información adicional de la tienda
+    'store:category': 'Calzados y Accesorios',
+    'store:payment_methods': 'Visa, Mastercard, Efectivo',
+    'store:shipping': 'Envío gratuito a partir de S/150',
+    
+    // Para mejor indexación
+    'theme-color': '#000000',
+    'msapplication-TileColor': '#000000',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
   }
 }
 export default function RootLayout({ children }: { children: React.ReactNode }) {
