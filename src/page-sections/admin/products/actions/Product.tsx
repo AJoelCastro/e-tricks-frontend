@@ -101,7 +101,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     handleSubmit,
     reset,
     setValue,
-    watch,
+    // watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
