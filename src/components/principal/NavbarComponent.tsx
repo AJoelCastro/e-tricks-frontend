@@ -16,7 +16,7 @@ import { IBrandWithCategories } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { store } from '@/store';
-import { AdminPanelSettings, AdminPanelSettingsOutlined } from '@mui/icons-material';
+import {  AdminPanelSettingsOutlined } from '@mui/icons-material';
 
 type Props = {
   main?: boolean;
