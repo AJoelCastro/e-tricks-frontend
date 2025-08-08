@@ -1,3 +1,5 @@
+import { IAddress } from "./Address";
+
 export interface ICreateOrderData {
     userId: string;
     addressId: string;
@@ -115,6 +117,7 @@ export interface IOrder {
     discountAmount?: number; 
     couponCode?: string;
     addressId: string;
+    address: IAddress;
     status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'payment_failed';
     orderType: 'standard' | 'pickup';
     paymentId?: string;

@@ -2,7 +2,7 @@
 import React from 'react'
 import { useParams, useRouter } from 'next/navigation';
 import NavbarComponent from '@/components/principal/NavbarComponent';
-import OrderDetailPageAdmin from '@/page-sections/order/detail/Main';
+import OrderDetailPageAdmin from './detail/Main';
 
 const OrderDetailPageSection = () => {
   const router = useRouter();

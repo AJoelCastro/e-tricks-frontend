@@ -46,12 +46,10 @@ const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
         showSuccess,
     } = useProductLogic();
     const {
-        addresses,
         pickUps,
     } = useCart();
 
     const [order, setOrder] = useState<IOrder | null>(null);
-    const [address, setAddress] = useState<IAddress | null>(null);
     const [pickupLocation, setPickupLocation] = useState<IPickUp | null>(null);
     const [loading, setLoading] = useState(true);
     const [dataLoaded, setDataLoaded] = useState(false);
@@ -82,18 +80,14 @@ const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
             if (response.data.orderType === 'pickup') {
                 const pickup = pickUps.find(pickup => pickup._id === response.data.addressId);
                 setPickupLocation(pickup || null);
-            } else {
-                const addr = addresses.find(address => address._id === response.data.addressId);
-                setAddress(addr || null);
             }
-
             setDataLoaded(true);
         } catch (error) {
             showError('Error al cargar los detalles de la orden');
         } finally {
             setLoading(false);
         }
-    }, [id, getToken, pickUps, addresses, dataLoaded, showError]);
+    }, [id, getToken, pickUps, dataLoaded, showError]);
 
     // Función para abrir el modal de reembolso
     const openRefundModal = (itemId: string, itemName: string) => {
@@ -180,7 +174,7 @@ const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
     // Componente de dirección optimizado
     const AddressComponent = React.memo(() => {
         if (!order) return null;
-
+        console.log('order', order)
         if (order.orderType === 'pickup') {
             return (
                 <Box sx={{ mb: 2 }}>
@@ -199,13 +193,13 @@ const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
             return (
                 <Box sx={{ mb: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: '600', mb: 0.5 }}>
-                        {address?.name} - {address?.phone}
+                        {order.address?.name} - {order.address?.phone}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {address?.street}
+                        {order.address?.street}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {address?.state}, {address?.city}, {address?.country}, {address?.zipCode}
+                        {order.address?.state}, {order.address?.city}, {order.address?.country}, {order.address?.zipCode}
                     </Typography>
                 </Box>
             );
@@ -225,7 +219,6 @@ const OrderDetailPageAdmin: React.FC<Props> = ({ id }) => {
     useEffect(() => {
         setDataLoaded(false);
         setOrder(null);
-        setAddress(null);
         setPickupLocation(null);
     }, [id]);
 
