@@ -8,13 +8,18 @@ import { esES } from '@clerk/localizations';
 import Script from 'next/script'; // 👈 importa Script
 import { GA_MEASUREMENT_ID } from '@/lib/gtag'; // 👈 importa tu ID
 
+// SEO NEXT
+import { DefaultSeo } from 'next-seo'
+import SEO from '../../next-seo.config'
+import OrganizationSchema from '@/components/OrganizationSchema'
+
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Tricks Peru | Calzados y accesorios para mujer',
-  description: 'Calzados y accesorios para mujer',
-}
+// export const metadata: Metadata = {
+//   title: 'Tricks Peru | Calzados y accesorios para mujer',
+//   description: 'Calzados y accesorios para mujer',
+// }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -41,6 +46,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+          <DefaultSeo {...SEO} />
+          <OrganizationSchema />
           <Providers>{children}</Providers>
         </body>
       </html>

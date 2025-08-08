@@ -3,6 +3,7 @@ import React from 'react'
 import { useParams, useRouter } from 'next/navigation';
 import NavbarComponent from '@/components/principal/NavbarComponent';
 import OrderEditStatusPageSection from '@/page-sections/admin/orders/actions/edit/Main';
+import { Box } from '@mui/material';
 
 const OrderEditPageSection = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const OrderEditPageSection = () => {
   return (
     <>
       <NavbarComponent/>
+      <Box sx={{height: '64px'}}/>
       <OrderEditStatusPageSection id={orderId} />
     </>
     
