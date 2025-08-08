@@ -15,6 +15,7 @@ import UserService from '@/services/UserService';
 import { IBrandWithCategories } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { store } from '@/store';
 
 type Props = {
   main?: boolean;
@@ -33,6 +34,7 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
   const navbarRef = useRef<HTMLDivElement>(null);
   const fabRef = useRef<HTMLDivElement>(null);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const { isAdmin } = store.getState().auth;
 
   const { isSignedIn, getToken } = useAuth();
   
@@ -213,6 +215,15 @@ const NavbarComponent: React.FC<Props> = ({ main, cartItemsCount }) => {
                     </button>
                   </div>
                 ))}
+                {
+                  isAdmin && (
+                    <Link href={'/admin'} className={`px-3 py-2 transition-colors ${showWhiteBackground ? 'text-gray-900 hover:text-[#7950f2]' : 'text-white hover:text-gray-300'}`}>
+                      <Typography variant='navbar'>
+                        Admin
+                      </Typography>
+                    </Link>
+                  )
+                }
               </div>
             </div>
 
