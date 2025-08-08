@@ -41,6 +41,7 @@ import {
   MoreVert as MoreVertIcon
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import LeftSideAdmin from '@/components/admin/LeftSideAdmin';
 
 const MainProductsPageSection = () => {
   const [products, setProducts] = useState<Array<IProduct>>([]);
@@ -131,350 +132,361 @@ const MainProductsPageSection = () => {
     <>
       <NavbarComponent />
       <Box sx={{ height: '64px' }} />
-      <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', p: 3 }}>
-
-        {/* Controles */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          mb: 3,
-          flexWrap: 'wrap',
+      <Grid container spacing={1} sx={{minHeight:'100vh'}}>
+        <Grid size={{
+          xs:12, sm:5, md:3
         }}>
-            {/* Header */}
-            <Box sx={{ mb: 1 }}>
-                <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
-                    Sección de Productos
-                </Typography>
-            </Box>
-          
-            <Box sx={{ display: 'flex', alignItems: 'center' , gap:2}}>
-                <TextField
-                    placeholder="Buscar productos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                    }}
-                    sx={{ minWidth: 300 }}
-                />
-                <Fab
-                    color="primary"
-                    aria-label="add"
-                    onClick={() => router.push('/admin/productos/crear')}
-                >
-                    <AddIcon />
-                </Fab>
-            </Box>
-        </Box>
-
-        {/* Stats Cards */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.main', color: 'white' }}>
-              <Typography variant="h4" fontWeight="bold">
-                {products.length}
-              </Typography>
-              <Typography variant="body2">
-                Total Productos
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'success.main', color: 'white' }}>
-              <Typography variant="h4" fontWeight="bold">
-                {products.filter(p => p.isNewProduct).length}
-              </Typography>
-              <Typography variant="body2">
-                Productos Nuevos
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.main', color: 'white' }}>
-              <Typography variant="h4" fontWeight="bold">
-                {products.filter(p => p.isTrending).length}
-              </Typography>
-              <Typography variant="body2">
-                En Tendencia
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'error.main', color: 'white' }}>
-              <Typography variant="h4" fontWeight="bold">
-                {products.filter(p => p.descuento && p.descuento > 0).length}
-              </Typography>
-              <Typography variant="body2">
-                Con Descuento
-              </Typography>
-            </Card>
-          </Grid>
+          <LeftSideAdmin/>
         </Grid>
+        <Grid size={{
+          xs:12, sm:7, md:9
+        }}>
+          <Box sx={{  bgcolor: '#f5f5f5', p: 3 }}>
 
-        {/* Products Grid */}
-        <Grid container spacing={3}>
-          {loading ? (
-            // Skeleton loading
-            Array.from(new Array(6)).map((_, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
-                <Card>
-                  <Skeleton variant="rectangular" height={200} />
-                  <CardContent>
-                    <Skeleton variant="text" />
-                    <Skeleton variant="text" width="60%" />
-                  </CardContent>
+            {/* Controles */}
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              mb: 3,
+              flexWrap: 'wrap',
+            }}>
+                {/* Header */}
+                <Box sx={{ mb: 1 }}>
+                    <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+                        Sección de Productos
+                    </Typography>
+                </Box>
+              
+                <Box sx={{ display: 'flex', alignItems: 'center' , gap:2}}>
+                    <TextField
+                        placeholder="Buscar productos..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                        }}
+                        sx={{ minWidth: 300 }}
+                    />
+                    <Fab
+                        color="primary"
+                        aria-label="add"
+                        onClick={() => router.push('/admin/productos/crear')}
+                    >
+                        <AddIcon />
+                    </Fab>
+                </Box>
+            </Box>
+
+            {/* Stats Cards */}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.main', color: 'white' }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    {products.length}
+                  </Typography>
+                  <Typography variant="body2">
+                    Total Productos
+                  </Typography>
                 </Card>
               </Grid>
-            ))
-          ) : filteredProducts.length === 0 ? (
-            <Grid size={12}>
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="h6" color="text.secondary">
-                  No se encontraron productos
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza creando tu primer producto'}
-                </Typography>
-              </Box>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'success.main', color: 'white' }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    {products.filter(p => p.isNewProduct).length}
+                  </Typography>
+                  <Typography variant="body2">
+                    Productos Nuevos
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.main', color: 'white' }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    {products.filter(p => p.isTrending).length}
+                  </Typography>
+                  <Typography variant="body2">
+                    En Tendencia
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card sx={{ p: 2, textAlign: 'center', bgcolor: 'error.main', color: 'white' }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    {products.filter(p => p.descuento && p.descuento > 0).length}
+                  </Typography>
+                  <Typography variant="body2">
+                    Con Descuento
+                  </Typography>
+                </Card>
+              </Grid>
             </Grid>
-          ) : (
-            filteredProducts.map((product) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product._id}>
-                <Card sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4
-                  }
-                }}>
-                  <Box sx={{ position: 'relative' }}>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={product.images[0] || '/placeholder-image.jpg'}
-                      alt={product.name}
-                      sx={{ objectFit: 'cover' }}
-                    />
-                    
-                    {/* Badges */}
-                    <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {product.isNewProduct && (
-                        <Box
-                          sx={{
-                            bgcolor: 'primary.main',
-                            color: 'white',
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            fontSize: '0.7rem',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5
-                          }}
-                        >
-                          <NewIcon sx={{ fontSize: '0.8rem' }} />
-                          Nuevo
-                        </Box>
-                      )}
-                      {product.isTrending && (
-                        <Box
-                          sx={{
-                            bgcolor: 'warning.main',
-                            color: 'white',
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            fontSize: '0.7rem',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5
-                          }}
-                        >
-                          <TrendingIcon sx={{ fontSize: '0.8rem' }} />
-                          Tendencia
-                        </Box>
-                      )}
-                      {product.descuento && product.descuento > 0 && (
-                        <Box
-                          sx={{
-                            bgcolor: 'error.main',
-                            color: 'white',
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 1,
-                            fontSize: '0.7rem',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5
-                          }}
-                        >
-                          <OfferIcon sx={{ fontSize: '0.8rem' }} />
-                          -{product.descuento}%
-                        </Box>
-                      )}
-                    </Box>
 
-                    {/* Menu Button */}
-                    <IconButton
-                      sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'white', '&:hover': { bgcolor: 'grey.100' } }}
-                      onClick={(e) => handleMenuOpen(e, product)}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
+            {/* Products Grid */}
+            <Grid container spacing={3}>
+              {loading ? (
+                // Skeleton loading
+                Array.from(new Array(6)).map((_, index) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+                    <Card>
+                      <Skeleton variant="rectangular" height={200} />
+                      <CardContent>
+                        <Skeleton variant="text" />
+                        <Skeleton variant="text" width="60%" />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              ) : filteredProducts.length === 0 ? (
+                <Grid size={12}>
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Typography variant="h6" color="text.secondary">
+                      No se encontraron productos
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza creando tu primer producto'}
+                    </Typography>
                   </Box>
-
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom noWrap>
-                      {product.name}
-                    </Typography>
-                    
-                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                      <Chip label={product.brand.name} size="small" variant="outlined" />
-                      <Chip label={product.category.name} size="small" variant="outlined" />
-                    </Box>
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {product.description.length > 60 
-                        ? `${product.description.substring(0, 60)}...` 
-                        : product.description}
-                    </Typography>
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Typography variant="h6" color="primary" fontWeight="bold">
-                        {formatPrice(product.price)}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Stock: {getTotalStock(product.stockPorTalla)}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-
-                  <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                    <Button
-                      size="small"
-                      startIcon={<ViewIcon />}
-                      onClick={() => handleViewClick(product)}
-                    >
-                      Ver
-                    </Button>
-                    <Button
-                      size="small"
-                      startIcon={<EditIcon />}
-                      onClick={() => handleEditClick(product)}
-                    >
-                      Editar
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))
-          )}
-        </Grid>
-
-        {/* Menu contextual */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-        >
-          <MenuItem onClick={() => selectedProduct && handleViewClick(selectedProduct)}>
-            <ViewIcon sx={{ mr: 1 }} />
-            Ver detalles
-          </MenuItem>
-          <MenuItem onClick={() => selectedProduct && handleEditClick(selectedProduct)}>
-            <EditIcon sx={{ mr: 1 }} />
-            Editar
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={() => selectedProduct && handleDeleteClick(selectedProduct)} sx={{ color: 'error.main' }}>
-            <DeleteIcon sx={{ mr: 1 }} />
-            Eliminar
-          </MenuItem>
-        </Menu>
-
-        {/* Dialog para eliminar */}
-        <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, product: null })}>
-          <DialogTitle>Confirmar eliminación</DialogTitle>
-          <DialogContent>
-            <Typography>
-              ¿Estás seguro de que quieres eliminar el producto "{deleteDialog.product?.name}"?
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteDialog({ open: false, product: null })}>
-              Cancelar
-            </Button>
-            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-              Eliminar
-            </Button>
-          </DialogActions>
-        </Dialog>
-        {/* Dialog para ver detalles */}
-        <Dialog 
-          open={viewDialog.open} 
-          onClose={() => setViewDialog({ open: false, product: null })}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>
-            Detalles del Producto
-          </DialogTitle>
-          <DialogContent>
-            {viewDialog.product && (
-              <Box>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <img 
-                      src={viewDialog.product.images[0] || '/placeholder-image.jpg'}
-                      alt={viewDialog.product.name}
-                      style={{ width: '100%', height: 'auto', borderRadius: 8 }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h5" gutterBottom>
-                      {viewDialog.product.name}
-                    </Typography>
-                    <Typography variant="body1" paragraph>
-                      {viewDialog.product.description}
-                    </Typography>
-                    <Typography variant="h6" color="primary" gutterBottom>
-                      {formatPrice(viewDialog.product.price)}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                      <Chip label={`Marca: ${viewDialog.product.brand.name}`} />
-                      <Chip label={`Categoría: ${viewDialog.product.category.name}`} />
-                    </Box>
-                    <Typography variant="body2" gutterBottom>
-                      <strong>Stock por talla:</strong>
-                    </Typography>
-                    {viewDialog.product.stockPorTalla.map((stock, index) => (
-                      <Typography key={index} variant="body2">
-                        Talla {stock.talla}: {stock.stock} unidades
-                      </Typography>
-                    ))}
-                  </Grid>
                 </Grid>
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setViewDialog({ open: false, product: null })}>
-              Cerrar
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+              ) : (
+                filteredProducts.map((product) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product._id}>
+                    <Card sx={{ 
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4
+                      }
+                    }}>
+                      <Box sx={{ position: 'relative' }}>
+                        <CardMedia
+                          component="img"
+                          height="200"
+                          image={product.images[0] || '/placeholder-image.jpg'}
+                          alt={product.name}
+                          sx={{ objectFit: 'cover' }}
+                        />
+                        
+                        {/* Badges */}
+                        <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {product.isNewProduct && (
+                            <Box
+                              sx={{
+                                bgcolor: 'primary.main',
+                                color: 'white',
+                                px: 1,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5
+                              }}
+                            >
+                              <NewIcon sx={{ fontSize: '0.8rem' }} />
+                              Nuevo
+                            </Box>
+                          )}
+                          {product.isTrending && (
+                            <Box
+                              sx={{
+                                bgcolor: 'warning.main',
+                                color: 'white',
+                                px: 1,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5
+                              }}
+                            >
+                              <TrendingIcon sx={{ fontSize: '0.8rem' }} />
+                              Tendencia
+                            </Box>
+                          )}
+                          {product.descuento && product.descuento > 0 && (
+                            <Box
+                              sx={{
+                                bgcolor: 'error.main',
+                                color: 'white',
+                                px: 1,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5
+                              }}
+                            >
+                              <OfferIcon sx={{ fontSize: '0.8rem' }} />
+                              -{product.descuento}%
+                            </Box>
+                          )}
+                        </Box>
+
+                        {/* Menu Button */}
+                        <IconButton
+                          sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'white', '&:hover': { bgcolor: 'grey.100' } }}
+                          onClick={(e) => handleMenuOpen(e, product)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </Box>
+
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" gutterBottom noWrap>
+                          {product.name}
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                          <Chip label={product.brand.name} size="small" variant="outlined" />
+                          <Chip label={product.category.name} size="small" variant="outlined" />
+                        </Box>
+
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                          {product.description.length > 60 
+                            ? `${product.description.substring(0, 60)}...` 
+                            : product.description}
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="h6" color="primary" fontWeight="bold">
+                            {formatPrice(product.price)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Stock: {getTotalStock(product.stockPorTalla)}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+
+                      <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                        <Button
+                          size="small"
+                          startIcon={<ViewIcon />}
+                          onClick={() => handleViewClick(product)}
+                        >
+                          Ver
+                        </Button>
+                        <Button
+                          size="small"
+                          startIcon={<EditIcon />}
+                          onClick={() => handleEditClick(product)}
+                        >
+                          Editar
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))
+              )}
+            </Grid>
+
+            {/* Menu contextual */}
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => selectedProduct && handleViewClick(selectedProduct)}>
+                <ViewIcon sx={{ mr: 1 }} />
+                Ver detalles
+              </MenuItem>
+              <MenuItem onClick={() => selectedProduct && handleEditClick(selectedProduct)}>
+                <EditIcon sx={{ mr: 1 }} />
+                Editar
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={() => selectedProduct && handleDeleteClick(selectedProduct)} sx={{ color: 'error.main' }}>
+                <DeleteIcon sx={{ mr: 1 }} />
+                Eliminar
+              </MenuItem>
+            </Menu>
+
+            {/* Dialog para eliminar */}
+            <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, product: null })}>
+              <DialogTitle>Confirmar eliminación</DialogTitle>
+              <DialogContent>
+                <Typography>
+                  ¿Estás seguro de que quieres eliminar el producto "{deleteDialog.product?.name}"?
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDeleteDialog({ open: false, product: null })}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+                  Eliminar
+                </Button>
+              </DialogActions>
+            </Dialog>
+            {/* Dialog para ver detalles */}
+            <Dialog 
+              open={viewDialog.open} 
+              onClose={() => setViewDialog({ open: false, product: null })}
+              maxWidth="md"
+              fullWidth
+            >
+              <DialogTitle>
+                Detalles del Producto
+              </DialogTitle>
+              <DialogContent>
+                {viewDialog.product && (
+                  <Box>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <img 
+                          src={viewDialog.product.images[0] || '/placeholder-image.jpg'}
+                          alt={viewDialog.product.name}
+                          style={{ width: '100%', height: 'auto', borderRadius: 8 }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <Typography variant="h5" gutterBottom>
+                          {viewDialog.product.name}
+                        </Typography>
+                        <Typography variant="body1" paragraph>
+                          {viewDialog.product.description}
+                        </Typography>
+                        <Typography variant="h6" color="primary" gutterBottom>
+                          {formatPrice(viewDialog.product.price)}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                          <Chip label={`Marca: ${viewDialog.product.brand.name}`} />
+                          <Chip label={`Categoría: ${viewDialog.product.category.name}`} />
+                        </Box>
+                        <Typography variant="body2" gutterBottom>
+                          <strong>Stock por talla:</strong>
+                        </Typography>
+                        {viewDialog.product.stockPorTalla.map((stock, index) => (
+                          <Typography key={index} variant="body2">
+                            Talla {stock.talla}: {stock.stock} unidades
+                          </Typography>
+                        ))}
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setViewDialog({ open: false, product: null })}>
+                  Cerrar
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Box>
+        </Grid>
+      </Grid>
     </>
   );
 };

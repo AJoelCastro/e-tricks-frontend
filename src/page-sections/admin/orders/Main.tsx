@@ -30,6 +30,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
+import LeftSideAdmin from '@/components/admin/LeftSideAdmin';
 
 const MainOrdersPageSection = () => {
     const { getToken } = useAuth();
@@ -158,170 +159,181 @@ const MainOrdersPageSection = () => {
         <>
             <NavbarComponent />
             <Box sx={{ height: '64px' }} />
-            <Container maxWidth="lg" sx={{ py: 4, minHeight: '100vh' }}>
-                <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
-                    Mis Órdenes
-                </Typography>
+            <Grid container spacing={1} sx={{minHeight:'100vh'}}>
+                <Grid size={{
+                    xs:12, sm:5, md:3
+                }}>
+                    <LeftSideAdmin/>
+                </Grid>
+                <Grid size={{
+                    xs:12, sm:7, md:9
+                }}>
+                    <Box sx={{ padding:3}}>
+                        <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+                            Sección de Órdenes
+                        </Typography>
 
-                {orders.length === 0 ? (
-                    <Card sx={{ textAlign: 'center', py: 8 }}>
-                        <CardContent>
-                            <ShoppingBagIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-                            <Typography variant="h6" color="text.secondary" gutterBottom>
-                                No tienes órdenes aún
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Cuando realices tu primera compra, aparecerá aquí.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <Stack spacing={3}>
-                        {orders.map((order) => (
-                            <Card key={order._id} elevation={2} sx={{ overflow: 'visible' }}>
+                        {orders.length === 0 ? (
+                            <Card sx={{ textAlign: 'center', py: 8 }}>
                                 <CardContent>
-                                    {/* Header de la orden */}
-                                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                                        <Box>
-                                            <Typography variant="h6" fontWeight="bold">
-                                                Orden #{order.orderNumber}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {formatDate(order.createdAt)}
-                                            </Typography>
-                                        </Box>
-                                        <Box textAlign="right">
-                                            <Typography variant="h6" fontWeight="bold" color="primary">
-                                                {formatCurrency(order.totalAmount)}
-                                            </Typography>
-                                            <Chip 
-                                                label={getStatusText(order.status)} 
-                                                color={getStatusColor(order.status) as any}
-                                                size="small"
-                                            />
-                                        </Box>
-                                    </Box>
-
-                                    {/* Información de pago y entrega */}
-                                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                                <CreditCardIcon fontSize="small" color="action" />
-                                                <Typography variant="body2">
-                                                    Pago: <strong>{order.paymentStatus === 'approved' ? 'Aprobado' : 'Pendiente'}</strong>
-                                                </Typography>
-                                            </Box>
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 6 }}>
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                                <LocalShippingIcon fontSize="small" color="action" />
-                                                <Typography variant="body2">
-                                                    Entrega: <strong>{order.deliveryStatus === 'pending' ? 'Pendiente' : order.deliveryStatus}</strong>
-                                                </Typography>
-                                            </Box>
-                                        </Grid>
-                                    </Grid>
-
-                                    {/* Botones de acción */}
-                                    <Box display="flex" alignItems="center" sx={{ mb: 2, gap:3 }}>
-                                        <Button 
-                                            startIcon={<VisibilityIcon />}
-                                            onClick={() => handleViewDetails(order._id)}
-                                            color="primary"
-                                        >
-                                            Ver Detalle
-                                        </Button>
-                                        <Button 
-                                            startIcon={<EditIcon />}
-                                            onClick={() => handleEditOrder(order._id)}
-                                            color="primary"
-                                            disabled={order.status === 'completed' || order.status === 'cancelled'}
-                                        >
-                                            Editar
-                                        </Button>
-                                    </Box>
-
-                                    <Divider sx={{ my: 2 }} />
-
-                                    {/* Resumen de productos */}
-                                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                                        <Typography variant="body2" color="text.secondary">
-                                            {order.items.length} producto{order.items.length > 1 ? 's' : ''} • {order.items.reduce((sum, item) => sum + item.quantity, 0)} unidad{order.items.reduce((sum, item) => sum + item.quantity, 0) > 1 ? 'es' : ''}
-                                        </Typography>
-                                        <IconButton 
-                                            onClick={() => toggleOrderExpansion(order._id)}
-                                            size="small"
-                                        >
-                                            {expandedOrders.has(order._id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                        </IconButton>
-                                    </Box>
-
-                                    {/* Detalles expandibles */}
-                                    <Collapse in={expandedOrders.has(order._id)}>
-                                        <Box sx={{ mt: 2 }}>
-                                            <Divider sx={{ mb: 2 }} />
-                                            <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-                                                Productos:
-                                            </Typography>
-                                            <Stack spacing={2}>
-                                                {order.items.map((item) => (
-                                                    <Card key={item._id} variant="outlined">
-                                                        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                                                            <Grid container spacing={2} alignItems="center">
-                                                                <Grid size={{ xs: 3, sm: 2 }} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                                                    <CardMedia
-                                                                        component="img"
-                                                                        height="80"
-                                                                        image={item.image}
-                                                                        alt={item.name}
-                                                                        sx={{ borderRadius: 1, objectFit: 'cover' }}
-                                                                    />
-                                                                </Grid>
-                                                                <Grid size={{ xs: 9, sm: 10 }}>
-                                                                    <Typography variant="subtitle2" fontWeight="bold">
-                                                                        {item.name}
-                                                                    </Typography>
-                                                                    <Typography variant="body2" color="text.secondary">
-                                                                        Talla: {item.size} • Cantidad: {item.quantity}
-                                                                    </Typography>
-                                                                    <Typography variant="body2" fontWeight="bold">
-                                                                        {formatCurrency(item.price)} c/u
-                                                                    </Typography>
-                                                                    <Chip 
-                                                                        label={item.itemStatus === 'pending' ? 'Pendiente' : item.itemStatus}
-                                                                        size="small"
-                                                                        color={getStatusColor(item.itemStatus) as any}
-                                                                        sx={{ mt: 1 }}
-                                                                    />
-                                                                </Grid>
-                                                            </Grid>
-                                                        </CardContent>
-                                                    </Card>
-                                                ))}
-                                            </Stack>
-
-                                            {/* Detalles de pago si están disponibles */}
-                                            {order.paymentDetails && (
-                                                <Box sx={{ mt: 3 }}>
-                                                    <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-                                                        Detalles de Pago:
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        Método: {order.paymentDetails.payment_method_id?.toUpperCase()}
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        Procesado: {formatDate(order.paymentDetails.processed_at)}
-                                                    </Typography>
-                                                </Box>
-                                            )}
-                                        </Box>
-                                    </Collapse>
+                                    <ShoppingBagIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                                        No tienes órdenes aún
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Cuando realices tu primera compra, aparecerá aquí.
+                                    </Typography>
                                 </CardContent>
                             </Card>
-                        ))}
-                    </Stack>
-                )}
-            </Container>
+                        ) : (
+                            <Stack spacing={3}>
+                                {orders.map((order) => (
+                                    <Card key={order._id} elevation={2} sx={{ overflow: 'visible' }}>
+                                        <CardContent>
+                                            {/* Header de la orden */}
+                                            <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                                                <Box>
+                                                    <Typography variant="h6" fontWeight="bold">
+                                                        Orden #{order.orderNumber}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {formatDate(order.createdAt)}
+                                                    </Typography>
+                                                </Box>
+                                                <Box textAlign="right">
+                                                    <Typography variant="h6" fontWeight="bold" color="primary">
+                                                        {formatCurrency(order.totalAmount)}
+                                                    </Typography>
+                                                    <Chip 
+                                                        label={getStatusText(order.status)} 
+                                                        color={getStatusColor(order.status) as any}
+                                                        size="small"
+                                                    />
+                                                </Box>
+                                            </Box>
+
+                                            {/* Información de pago y entrega */}
+                                            <Grid container spacing={2} sx={{ mb: 2 }}>
+                                                <Grid size={{ xs: 12, sm: 6 }}>
+                                                    <Box display="flex" alignItems="center" gap={1}>
+                                                        <CreditCardIcon fontSize="small" color="action" />
+                                                        <Typography variant="body2">
+                                                            Pago: <strong>{order.paymentStatus === 'approved' ? 'Aprobado' : 'Pendiente'}</strong>
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+                                                <Grid size={{ xs: 12, sm: 6 }}>
+                                                    <Box display="flex" alignItems="center" gap={1}>
+                                                        <LocalShippingIcon fontSize="small" color="action" />
+                                                        <Typography variant="body2">
+                                                            Entrega: <strong>{order.deliveryStatus === 'pending' ? 'Pendiente' : order.deliveryStatus}</strong>
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+                                            </Grid>
+
+                                            {/* Botones de acción */}
+                                            <Box display="flex" alignItems="center" sx={{ mb: 2, gap:3 }}>
+                                                <Button 
+                                                    startIcon={<VisibilityIcon />}
+                                                    onClick={() => handleViewDetails(order._id)}
+                                                    color="primary"
+                                                >
+                                                    Ver Detalle
+                                                </Button>
+                                                <Button 
+                                                    startIcon={<EditIcon />}
+                                                    onClick={() => handleEditOrder(order._id)}
+                                                    color="primary"
+                                                    disabled={order.status === 'completed' || order.status === 'cancelled'}
+                                                >
+                                                    Editar
+                                                </Button>
+                                            </Box>
+
+                                            <Divider sx={{ my: 2 }} />
+
+                                            {/* Resumen de productos */}
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {order.items.length} producto{order.items.length > 1 ? 's' : ''} • {order.items.reduce((sum, item) => sum + item.quantity, 0)} unidad{order.items.reduce((sum, item) => sum + item.quantity, 0) > 1 ? 'es' : ''}
+                                                </Typography>
+                                                <IconButton 
+                                                    onClick={() => toggleOrderExpansion(order._id)}
+                                                    size="small"
+                                                >
+                                                    {expandedOrders.has(order._id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                                </IconButton>
+                                            </Box>
+
+                                            {/* Detalles expandibles */}
+                                            <Collapse in={expandedOrders.has(order._id)}>
+                                                <Box sx={{ mt: 2 }}>
+                                                    <Divider sx={{ mb: 2 }} />
+                                                    <Typography variant="subtitle2" gutterBottom fontWeight="bold">
+                                                        Productos:
+                                                    </Typography>
+                                                    <Stack spacing={2}>
+                                                        {order.items.map((item) => (
+                                                            <Card key={item._id} variant="outlined">
+                                                                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                                                    <Grid container spacing={2} alignItems="center">
+                                                                        <Grid size={{ xs: 3, sm: 2 }} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                                                            <CardMedia
+                                                                                component="img"
+                                                                                height="80"
+                                                                                image={item.image}
+                                                                                alt={item.name}
+                                                                                sx={{ borderRadius: 1, objectFit: 'cover' }}
+                                                                            />
+                                                                        </Grid>
+                                                                        <Grid size={{ xs: 9, sm: 10 }}>
+                                                                            <Typography variant="subtitle2" fontWeight="bold">
+                                                                                {item.name}
+                                                                            </Typography>
+                                                                            <Typography variant="body2" color="text.secondary">
+                                                                                Talla: {item.size} • Cantidad: {item.quantity}
+                                                                            </Typography>
+                                                                            <Typography variant="body2" fontWeight="bold">
+                                                                                {formatCurrency(item.price)} c/u
+                                                                            </Typography>
+                                                                            <Chip 
+                                                                                label={item.itemStatus === 'pending' ? 'Pendiente' : item.itemStatus}
+                                                                                size="small"
+                                                                                color={getStatusColor(item.itemStatus) as any}
+                                                                                sx={{ mt: 1 }}
+                                                                            />
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                </CardContent>
+                                                            </Card>
+                                                        ))}
+                                                    </Stack>
+
+                                                    {/* Detalles de pago si están disponibles */}
+                                                    {order.paymentDetails && (
+                                                        <Box sx={{ mt: 3 }}>
+                                                            <Typography variant="subtitle2" gutterBottom fontWeight="bold">
+                                                                Detalles de Pago:
+                                                            </Typography>
+                                                            <Typography variant="body2">
+                                                                Método: {order.paymentDetails.payment_method_id?.toUpperCase()}
+                                                            </Typography>
+                                                            <Typography variant="body2">
+                                                                Procesado: {formatDate(order.paymentDetails.processed_at)}
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            </Collapse>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Stack>
+                        )}
+                    </Box>
+                </Grid>
+            </Grid>
         </>
     )
 }
