@@ -1,3 +1,4 @@
+'use client'
 // components/cart/CartContext.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
