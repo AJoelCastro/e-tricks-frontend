@@ -323,6 +323,23 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                     </Button>
                                     </Box>
                                 ))}
+                                {
+                                    product?.stockPorTalla.find((s) => s.talla === Number(selectedSize))? (
+                                        product?.stockPorTalla.find((s) => s.talla === Number(selectedSize))?.stock === 0 ? (
+                                            <Typography color="error" variant="body2" sx={{fontFamily:'cursive'}}>
+                                                Talla no disponible, comunicate via WhatsApp para más información.
+                                            </Typography>
+                                        ) : (
+                                            <Typography color="text.secondary" variant="body2" sx={{fontFamily:'cursive'}}>
+                                                Stock disponible: {product?.stockPorTalla.find((s) => s.talla === Number(selectedSize))?.stock} unidades
+                                            </Typography>
+                                        )
+                                    ) : (
+                                        <Typography color="error" variant="body2" sx={{fontFamily:'cursive'}}>
+                                            Talla no disponible, comunicate via WhatsApp para más información.
+                                        </Typography>
+                                    )
+                                }
                             </Grid>
                             {methods.formState.errors.size && (
                                 <Typography color="error" variant="body2" sx={{fontFamily:'cursive'}}>
@@ -435,6 +452,7 @@ const MainProductDetail: React.FC<Props> = ({ id }) => {
                                         }}
                                         type="submit"  
                                         loading={isSubmitting}
+                                        disabled={isSubmitting || !selectedSize || (product?.stockPorTalla.find((s) => s.talla === Number(selectedSize))?.stock || 0) < quantity}
                                     >
                                         <Typography sx={{ fontSize: 14, fontWeight: 'bold' }}>
                                             AGREGAR AL CARRO
