@@ -91,7 +91,7 @@ const MainProductsPageSection = () => {
   };
 
   const handleViewClick = (product: IProduct) => {
-    setViewDialog({ open: true, product });
+    router.push(`/admin/productos/detalle/${product._id}`);
     handleMenuClose();
   };
 
@@ -427,60 +427,6 @@ const MainProductsPageSection = () => {
                 </Button>
                 <Button onClick={handleDeleteConfirm} color="error" variant="contained">
                   Eliminar
-                </Button>
-              </DialogActions>
-            </Dialog>
-            {/* Dialog para ver detalles */}
-            <Dialog 
-              open={viewDialog.open} 
-              onClose={() => setViewDialog({ open: false, product: null })}
-              maxWidth="md"
-              fullWidth
-            >
-              <DialogTitle>
-                Detalles del Producto
-              </DialogTitle>
-              <DialogContent>
-                {viewDialog.product && (
-                  <Box>
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <img 
-                          src={viewDialog.product.images[0] || '/placeholder-image.jpg'}
-                          alt={viewDialog.product.name}
-                          style={{ width: '100%', height: 'auto', borderRadius: 8 }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Typography variant="h5" gutterBottom>
-                          {viewDialog.product.name}
-                        </Typography>
-                        <Typography variant="body1" paragraph>
-                          {viewDialog.product.description}
-                        </Typography>
-                        <Typography variant="h6" color="primary" gutterBottom>
-                          {formatPrice(viewDialog.product.price)}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                          <Chip label={`Marca: ${viewDialog.product.brand.name}`} />
-                          <Chip label={`Categoría: ${viewDialog.product.category.name}`} />
-                        </Box>
-                        <Typography variant="body2" gutterBottom>
-                          <strong>Stock por talla:</strong>
-                        </Typography>
-                        {viewDialog.product.stockPorTalla.map((stock, index) => (
-                          <Typography key={index} variant="body2">
-                            Talla {stock.talla}: {stock.stock} unidades
-                          </Typography>
-                        ))}
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setViewDialog({ open: false, product: null })}>
-                  Cerrar
                 </Button>
               </DialogActions>
             </Dialog>
