@@ -21,8 +21,13 @@ import {
   Chip,
   Divider,
   IconButton,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
-import { Edit, Save, Cancel, Delete } from '@mui/icons-material';
+import { Edit, Save, Cancel, Delete, Image as ImageIcon, Inventory, Category, LocalOffer, Info } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -306,6 +311,21 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
     return stockPorTalla.reduce((total, item) => total + item.stock, 0);
   };
 
+  // Componente para mostrar información en modo visualización
+  const InfoField = ({ label, value, icon }: { label: string; value: string | number | boolean; icon?: React.ReactNode }) => (
+    <Paper sx={{ p: 2, backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        {icon && <Box sx={{ mr: 1, color: 'primary.main' }}>{icon}</Box>}
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem' }}>
+          {label}
+        </Typography>
+      </Box>
+      <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
+        {typeof value === 'boolean' ? (value ? 'Sí' : 'No') : value || 'No especificado'}
+      </Typography>
+    </Paper>
+  );
+
   if (loadingProduct) {
     return (
       <Box sx={{ p: 4 }}>
@@ -336,7 +356,7 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
 
   return (
     <>
-      <Box sx={{ padding: 2 }} >
+      <Box sx={{ padding: 2 }}>
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
@@ -397,25 +417,27 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
 
         {/* Información de resumen cuando no se está editando */}
         {!isEditing && (
-          <Card sx={{ p: 3, mb: 3 }}>
+          <Card sx={{ p: 3, mb: 3, background: 'white' }}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Info sx={{ mr: 1 }} />
                   Resumen del Producto
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  <Chip label={`Precio: ${product.price}`} color="primary" />
+                  <Chip label={`$${product.price}`} color="primary" size="medium" />
                   {product.descuento! > 0 && (
                     <Chip 
-                      label={`Con descuento: ${calculateDiscountedPrice(product.price, product.descuento!).toFixed(2)}`} 
+                      label={`Con descuento: $${calculateDiscountedPrice(product.price, product.descuento!).toFixed(2)}`} 
                       color="secondary" 
+                      size="medium"
                     />
                   )}
-                  <Chip label={`Stock total: ${getTotalStock()}`} color="info" />
-                  {product.isNewProduct && <Chip label="Nuevo" color="success" />}
-                  {product.isTrending && <Chip label="Tendencia" color="warning" />}
+                  <Chip label={`Stock total: ${getTotalStock()}`} color="info" size="medium" />
+                  {product.isNewProduct && <Chip label="Nuevo" color="success" size="medium" />}
+                  {product.isTrending && <Chip label="Tendencia" color="warning" size="medium" />}
                 </Box>
-                <Typography variant="body1" paragraph>
+                <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', lineHeight: 1.6 }}>
                   {product.description}
                 </Typography>
               </Grid>
@@ -428,9 +450,10 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
                       width={200}
                       height={200}
                       style={{ 
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                         objectFit: 'cover',
-                        border: '1px solid #ddd'
+                        border: '3px solid #fff',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
                       }}
                     />
                   </Box>
@@ -440,307 +463,439 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
           </Card>
         )}
 
-        <Card sx={{ p: 4 }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={3}>
-              {/* Información básica */}
-              <Grid size={{ xs: 12 }}>
-                <Typography variant="h6" gutterBottom>
-                  Información básica
+        {/* Contenido principal */}
+        {!isEditing ? (
+          // Vista de solo lectura mejorada
+          <Box>
+            {/* Información básica */}
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Info sx={{ mr: 1 }} />
+                Información Básica
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <InfoField label="Nombre del producto" value={product.name} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <InfoField label="Marca" value={typeof product.brand === 'object' ? product.brand.name : product.brand} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <InfoField label="Material" value={typeof product.material === 'object' ? product.material.name : product.material} />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Paper sx={{ p: 2, backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', display: 'block', mb: 1 }}>
+                      Descripción
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary', lineHeight: 1.6 }}>
+                      {product.description}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Card>
+
+            {/* Categorización */}
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Category sx={{ mr: 1 }} />
+                Categorización
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Categoría" value={typeof product.category === 'object' ? product.category.name : product.category} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Subcategoría" value={typeof product.subCategory === 'object' ? product.subCategory.name : product.subCategory} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Grupo" value={typeof product.groupCategory === 'object' ? product.groupCategory.name : product.groupCategory} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Temporada" value={product.season || 'Sin temporada'} />
+                </Grid>
+              </Grid>
+            </Card>
+
+            {/* Precio y promociones */}
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <LocalOffer sx={{ mr: 1 }} />
+                Precio y Promociones
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Precio" value={`$${product.price}`} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Descuento" value={`${product.descuento || 0}%`} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="Producto nuevo" value={product.isNewProduct} />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <InfoField label="En tendencia" value={product.isTrending} />
+                </Grid>
+              </Grid>
+            </Card>
+
+            {/* Stock por talla */}
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Inventory sx={{ mr: 1 }} />
+                Stock por Talla
+              </Typography>
+              <Grid container spacing={2}>
+                {stockPorTalla.map((item, index) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+                    <Paper sx={{ p: 2, backgroundColor: '#f0f7ff', border: '1px solid #b3d4fc', textAlign: 'center' }}>
+                      <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                        Talla {item.talla}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Stock disponible
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: item.stock > 0 ? 'success.main' : 'error.main' }}>
+                        {item.stock}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+              <Paper sx={{ p: 2, mt: 2, backgroundColor: '#f8f9fa', textAlign: 'center' }}>
+                <Typography variant="h6">
+                  Stock Total: <span style={{ color: '#1976d2', fontWeight: 'bold' }}>{getTotalStock()}</span>
                 </Typography>
-              </Grid>
-              
-              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Controller
-                  name="name"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Nombre del producto"
-                      fullWidth
-                      disabled={!isEditing}
-                      error={!!errors.name}
-                      helperText={errors.name?.message}
-                    />
-                  )}
-                />
-              </Grid>
+              </Paper>
+            </Card>
 
-              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Controller
-                  name="brand"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.brand} disabled={!isEditing}>
-                      <InputLabel>Marca</InputLabel>
-                      <Select {...field} label="Marca">
-                        {brands.map((brand) => (
-                          <MenuItem key={brand} value={brand}>
-                            {brand}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.brand && (
-                        <FormHelperText>{errors.brand.message}</FormHelperText>
-                      )}
-                    </FormControl>
-                  )}
-                />
+            {/* Imágenes */}
+            <Card sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <ImageIcon sx={{ mr: 1 }} />
+                Imágenes del Producto
+              </Typography>
+              <Grid container spacing={2}>
+                {imageUrls.map((url, index) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+                    <Paper sx={{ p: 1, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                      <Image
+                        src={url}
+                        alt={`Imagen ${index + 1}`}
+                        width={200}
+                        height={200}
+                        style={{ 
+                          width: '100%', 
+                          height: '200px', 
+                          objectFit: 'cover', 
+                          borderRadius: '8px' 
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1, color: 'text.secondary' }}>
+                        Imagen {index + 1}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                ))}
               </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                <Controller
-                  name="material"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.material} disabled={!isEditing}>
-                      <InputLabel>Material</InputLabel>
-                      <Select {...field} label="Material">
-                        {materials.map((material) => (
-                          <MenuItem key={material} value={material}>
-                            {material}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.material && (
-                        <FormHelperText>{errors.material.message}</FormHelperText>
-                      )}
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <Controller
-                  name="description"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Descripción"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      disabled={!isEditing}
-                      error={!!errors.description}
-                      helperText={errors.description?.message}
-                    />
-                  )}
-                />
-              </Grid>
-
-              {/* Categorización */}
-              <Grid size={{ xs: 12 }}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Categorización
-                </Typography>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="category"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.category} disabled={!isEditing}>
-                      <InputLabel>Categoría</InputLabel>
-                      <Select {...field} label="Categoría">
-                        {categories.map((category) => (
-                          <MenuItem key={category} value={category}>
-                            {category}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.category && (
-                        <FormHelperText>{errors.category.message}</FormHelperText>
-                      )}
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="subCategory"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.subCategory} disabled={!isEditing}>
-                      <InputLabel>Subcategoría</InputLabel>
-                      <Select {...field} label="Subcategoría">
-                        {subCategories.map((subCategory) => (
-                          <MenuItem key={subCategory} value={subCategory}>
-                            {subCategory}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.subCategory && (
-                        <FormHelperText>{errors.subCategory.message}</FormHelperText>
-                      )}
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="groupCategory"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.groupCategory} disabled={!isEditing}>
-                      <InputLabel>Grupo</InputLabel>
-                      <Select {...field} label="Grupo">
-                        {groupCategories.map((group) => (
-                          <MenuItem key={group} value={group}>
-                            {group}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.groupCategory && (
-                        <FormHelperText>{errors.groupCategory.message}</FormHelperText>
-                      )}
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="season"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth disabled={!isEditing}>
-                      <InputLabel>Temporada</InputLabel>
-                      <Select {...field} label="Temporada">
-                        <MenuItem value="">Sin temporada</MenuItem>
-                        {seasons.map((season) => (
-                          <MenuItem key={season} value={season}>
-                            {season}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-
-              {/* Precio y descuento */}
-              <Grid size={{ xs: 12 }}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Precio y promociones
-                </Typography>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="price"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Precio"
-                      type="number"
-                      fullWidth
-                      disabled={!isEditing}
-                      InputProps={{ inputProps: { min: 0, step: 0.01 } }}
-                      error={!!errors.price}
-                      helperText={errors.price?.message}
-                    />
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="descuento"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Descuento (%)"
-                      type="number"
-                      fullWidth
-                      disabled={!isEditing}
-                      InputProps={{ inputProps: { min: 0, max: 100 } }}
-                      error={!!errors.descuento}
-                      helperText={errors.descuento?.message}
-                    />
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="isNewProduct"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      control={<Switch {...field} checked={field.value} disabled={!isEditing} />}
-                      label="Producto nuevo"
-                    />
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Controller
-                  name="isTrending"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      control={<Switch {...field} checked={field.value} disabled={!isEditing} />}
-                      label="En tendencia"
-                    />
-                  )}
-                />
-              </Grid>
-
-              {/* Stock por talla */}
-              <Grid size={{ xs: 12 }}>
-                <Divider sx={{ my: 2 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6">
-                    Stock por talla
+            </Card>
+          </Box>
+        ) : (
+          // Vista de edición (formulario original)
+          <Card sx={{ p: 4 }}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Grid container spacing={3}>
+                {/* Información básica */}
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Información básica
                   </Typography>
-                  {isEditing && (
+                </Grid>
+                
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Controller
+                    name="name"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Nombre del producto"
+                        fullWidth
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Controller
+                    name="brand"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.brand}>
+                        <InputLabel>Marca</InputLabel>
+                        <Select {...field} label="Marca">
+                          {brands.map((brand) => (
+                            <MenuItem key={brand} value={brand}>
+                              {brand}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.brand && (
+                          <FormHelperText>{errors.brand.message}</FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Controller
+                    name="material"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.material}>
+                        <InputLabel>Material</InputLabel>
+                        <Select {...field} label="Material">
+                          {materials.map((material) => (
+                            <MenuItem key={material} value={material}>
+                              {material}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.material && (
+                          <FormHelperText>{errors.material.message}</FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Descripción"
+                        fullWidth
+                        multiline
+                        rows={3}
+                        error={!!errors.description}
+                        helperText={errors.description?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                {/* Categorización */}
+                <Grid size={{ xs: 12 }}>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Categorización
+                  </Typography>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="category"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.category}>
+                        <InputLabel>Categoría</InputLabel>
+                        <Select {...field} label="Categoría">
+                          {categories.map((category) => (
+                            <MenuItem key={category} value={category}>
+                              {category}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.category && (
+                          <FormHelperText>{errors.category.message}</FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="subCategory"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.subCategory}>
+                        <InputLabel>Subcategoría</InputLabel>
+                        <Select {...field} label="Subcategoría">
+                          {subCategories.map((subCategory) => (
+                            <MenuItem key={subCategory} value={subCategory}>
+                              {subCategory}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.subCategory && (
+                          <FormHelperText>{errors.subCategory.message}</FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="groupCategory"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.groupCategory}>
+                        <InputLabel>Grupo</InputLabel>
+                        <Select {...field} label="Grupo">
+                          {groupCategories.map((group) => (
+                            <MenuItem key={group} value={group}>
+                              {group}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.groupCategory && (
+                          <FormHelperText>{errors.groupCategory.message}</FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="season"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth>
+                        <InputLabel>Temporada</InputLabel>
+                        <Select {...field} label="Temporada">
+                          <MenuItem value="">Sin temporada</MenuItem>
+                          {seasons.map((season) => (
+                            <MenuItem key={season} value={season}>
+                              {season}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                {/* Precio y descuento */}
+                <Grid size={{ xs: 12 }}>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Precio y promociones
+                  </Typography>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="price"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Precio"
+                        type="number"
+                        fullWidth
+                        InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                        error={!!errors.price}
+                        helperText={errors.price?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="descuento"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Descuento (%)"
+                        type="number"
+                        fullWidth
+                        InputProps={{ inputProps: { min: 0, max: 100 } }}
+                        error={!!errors.descuento}
+                        helperText={errors.descuento?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="isNewProduct"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<Switch {...field} checked={field.value} />}
+                        label="Producto nuevo"
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    name="isTrending"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<Switch {...field} checked={field.value} />}
+                        label="En tendencia"
+                      />
+                    )}
+                  />
+                </Grid>
+
+                {/* Stock por talla */}
+                <Grid size={{ xs: 12 }}>
+                  <Divider sx={{ my: 2 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">
+                      Stock por talla
+                    </Typography>
                     <Button variant="outlined" onClick={handleAddSizeStock}>
                       Agregar talla
                     </Button>
-                  )}
-                </Box>
-              </Grid>
+                  </Box>
+                </Grid>
 
-              {stockPorTalla.map((item, index) => (
-                <React.Fragment key={index}>
-                  <Grid size={{ xs: 12, sm: 4, md: 3 }}>
-                    <FormControl fullWidth disabled={!isEditing}>
-                      <InputLabel>Talla</InputLabel>
-                      <Select
-                        value={item.talla}
-                        onChange={(e) => handleSizeStockChange(index, 'talla', Number(e.target.value))}
-                        label="Talla"
-                      >
-                        {sizes.map((size) => (
-                          <MenuItem key={size} value={size}>
-                            {size}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 4, md: 3 }}>
-                    <TextField
-                      label="Stock"
-                      type="number"
-                      fullWidth
-                      disabled={!isEditing}
-                      value={item.stock}
-                      onChange={(e) => handleSizeStockChange(index, 'stock', Number(e.target.value))}
-                      InputProps={{ inputProps: { min: 0 } }}
-                    />
-                  </Grid>
-                  {isEditing && (
+                {stockPorTalla.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <Grid size={{ xs: 12, sm: 4, md: 3 }}>
+                      <FormControl fullWidth>
+                        <InputLabel>Talla</InputLabel>
+                        <Select
+                          value={item.talla}
+                          onChange={(e) => handleSizeStockChange(index, 'talla', Number(e.target.value))}
+                          label="Talla"
+                        >
+                          {sizes.map((size) => (
+                            <MenuItem key={size} value={size}>
+                              {size}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4, md: 3 }}>
+                      <TextField
+                        label="Stock"
+                        type="number"
+                        fullWidth
+                        value={item.stock}
+                        onChange={(e) => handleSizeStockChange(index, 'stock', Number(e.target.value))}
+                        InputProps={{ inputProps: { min: 0 } }}
+                      />
+                    </Grid>
                     <Grid size={{ xs: 12, sm: 4, md: 2 }}>
                       <Button
                         variant="outlined"
@@ -751,25 +906,23 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
                         Eliminar
                       </Button>
                     </Grid>
-                  )}
-                </React.Fragment>
-              ))}
+                  </React.Fragment>
+                ))}
 
-              {errors.stockPorTalla && (
+                {errors.stockPorTalla && (
+                  <Grid size={{ xs: 12 }}>
+                    <FormHelperText error>{errors.stockPorTalla.message}</FormHelperText>
+                  </Grid>
+                )}
+
+                {/* Imágenes */}
                 <Grid size={{ xs: 12 }}>
-                  <FormHelperText error>{errors.stockPorTalla.message}</FormHelperText>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Imágenes del producto
+                  </Typography>
                 </Grid>
-              )}
 
-              {/* Imágenes */}
-              <Grid size={{ xs: 12 }}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Imágenes del producto
-                </Typography>
-              </Grid>
-
-              {isEditing && (
                 <Grid size={{ xs: 12, sm: 8, md: 6 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <TextField
@@ -791,30 +944,28 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
                     <FormHelperText error>{errors.images.message}</FormHelperText>
                   )}
                 </Grid>
-              )}
 
-              <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-                  {imageUrls.map((url, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        position: 'relative',
-                        width: 150,
-                        height: 150,
-                        border: '1px solid #ddd',
-                        borderRadius: 1,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <Image
-                        src={url}
-                        alt={`Imagen ${index + 1}`}
-                        width={150}
-                        height={150}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      {isEditing && (
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                    {imageUrls.map((url, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          position: 'relative',
+                          width: 150,
+                          height: 150,
+                          border: '1px solid #ddd',
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <Image
+                          src={url}
+                          alt={`Imagen ${index + 1}`}
+                          width={150}
+                          height={150}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                         <IconButton
                           color="error"
                           size="small"
@@ -831,14 +982,14 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
                         >
                           <Delete />
                         </IconButton>
-                      )}
-                    </Box>
-                  ))}
-                </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Grid>
               </Grid>
-            </Grid>
-          </form>
-        </Card>
+            </form>
+          </Card>
+        )}
 
         <Snackbar
           open={snackbar.open}
