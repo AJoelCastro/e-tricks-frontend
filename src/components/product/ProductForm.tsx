@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -11,14 +11,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
   FormHelperText,
   CircularProgress,
   Snackbar,
   Alert,
   Switch,
   FormControlLabel,
-  Skeleton,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -28,13 +26,12 @@ import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import { IProduct } from '@/interfaces/Product';
 
-interface ProductFormProps {
-  productId?: string; // Si tiene ID, es edición; si no, es creación
-  onSuccess?: (product: IProduct) => void; // Callback opcional para manejar el éxito
-  onCancel?: () => void; // Callback opcional para manejar cancelación
+interface CreateProductFormProps {
+  onSuccess?: (product: IProduct) => void;
+  onCancel?: () => void;
 }
 
-// Esquema de validación actualizado según tu interfaz
+// Esquema de validación
 const schema = yup.object().shape({
   name: yup.string().required('El nombre es obligatorio'),
   description: yup.string().required('La descripción es obligatoria'),
@@ -57,19 +54,8 @@ const schema = yup.object().shape({
   isTrending: yup.boolean(),
 });
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-// Datos estáticos (podrías obtenerlos de una API)
-const sizes = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]; // Tallas numéricas
+// Datos estáticos
+const sizes = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
 const materials = ['Algodón', 'Poliéster', 'Cuero', 'Lino', 'Seda', 'Lana'];
 const categories = ['Camisetas', 'Pantalones', 'Vestidos', 'Zapatos', 'Accesorios'];
 const subCategories = ['Casual', 'Formal', 'Deportivo', 'Elegante'];
@@ -77,13 +63,11 @@ const groupCategories = ['Hombres', 'Mujeres', 'Niños', 'Unisex'];
 const brands = ['Nike', 'Adidas', 'Zara', 'H&M', 'Gucci', 'Prada'];
 const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
 
-const ProductForm: React.FC<ProductFormProps> = ({ 
-  productId, 
+const CreateProductForm: React.FC<CreateProductFormProps> = ({ 
   onSuccess, 
   onCancel 
 }) => {
   const [loading, setLoading] = useState(false);
-  const [loadingProduct, setLoadingProduct] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [stockPorTalla, setStockPorTalla] = useState<{ talla: number; stock: number }[]>([]);
@@ -94,14 +78,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
   });
   
   const { getToken } = useAuth();
-  const isEditing = !!productId;
   
   const {
     control,
     handleSubmit,
     reset,
     setValue,
-    // watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -122,51 +104,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
       isTrending: false,
     },
   });
-
-  // Cargar datos del producto si es edición
-  useEffect(() => {
-    if (isEditing && productId) {
-      loadProductData(productId);
-    }
-  }, [productId, isEditing]);
-
-  const loadProductData = async (id: string) => {
-    try {
-      setLoadingProduct(true);
-      const product = await ProductService.GetProductById(id);
-      
-      // Llenar el formulario con los datos del producto
-      reset({
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        stockPorTalla: product.stockPorTalla,
-        material: product.material._id, // Asumiendo que necesitas el ID
-        category: product.category._id,
-        subCategory: product.subCategory._id,
-        groupCategory: product.groupCategory._id,
-        brand: product.brand._id,
-        images: product.images,
-        descuento: product.descuento || 0,
-        season: product.season || '',
-        isNewProduct: product.isNewProduct,
-        isTrending: product.isTrending,
-      });
-      
-      setImageUrls(product.images);
-      setStockPorTalla(product.stockPorTalla);
-      
-    } catch (error) {
-      console.error('Error al cargar el producto:', error);
-      setSnackbar({
-        open: true,
-        message: 'Error al cargar los datos del producto',
-        severity: 'error',
-      });
-    } finally {
-      setLoadingProduct(false);
-    }
-  };
 
   const handleAddImage = () => {
     if (newImageUrl && !imageUrls.includes(newImageUrl)) {
@@ -208,46 +145,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(true);
       const token = await getToken();
       
-      // Preparar los datos según tu interfaz
       const productData = {
         ...data,
         stockPorTalla: stockPorTalla,
       };
       
-      let result;
-      if (isEditing) {
-        // Actualizar producto existente
-        result = await ProductService.UpdateProduct(token as string, productId!, productData);
-      } else {
-        // Crear nuevo producto
-        result = await ProductService.CreateProduct(token as string, productData);
-      }
+      const result = await ProductService.CreateProduct(token as string, productData);
       
       setSnackbar({
         open: true,
-        message: isEditing ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente',
+        message: 'Producto creado exitosamente',
         severity: 'success',
       });
       
-      // Llamar callback de éxito si existe
       if (onSuccess) {
         onSuccess(result);
       }
       
-      // Si es creación, resetear el formulario
-      if (!isEditing) {
-        reset();
-        setImageUrls([]);
-        setStockPorTalla([]);
-      }
+      // Resetear el formulario
+      reset();
+      setImageUrls([]);
+      setStockPorTalla([]);
       
     } catch (error) {
-      console.error('Error al guardar el producto:', error);
+      console.error('Error al crear el producto:', error);
       setSnackbar({
         open: true,
         message:
           (error && typeof error === 'object' && 'response' in error && (error as any).response?.data?.message)
-            || `Error al ${isEditing ? 'actualizar' : 'crear'} el producto`,
+            || 'Error al crear el producto',
         severity: 'error',
       });
     } finally {
@@ -259,35 +185,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setSnackbar({ ...snackbar, open: false });
   };
 
-  if (loadingProduct) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Skeleton variant="text" height={60} />
-        <Skeleton variant="text" height={40} />
-        <Card sx={{ p: 4, mt: 2 }}>
-          <Grid container spacing={3}>
-            {Array.from(new Array(8)).map((_, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                <Skeleton variant="rectangular" height={56} />
-              </Grid>
-            ))}
-          </Grid>
-        </Card>
-      </Box>
-    );
-  }
-
   return (
     <>
-      <Box sx={{ height: { xs: 16, sm: 32, md: 64 } }} />
       <Box sx={{ padding: 2 }} minHeight={'100vh'}>
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
-              {isEditing ? 'Editar Producto' : 'Crear Nuevo Producto'}
+              Crear Nuevo Producto
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              {isEditing ? 'Modifica los datos del producto' : 'Registra nuevos productos para la tienda'}
+              Registra nuevos productos para la tienda
             </Typography>
           </Box>
           {onCancel && (
@@ -692,7 +599,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     {loading ? (
                       <CircularProgress size={24} />
                     ) : (
-                      isEditing ? 'Actualizar Producto' : 'Crear Producto'
+                      'Crear Producto'
                     )}
                   </Button>
                   
@@ -731,4 +638,4 @@ const ProductForm: React.FC<ProductFormProps> = ({
   );
 };
 
-export default ProductForm;
+export default CreateProductForm;
