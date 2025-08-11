@@ -17,14 +17,18 @@ import {
   Alert,
   Switch,
   FormControlLabel,
+  IconButton,
+  Divider,
+  Paper,
 } from '@mui/material';
+import { Add, Delete, Settings } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
-import { IProduct } from '@/interfaces/Product';
+import { IProduct, ICaracteristica } from '@/interfaces/Product';
 import { IMaterial } from '@/interfaces/Material';
 import MaterialService from '@/services/MaterialService';
 import { IBrand } from '@/interfaces/Brand';
@@ -41,7 +45,7 @@ interface CreateProductFormProps {
   onCancel?: () => void;
 }
 
-// Esquema de validación
+// Esquema de validación actualizado
 const schema = yup.object().shape({
   name: yup.string().required('El nombre es obligatorio'),
   description: yup.string().required('La descripción es obligatoria'),
@@ -62,11 +66,31 @@ const schema = yup.object().shape({
   season: yup.string().optional(),
   isNewProduct: yup.boolean(),
   isTrending: yup.boolean(),
+  caracteristicas: yup.array().of(
+    yup.object().shape({
+      nombre: yup.string().required('El nombre de la característica es obligatorio'),
+      valor: yup.string().required('El valor de la característica es obligatorio'),
+    })
+  ).optional(),
 });
 
 // Datos estáticos
-const sizes = [34,35, 36, 37, 38, 39, 40, 41, 42];
-const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
+const sizes = [34, 35, 36, 37, 38, 39, 40, 41, 42];
+const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno', 'Todas las temporadas'];
+
+// Características predefinidas comunes
+const commonCharacteristics = [
+  'Color',
+  'Talla',
+  'Peso',
+  'Dimensiones',
+  'Género',
+  'Estilo',
+  'Ocasión',
+  'Cuidado',
+  'Origen',
+  'Garantía'
+];
 
 const CreateProductForm: React.FC<CreateProductFormProps> = ({ 
   onSuccess, 
@@ -76,6 +100,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [stockPorTalla, setStockPorTalla] = useState<{ talla: number; stock: number }[]>([]);
+  const [caracteristicas, setCaracteristicas] = useState<ICaracteristica[]>([]);
   const [materials, setMaterials] = useState<IMaterial[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [categories, setCategories] = useState<IProductCategory[]>([]);
@@ -112,10 +137,12 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       season: '',
       isNewProduct: false,
       isTrending: false,
+      caracteristicas: [],
     },
   });
 
-  const getMaterials = async ()=>{
+  // Funciones para obtener datos de los servicios
+  const getMaterials = async () => {
     try {
       const response = await MaterialService.getAllMaterials();
       setMaterials(response)
@@ -123,7 +150,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       throw error
     }
   }
-  const getBrands = async ()=>{
+
+  const getBrands = async () => {
     try {
       const response = await BrandService.getBrands();
       setBrands(response)
@@ -131,7 +159,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       throw error
     }
   }
-  const getCategories = async()=>{
+
+  const getCategories = async () => {
     try {
       const response = await ProductCategoryService.getCategories();
       setCategories(response)
@@ -139,7 +168,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       throw error
     }
   }
-  const getSubCategories = async()=>{
+
+  const getSubCategories = async () => {
     try {
       const response = await SubCategoryService.getSubCategories();
       setSubCategories(response)
@@ -147,10 +177,11 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       throw error
     }
   }
-  const getGroupCategories = async()=>{
+
+  const getGroupCategories = async () => {
     try {
       const response = await GroupCategoryService.getGroupCategories(true);
-      setGroupCategories(response.filter((gc: IGroupCategory)=>gc.routeLink!=="marcas"))
+      setGroupCategories(response.filter((gc: IGroupCategory) => gc.routeLink !== "marcas"))
     } catch (error) {
       throw error
     }
@@ -163,8 +194,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
     getBrands();
     getMaterials();
   }, [])
-  
 
+  // Funciones para manejar imágenes
   const handleAddImage = () => {
     if (newImageUrl && !imageUrls.includes(newImageUrl)) {
       const updatedImages = [...imageUrls, newImageUrl];
@@ -180,6 +211,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
     setValue('images', updatedImages);
   };
 
+  // Funciones para manejar stock por talla
   const handleAddSizeStock = () => {
     const newEntry = { talla: 0, stock: 0 };
     const updatedStock = [...stockPorTalla, newEntry];
@@ -200,6 +232,37 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
     setValue('stockPorTalla', updatedStock);
   };
 
+  // Funciones para manejar características
+  const handleAddCaracteristica = () => {
+    const newCaracteristica: ICaracteristica = { nombre: '', valor: '' };
+    const updatedCaracteristicas = [...caracteristicas, newCaracteristica];
+    setCaracteristicas(updatedCaracteristicas);
+    setValue('caracteristicas', updatedCaracteristicas);
+  };
+
+  const handleRemoveCaracteristica = (index: number) => {
+    const updatedCaracteristicas = caracteristicas.filter((_, i) => i !== index);
+    setCaracteristicas(updatedCaracteristicas);
+    setValue('caracteristicas', updatedCaracteristicas);
+  };
+
+  const handleCaracteristicaChange = (index: number, field: 'nombre' | 'valor', value: string) => {
+    const updatedCaracteristicas = [...caracteristicas];
+    updatedCaracteristicas[index][field] = value;
+    setCaracteristicas(updatedCaracteristicas);
+    setValue('caracteristicas', updatedCaracteristicas);
+  };
+
+  const handleAddPresetCharacteristic = (characteristicName: string) => {
+    const exists = caracteristicas.some(c => c.nombre === characteristicName);
+    if (!exists) {
+      const newCaracteristica: ICaracteristica = { nombre: characteristicName, valor: '' };
+      const updatedCaracteristicas = [...caracteristicas, newCaracteristica];
+      setCaracteristicas(updatedCaracteristicas);
+      setValue('caracteristicas', updatedCaracteristicas);
+    }
+  };
+
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
@@ -208,6 +271,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       const productData = {
         ...data,
         stockPorTalla: stockPorTalla,
+        caracteristicas: caracteristicas.filter(c => c.nombre.trim() && c.valor.trim()), // Solo incluir características completas
       };
       
       const result = await ProductService.CreateProduct(token as string, productData);
@@ -226,6 +290,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       reset();
       setImageUrls([]);
       setStockPorTalla([]);
+      setCaracteristicas([]);
       
     } catch (error) {
       console.error('Error al crear el producto:', error);
@@ -354,7 +419,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
 
               {/* Categorización */}
               <Grid size={{ xs: 12 }}>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
                   Categorización
                 </Typography>
               </Grid>
@@ -433,7 +499,6 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                     <FormControl fullWidth>
                       <InputLabel>Temporada</InputLabel>
                       <Select {...field} label="Temporada">
-                        <MenuItem value="">Sin temporada</MenuItem>
                         {seasons.map((season) => (
                           <MenuItem key={season} value={season}>
                             {season}
@@ -447,7 +512,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
 
               {/* Precio y descuento */}
               <Grid size={{ xs: 12 }}>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
                   Precio y promociones
                 </Typography>
               </Grid>
@@ -514,9 +580,91 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                 />
               </Grid>
 
+              {/* Características del producto */}
+              <Grid size={{ xs: 12 }}>
+                <Divider sx={{ my: 2 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Settings sx={{ mr: 1 }} />
+                    Características del producto
+                  </Typography>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<Add />}
+                    onClick={handleAddCaracteristica}
+                  >
+                    Agregar característica
+                  </Button>
+                </Box>
+              </Grid>
+
+              {/* Características predefinidas */}
+              {caracteristicas.length === 0 && (
+                <Grid size={{ xs: 12 }}>
+                  <Paper sx={{ p: 2, backgroundColor: '#f5f5f5' }}>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Características comunes (clic para agregar):
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {commonCharacteristics.map((char) => (
+                        <Button
+                          key={char}
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleAddPresetCharacteristic(char)}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          + {char}
+                        </Button>
+                      ))}
+                    </Box>
+                  </Paper>
+                </Grid>
+              )}
+
+              {/* Lista de características */}
+              {caracteristicas.map((caracteristica, index) => (
+                <React.Fragment key={index}>
+                  <Grid size={{ xs: 12, sm: 5, md: 4 }}>
+                    <TextField
+                      label="Nombre de la característica"
+                      fullWidth
+                      value={caracteristica.nombre}
+                      onChange={(e) => handleCaracteristicaChange(index, 'nombre', e.target.value)}
+                      placeholder="Ej: Color, Talla, Material..."
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 5, md: 4 }}>
+                    <TextField
+                      label="Valor"
+                      fullWidth
+                      value={caracteristica.valor}
+                      onChange={(e) => handleCaracteristicaChange(index, 'valor', e.target.value)}
+                      placeholder="Ej: Rojo, XL, Algodón..."
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2, md: 2 }}>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleRemoveCaracteristica(index)}
+                      sx={{ mt: 1 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                </React.Fragment>
+              ))}
+
+              {errors.caracteristicas && (
+                <Grid size={{ xs: 12 }}>
+                  <FormHelperText error>{errors.caracteristicas.message}</FormHelperText>
+                </Grid>
+              )}
+
               {/* Stock por talla */}
               <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3, mb: 2 }}>
+                <Divider sx={{ my: 2 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6">
                     Stock por talla
                   </Typography>
@@ -575,7 +723,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
 
               {/* Imágenes */}
               <Grid size={{ xs: 12 }}>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
                   Imágenes del producto
                 </Typography>
               </Grid>

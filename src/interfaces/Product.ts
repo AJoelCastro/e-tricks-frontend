@@ -45,3 +45,8 @@ export interface Resenia {
   valoracion: number;
   comentario: string;
 }
+
+export interface ICaracteristica {
+  nombre: string;
+  valor: string;
+}
