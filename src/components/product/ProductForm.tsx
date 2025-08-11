@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -25,6 +25,10 @@ import ProductService from '@/services/ProductService';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import { IProduct } from '@/interfaces/Product';
+import { IMaterial } from '@/interfaces/Material';
+import MaterialService from '@/services/MaterialService';
+import { IBrand } from '@/interfaces/Brand';
+import BrandService from '@/services/BrandService';
 
 interface CreateProductFormProps {
   onSuccess?: (product: IProduct) => void;
@@ -56,11 +60,9 @@ const schema = yup.object().shape({
 
 // Datos estáticos
 const sizes = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
-const materials = ['Algodón', 'Poliéster', 'Cuero', 'Lino', 'Seda', 'Lana'];
 const categories = ['Camisetas', 'Pantalones', 'Vestidos', 'Zapatos', 'Accesorios'];
 const subCategories = ['Casual', 'Formal', 'Deportivo', 'Elegante'];
 const groupCategories = ['Hombres', 'Mujeres', 'Niños', 'Unisex'];
-const brands = ['Nike', 'Adidas', 'Zara', 'H&M', 'Gucci', 'Prada'];
 const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
 
 const CreateProductForm: React.FC<CreateProductFormProps> = ({ 
@@ -71,6 +73,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [stockPorTalla, setStockPorTalla] = useState<{ talla: number; stock: number }[]>([]);
+  const [materials, setMaterials] = useState<IMaterial[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -104,6 +108,28 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       isTrending: false,
     },
   });
+
+  const getMaterials = async ()=>{
+    try {
+      const response = await MaterialService.getAllMaterials();
+      setMaterials(response)
+    } catch (error) {
+      throw error
+    }
+  }
+  const getBrands = async ()=>{
+    try {
+      const response = await BrandService.getBrands();
+      setBrands(response)
+    } catch (error) {
+      throw error
+    }
+  }
+  useEffect(() => {
+    getBrands();
+    getMaterials();
+  }, [])
+  
 
   const handleAddImage = () => {
     if (newImageUrl && !imageUrls.includes(newImageUrl)) {
@@ -239,8 +265,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                       <InputLabel>Marca</InputLabel>
                       <Select {...field} label="Marca">
                         {brands.map((brand) => (
-                          <MenuItem key={brand} value={brand}>
-                            {brand}
+                          <MenuItem key={brand._id} value={brand._id}>
+                            {brand.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -261,8 +287,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                       <InputLabel>Material</InputLabel>
                       <Select {...field} label="Material">
                         {materials.map((material) => (
-                          <MenuItem key={material} value={material}>
-                            {material}
+                          <MenuItem key={material._id} value={material._id}>
+                            {material.name}
                           </MenuItem>
                         ))}
                       </Select>
