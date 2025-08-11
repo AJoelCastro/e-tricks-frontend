@@ -31,6 +31,10 @@ import { IBrand } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
 import { IProductCategory } from '@/interfaces/ProductCategory';
 import ProductCategoryService from '@/services/ProductCategoryService';
+import { ISubCategory } from '@/interfaces/SubCategory';
+import SubCategoryService from '@/services/SubCategoryService';
+import { IGroupCategory } from '@/interfaces/GroupCategory';
+import GroupCategoryService from '@/services/GroupCategoryService';
 
 interface CreateProductFormProps {
   onSuccess?: (product: IProduct) => void;
@@ -62,8 +66,6 @@ const schema = yup.object().shape({
 
 // Datos estáticos
 const sizes = [34,35, 36, 37, 38, 39, 40, 41, 42];
-const subCategories = ['Casual', 'Formal', 'Deportivo', 'Elegante'];
-const groupCategories = ['Hombres', 'Mujeres', 'Niños', 'Unisex'];
 const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
 
 const CreateProductForm: React.FC<CreateProductFormProps> = ({ 
@@ -77,6 +79,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [materials, setMaterials] = useState<IMaterial[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [categories, setCategories] = useState<IProductCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<ISubCategory[]>([]);
+  const [groupCategories, setGroupCategories] = useState<IGroupCategory[]>([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -130,13 +134,31 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const getCategories = async()=>{
     try {
       const response = await ProductCategoryService.getCategories();
-      console.log(response)
       setCategories(response)
     } catch (error) {
       throw error
     }
   }
+  const getSubCategories = async()=>{
+    try {
+      const response = await SubCategoryService.getSubCategories();
+      setSubCategories(response)
+    } catch (error) {
+      throw error
+    }
+  }
+  const getGroupCategories = async()=>{
+    try {
+      const response = await GroupCategoryService.getGroupCategories(true);
+      setGroupCategories(response.filter((gc: IGroupCategory)=>gc.routeLink!=="marcas"))
+    } catch (error) {
+      throw error
+    }
+  }
+
   useEffect(() => {
+    getGroupCategories();
+    getSubCategories();
     getCategories()
     getBrands();
     getMaterials();
@@ -368,8 +390,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                       <InputLabel>Subcategoría</InputLabel>
                       <Select {...field} label="Subcategoría">
                         {subCategories.map((subCategory) => (
-                          <MenuItem key={subCategory} value={subCategory}>
-                            {subCategory}
+                          <MenuItem key={subCategory._id} value={subCategory._id}>
+                            {subCategory.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -390,8 +412,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                       <InputLabel>Grupo</InputLabel>
                       <Select {...field} label="Grupo">
                         {groupCategories.map((group) => (
-                          <MenuItem key={group} value={group}>
-                            {group}
+                          <MenuItem key={group._id} value={group._id}>
+                            {group.name}
                           </MenuItem>
                         ))}
                       </Select>
