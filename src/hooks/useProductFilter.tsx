@@ -3,10 +3,11 @@ import { IProduct } from '@/interfaces/Product';
 
 // Datos estáticos para filtros
 export const SEASONS = [
-    { value: 'primavera', label: 'Primavera' },
-    { value: 'verano', label: 'Verano' },
-    { value: 'otono', label: 'Otoño' },
-    { value: 'invierno', label: 'Invierno' }
+    { value: 'Primavera', label: 'Primavera' },
+    { value: 'Verano', label: 'Verano' },
+    { value: 'Otoño', label: 'Otoño' },
+    { value: 'Invierno', label: 'Invierno' },
+    { value: 'Todas las temporadas', label: 'Todas las temporadas' }
 ];
 
 export const STATIC_BRANDS = [

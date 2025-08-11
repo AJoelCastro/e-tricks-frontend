@@ -225,25 +225,6 @@ const ProductFilter: React.FC<ProductFilterProps> = ({
                                 </Typography>
                             </Box>
                         ))}
-                        <Divider sx={{ my: 1 }} />
-                        <Box
-                            onClick={() => {
-                                onSeasonChange({ target: { value: '' } });
-                                handleMenuClose();
-                            }}
-                            sx={{
-                                p: 2,
-                                cursor: 'pointer',
-                                borderRadius: '8px',
-                                '&:hover': {
-                                    backgroundColor: '#f8f9fa'
-                                }
-                            }}
-                        >
-                            <Typography sx={{ fontSize: '15px', fontStyle: 'italic', color: '#666', ":hover":{color:'primary.main'} }}>
-                                Todas las temporadas
-                            </Typography>
-                        </Box>
                     </Box>
                 );
 
