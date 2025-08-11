@@ -29,6 +29,8 @@ import { IMaterial } from '@/interfaces/Material';
 import MaterialService from '@/services/MaterialService';
 import { IBrand } from '@/interfaces/Brand';
 import BrandService from '@/services/BrandService';
+import { IProductCategory } from '@/interfaces/ProductCategory';
+import ProductCategoryService from '@/services/ProductCategoryService';
 
 interface CreateProductFormProps {
   onSuccess?: (product: IProduct) => void;
@@ -59,8 +61,7 @@ const schema = yup.object().shape({
 });
 
 // Datos estáticos
-const sizes = [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
-const categories = ['Camisetas', 'Pantalones', 'Vestidos', 'Zapatos', 'Accesorios'];
+const sizes = [34,35, 36, 37, 38, 39, 40, 41, 42];
 const subCategories = ['Casual', 'Formal', 'Deportivo', 'Elegante'];
 const groupCategories = ['Hombres', 'Mujeres', 'Niños', 'Unisex'];
 const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
@@ -75,6 +76,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [stockPorTalla, setStockPorTalla] = useState<{ talla: number; stock: number }[]>([]);
   const [materials, setMaterials] = useState<IMaterial[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
+  const [categories, setCategories] = useState<IProductCategory[]>([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -125,7 +127,17 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       throw error
     }
   }
+  const getCategories = async()=>{
+    try {
+      const response = await ProductCategoryService.getCategories();
+      console.log(response)
+      setCategories(response)
+    } catch (error) {
+      throw error
+    }
+  }
   useEffect(() => {
+    getCategories()
     getBrands();
     getMaterials();
   }, [])
@@ -334,8 +346,8 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                       <InputLabel>Categoría</InputLabel>
                       <Select {...field} label="Categoría">
                         {categories.map((category) => (
-                          <MenuItem key={category} value={category}>
-                            {category}
+                          <MenuItem key={category._id} value={category._id}>
+                            {category.name}
                           </MenuItem>
                         ))}
                       </Select>
