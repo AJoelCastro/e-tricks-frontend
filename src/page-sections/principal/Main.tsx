@@ -68,7 +68,6 @@ const MainComponent = () => {
       const data = await BrandService.getBrandsWithProductCategories();
       setBrandsWithCategories(data);
     } catch (error) {
-      console.error('Error fetching brands with categories:', error);
       showError('Error al cargar las categor?as de marcas');
     }
   }
@@ -114,6 +113,24 @@ const MainComponent = () => {
   if(isLoading){
     return <SplashScreen/>
   }
+  // Agregar esta función dentro del componente MainComponent
+  const getAllUniqueCategories = () => {
+    // Obtener categorías de marcas
+    const categoriesFromBrands = brandsWithCategories.flatMap(item => item.categories);
+    
+    // Combinar con categorías con descuento
+    const allCategories = [...categoriesFromBrands, ...categoriesWithDescuento];
+    
+    // Filtrar categorías únicas por routeLink (que parece ser único)
+    const uniqueCategories = allCategories.filter((category, index, self) => 
+      index === self.findIndex(c => c.routeLink === category.routeLink)
+    );
+    
+    return uniqueCategories;
+  };
+
+  // Usar en el componente
+  const uniqueCategories = getAllUniqueCategories();
 
   // Funcion mejorada para agregar al carrito con producto completo
   const handleAddToCartWithProduct = async (productId: string, size: string, quantity: number) => {
@@ -312,9 +329,7 @@ const MainComponent = () => {
             className="mySwiper"
             style={{ paddingBottom: '2rem' }}
           >
-            {brandsWithCategories
-              .find((brand) => brand.brand.name === 'Tricks')
-              ?.categories.map((category) => (
+            {getAllUniqueCategories().map((category) => (
                 <SwiperSlide key={category._id} onClick={()=>router.push(`/mujer/calzados/${category.routeLink}`)}>
                   <Box
                     sx={{
