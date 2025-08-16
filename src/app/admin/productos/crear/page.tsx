@@ -4,7 +4,7 @@ import React from 'react'
 const CrearProductoPage = () => {
   return (
     <>
-        <ProductRegisterPageSection/>
+      <ProductRegisterPageSection/>
     </>
   )
 }

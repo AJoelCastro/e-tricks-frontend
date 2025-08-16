@@ -51,6 +51,7 @@ const LeftSideAdmin= () => {
     { href: '/admin', label: 'DASHBOARD' },
     { href: '/admin/ordenes', label: 'ORDENES' },
     { href: '/admin/productos', label: 'PRODUCTOS' },
+    { href: '/admin/productosS3', label: 'AWS S3 PRODUCTOS' },
   ];
 
   return (
