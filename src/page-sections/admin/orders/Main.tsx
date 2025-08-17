@@ -18,9 +18,10 @@ import {
     Button,
     Collapse,
     IconButton,
-    ButtonGroup
+    TextField
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { IOrder } from '@/interfaces/Order'; // Ajusta la ruta según tu estructura
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -39,7 +40,25 @@ const MainOrdersPageSection = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
+    const handleExportPDF = async () => {
+        if (!startDate || !endDate) {
+            alert("Por favor selecciona ambas fechas");
+            return;
+        }
+        try {
+            setLoading(true);
+            const token = await getToken();
+            await OrderService.exportPdf(token as string, startDate, endDate);
+        } catch (error) {
+            alert('Error al generar el PDF');
+        } finally {
+            setLoading(false);
+        }
+
+    };
     const getOrdenes = async () => {
         try {
             setLoading(true);
@@ -168,7 +187,31 @@ const MainOrdersPageSection = () => {
                 <Grid size={{
                     xs:12, sm:7, md:9
                 }}>
-                    <Box sx={{ padding:3}}>
+                    <Box sx={{ padding:2}}>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+                            <TextField
+                                label="Fecha Inicio"
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <TextField
+                                label="Fecha Fin"
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<PictureAsPdfIcon />}
+                                onClick={handleExportPDF}
+                            >
+                                Exportar PDF
+                            </Button>
+                        </Stack>
                         <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
                             Sección de Órdenes
                         </Typography>

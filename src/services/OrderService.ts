@@ -202,6 +202,31 @@ const OrderService = {
             throw error
         }
     },
+    exportPdf: async (token: string, startDate: string, endDate: string) => {
+        try {
+            const response = await axios.get(`${API_URL}/order/export-pdf`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                params: {
+                    startDate,
+                    endDate
+                },
+                responseType: 'blob',
+            });
+            
+            const url = window.URL.createObjectURL(response.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ordenes_${startDate}_${endDate}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            throw error;
+        }
+    },
 
     /**
      * Cancelar una orden
