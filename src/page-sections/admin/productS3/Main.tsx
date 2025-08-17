@@ -139,7 +139,7 @@ const MainProductS3PageSection = () => {
                                 <Info />
                                 </IconButton>
                                 <IconButton
-                                color="secondary"
+                                color="primary"
                                 onClick={() => handleEditClick(folder)}
                                 >
                                 <Edit />
