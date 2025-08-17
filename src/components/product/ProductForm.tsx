@@ -124,28 +124,30 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
     setSelectedFolder(folderName);
     if (!folderName) {
       setFolderImages([]);
+      setImageUrls([]);
+      setValue('images', []);
       return;
     }
     try {
       setLoadingFolderImages(true);
       const token = await getToken();
       const res = await AWSService.getFolderDetails(token!, folderName);
-      // asumo res.images es el array que mostraste
-      setFolderImages(res.images || []);
+      const imgs = res.images || [];
+
+      // Tomamos todas las URLs (puede ser img.url, img.signedUrl o img.key según tu backend)
+      const urls = imgs.map((img: any) => img.url || img.signedUrl || img.key);
+
+      setFolderImages(imgs);
+      setImageUrls(urls);
+      setValue('images', urls); // las guarda en el form de react-hook-form
     } catch (err) {
       console.error('Error al obtener imágenes de carpeta:', err);
       setFolderImages([]);
+      setImageUrls([]);
+      setValue('images', []);
     } finally {
       setLoadingFolderImages(false);
     }
-  };
-
-  // Alternar selección de imagen (añade/remueve de imageUrls y del form)
-  const toggleSelectImage = (imageUrl: string) => {
-    const exists = imageUrls.includes(imageUrl);
-    const updated = exists ? imageUrls.filter(u => u !== imageUrl) : [...imageUrls, imageUrl];
-    setImageUrls(updated);
-    setValue('images', updated);
   };
 
   const [snackbar, setSnackbar] = useState({
@@ -822,23 +824,21 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
               <Grid size={{ xs: 12 }}>
                 <Box sx={{ mt: 2 }}>
                   {folderImages.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">Selecciona una carpeta para ver sus imágenes</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Selecciona una carpeta para ver sus imágenes
+                    </Typography>
                   ) : (
                     <Grid container spacing={2}>
                       {folderImages.map((img, index) => {
-                        // usa img.url o img.signedUrl según lo que devuelva tu backend
                         const imageUrl = img.url || img.signedUrl || img.key;
-                        const selected = imageUrls.includes(imageUrl);
                         return (
                           <Grid size={{ xs: 6, sm: 4, md: 3 }} key={index}>
                             <Box
-                              onClick={() => toggleSelectImage(imageUrl)}
                               sx={{
                                 position: 'relative',
-                                border: selected ? '3px solid #1976d2' : '1px solid #ddd',
+                                border: '1px solid #ddd',
                                 borderRadius: 2,
                                 overflow: 'hidden',
-                                cursor: 'pointer',
                               }}
                             >
                               <Image
@@ -848,26 +848,10 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                                 height={200}
                                 style={{ width: '100%', height: 180, objectFit: 'cover' }}
                               />
-                              {selected && (
-                                <Box sx={{
-                                  position: 'absolute',
-                                  top: 6,
-                                  right: 6,
-                                  backgroundColor: 'rgba(25,118,210,0.9)',
-                                  color: '#fff',
-                                  borderRadius: '50%',
-                                  width: 28,
-                                  height: 28,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: 14
-                                }}>
-                                  ✓
-                                </Box>
-                              )}
                             </Box>
-                            <Typography variant="caption" noWrap>{img.fileName}</Typography>
+                            <Typography variant="caption" noWrap>
+                              {img.fileName}
+                            </Typography>
                           </Grid>
                         );
                       })}
@@ -875,7 +859,6 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                   )}
                 </Box>
               </Grid>
-
               {/* Botones */}
               <Grid size={{ xs: 12 }}>
                 <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
