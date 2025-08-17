@@ -4,6 +4,7 @@ import { useAuth } from '@clerk/nextjs';
 import AWSService from '@/services/AWS';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Box,
   Typography,
@@ -14,6 +15,14 @@ import {
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Image from 'next/image';
+
+interface ImageItem {
+  fileName: string;
+  key: string;
+  url: string;
+  signedUrl: string;
+}
 
 const EditFolderComponent = () => {
   const { getToken } = useAuth();
@@ -23,7 +32,7 @@ const EditFolderComponent = () => {
 
   const [newName, setNewName] = useState(folderName);
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [loadingDelete, setLoadingDelete] = useState<string | null>(null);
 
   // Obtener imágenes al cargar
@@ -62,7 +71,7 @@ const EditFolderComponent = () => {
       await AWSService.deleteProductImage(token!, folderName, fileName);
 
       // actualizar lista local sin recargar
-      setImages((prev) => prev.filter((img) => img !== fileName));
+      setImages((prev) => prev.filter((img) => img.fileName !== fileName));
     } catch (error) {
       console.error('Error eliminando imagen:', error);
     } finally {
@@ -72,70 +81,90 @@ const EditFolderComponent = () => {
 
   return (
     <Box p={3}>
-        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Typography variant="h5" mb={2}>
+        <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
+            <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<ArrowBackIcon />}
+                onClick={() => router.back()}
+                sx={{ mb: 2, color: 'primary.main' }}
+            >
+                Volver
+            </Button>
+            
+        </Box>
+        <Typography variant="h5" mb={2}>
                 Editar carpeta: {folderName}
             </Typography>
-            <Button
+        {/* aqui la seccion del nombre */}
+        <Grid container spacing={2} alignItems="center" mb={2}>
+            <Grid size={{xs:12, md:6}}>
+                <TextField
+                fullWidth
+                label="Nuevo nombre"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                />
+            </Grid>
+            <Grid size={{xs:12, md:"auto"}}>
+                <Button
+                fullWidth
                 variant="contained"
                 color="primary"
                 onClick={handleSave}
                 disabled={loading}
-                sx={{ mb: 3 }}
-            >
+                sx={{ height: '100%' }}
+                >
                 {loading ? <CircularProgress size={20} /> : 'Guardar cambios'}
-            </Button>
-        </Box>
-        <TextField
-            label="Nuevo nombre"
-            fullWidth
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            sx={{ mb: 2 }}
-        />
-      <Typography variant="h6" mb={2}>
-        Imágenes en la carpeta
-      </Typography>
+                </Button>
+            </Grid>
+        </Grid>
+        <Typography variant="h6" mb={2}>
+            Imágenes en la carpeta
+        </Typography>
 
-      <Grid container spacing={2}>
-        {images.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            No hay imágenes en esta carpeta.
-          </Typography>
-        )}
+        <Grid container spacing={2}>
+            {images.length === 0 && (
+            <Typography variant="body2" color="text.secondary">
+                No hay imágenes en esta carpeta.
+            </Typography>
+            )}
 
-        {images.map((fileName) => (
-          <Grid key={fileName} size={{ xs: 6, sm: 4, md: 3 }}>
-            <Box
-              sx={{
-                border: '1px solid #ddd',
-                borderRadius: 2,
-                p: 1,
-                position: 'relative',
-              }}
-            >
-              <img
-                src={`${process.env.NEXT_PUBLIC_AWS_BASE_URL}/productos/${folderName}/${fileName}`}
-                alt={fileName}
-                style={{ width: '100%', borderRadius: 8 }}
-              />
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => handleDeleteImage(fileName)}
-                sx={{ position: 'absolute', top: 5, right: 5 }}
-              >
-                {loadingDelete === fileName ? (
-                  <CircularProgress size={20} />
-                ) : (
-                  <DeleteIcon />
-                )}
-              </IconButton>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+            {images.map((img) => (
+            <Grid key={img.fileName} size={{ xs: 6, sm: 6, md: 3 }}>
+                <Box
+                    sx={{
+                        border: '1px solid #ddd',
+                        borderRadius: 2,
+                        p: 1,
+                        position: 'relative',
+                        height: { xs: 300, sm: 400, md: 500 },
+                    }}
+                >
+                <Image
+                    src={img.url}
+                    alt={img.fileName}
+                    fill
+                    style={{ objectFit: 'cover', borderRadius: 8 }}
+                />
+                <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDeleteImage(img.fileName)}
+                    sx={{ position: 'absolute', top: 5, right: 5 }}
+                >
+                    {loadingDelete === img.fileName ? (
+                    <CircularProgress size={20} />
+                    ) : (
+                    <DeleteIcon />
+                    )}
+                </IconButton>
+                </Box>
+            </Grid>
+            ))}
+        </Grid>
     </Box>
   );
 };
+
 export default EditFolderComponent;

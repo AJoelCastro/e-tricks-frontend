@@ -94,9 +94,9 @@ const MainProductS3PageSection = () => {
         <>
         <NavbarComponent />
         <Box sx={{ height: '64px' }} />
-        <Grid container spacing={1} sx={{ minHeight: '100vh' }}>
+        <Grid container spacing={1} >
             <Grid size={{ xs: 12, sm: 5, md: 3 }}>
-            <LeftSideAdmin />
+                <LeftSideAdmin />
             </Grid>
             <Grid size={{ xs: 12, sm: 7, md: 9 }}>
             <Box p={2}>

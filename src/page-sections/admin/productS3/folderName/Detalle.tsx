@@ -9,7 +9,7 @@ const DetalleFolderS3PageSection = () => {
     <>
         <NavbarComponent />
         <Box sx={{ height: '64px' }} />
-        <Grid container spacing={1} sx={{ minHeight: '100vh' }}>
+        <Grid container spacing={1}>
             <Grid size={{ xs: 12, sm: 5, md: 3 }}>
             <LeftSideAdmin />
             </Grid>
