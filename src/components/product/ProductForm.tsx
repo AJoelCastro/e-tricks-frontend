@@ -111,6 +111,9 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [selectedFolder, setSelectedFolder] = useState<string>('');
   const [folderImages, setFolderImages] = useState<any[]>([]);
   const [loadingFolderImages, setLoadingFolderImages] = useState(false);
+  // Nuevo estado para manejar las características comunes restantes
+  const [availableCommonChars, setAvailableCommonChars] = useState<string[]>(commonCharacteristics);
+
   const getFolders = async () => {
     try {
       const token = await getToken();
@@ -286,9 +289,15 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   };
 
   const handleRemoveCaracteristica = (index: number) => {
+    const removed = caracteristicas[index];
     const updatedCaracteristicas = caracteristicas.filter((_, i) => i !== index);
     setCaracteristicas(updatedCaracteristicas);
     setValue('caracteristicas', updatedCaracteristicas);
+
+    // Si estaba en las comunes, la devolvemos
+    if (commonCharacteristics.includes(removed.nombre)) {
+      setAvailableCommonChars(prev => [...prev, removed.nombre]);
+    }
   };
 
   const handleCaracteristicaChange = (index: number, field: 'nombre' | 'valor', value: string) => {
@@ -305,6 +314,9 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
       const updatedCaracteristicas = [...caracteristicas, newCaracteristica];
       setCaracteristicas(updatedCaracteristicas);
       setValue('caracteristicas', updatedCaracteristicas);
+
+      // Sacamos la característica de las disponibles
+      setAvailableCommonChars(prev => prev.filter(c => c !== characteristicName));
     }
   };
 
@@ -644,14 +656,14 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
               </Grid>
 
               {/* Características predefinidas */}
-              {caracteristicas.length === 0 && (
+              {availableCommonChars.length > 0 && (
                 <Grid size={{ xs: 12 }}>
                   <Paper sx={{ p: 2, backgroundColor: '#f5f5f5' }}>
                     <Typography variant="subtitle2" gutterBottom>
                       Características comunes (clic para agregar):
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {commonCharacteristics.map((char) => (
+                      {availableCommonChars.map((char) => (
                         <Button
                           key={char}
                           variant="outlined"
@@ -666,7 +678,6 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                   </Paper>
                 </Grid>
               )}
-
               {/* Lista de características */}
               {caracteristicas.map((caracteristica, index) => (
                 <React.Fragment key={index}>
