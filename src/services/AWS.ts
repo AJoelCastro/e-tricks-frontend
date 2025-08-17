@@ -34,7 +34,6 @@ const AWSService={
         }
     },
     deleteFolder: async (token: string, folderName: string) => {
-        console.log(folderName, 'folder')
         try {
             const response = await axios.delete(`${API_URL}/product/folders/${folderName}`, {
                 headers: {
@@ -46,7 +45,43 @@ const AWSService={
             throw error
         }
     },
-    
+    getFolderDetails: async (token: string, folderName: string) => {
+        try {
+            const response = await axios.get(`${API_URL}/product/folders/${folderName}/images`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+    renameFolder: async (token: string, oldName: string, newName: string) => {
+        try {
+            const response = await axios.put(`${API_URL}/product/folders/${oldName}`, { newName }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+    deleteProductImage: async (token: string, folderName: string, fileName: string) => {
+        try {
+            const response = await axios.delete(`${API_URL}/product/folders/${folderName}/images/${fileName}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default AWSService;

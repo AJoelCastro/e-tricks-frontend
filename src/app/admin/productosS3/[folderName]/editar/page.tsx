@@ -1,10 +1,11 @@
+import EditarFolderS3PageSection from '@/page-sections/admin/productS3/folderName/Editar'
 import React from 'react'
 
 const EditFolderS3Page = () => {
   return (
-    <div>
-      
-    </div>
+    <>
+      <EditarFolderS3PageSection />
+    </>
   )
 }
 

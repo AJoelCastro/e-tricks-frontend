@@ -1,10 +1,11 @@
+import DetalleFolderS3PageSection from '@/page-sections/admin/productS3/folderName/Detalle'
 import React from 'react'
 
 const DetailFolderS3Page = () => {
   return (
-    <div>
-      
-    </div>
+    <>
+        <DetalleFolderS3PageSection/>
+    </>
   )
 }
 
