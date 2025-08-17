@@ -39,6 +39,7 @@ import { ISubCategory } from '@/interfaces/SubCategory';
 import SubCategoryService from '@/services/SubCategoryService';
 import { IGroupCategory } from '@/interfaces/GroupCategory';
 import GroupCategoryService from '@/services/GroupCategoryService';
+import AWSService from '@/services/AWS';
 
 interface CreateProductFormProps {
   onSuccess?: (product: IProduct) => void;
@@ -106,6 +107,47 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
   const [categories, setCategories] = useState<IProductCategory[]>([]);
   const [subCategories, setSubCategories] = useState<ISubCategory[]>([]);
   const [groupCategories, setGroupCategories] = useState<IGroupCategory[]>([]);
+  const [folders, setFolders] = useState<{ folderName: string }[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<string>('');
+  const [folderImages, setFolderImages] = useState<any[]>([]);
+  const [loadingFolderImages, setLoadingFolderImages] = useState(false);
+  const getFolders = async () => {
+    try {
+      const token = await getToken();
+      const res = await AWSService.getFolderNames(token!);
+      setFolders(res.folders || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleSelectFolder = async (folderName: string) => {
+    setSelectedFolder(folderName);
+    if (!folderName) {
+      setFolderImages([]);
+      return;
+    }
+    try {
+      setLoadingFolderImages(true);
+      const token = await getToken();
+      const res = await AWSService.getFolderDetails(token!, folderName);
+      // asumo res.images es el array que mostraste
+      setFolderImages(res.images || []);
+    } catch (err) {
+      console.error('Error al obtener imágenes de carpeta:', err);
+      setFolderImages([]);
+    } finally {
+      setLoadingFolderImages(false);
+    }
+  };
+
+  // Alternar selección de imagen (añade/remueve de imageUrls y del form)
+  const toggleSelectImage = (imageUrl: string) => {
+    const exists = imageUrls.includes(imageUrl);
+    const updated = exists ? imageUrls.filter(u => u !== imageUrl) : [...imageUrls, imageUrl];
+    setImageUrls(updated);
+    setValue('images', updated);
+  };
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -193,6 +235,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
     getCategories()
     getBrands();
     getMaterials();
+    getFolders();
   }, [])
 
   // Funciones para manejar imágenes
@@ -728,6 +771,30 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                   Imágenes del producto
                 </Typography>
               </Grid>
+              {/* Selector de carpeta */}
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Carpeta (S3)</InputLabel>
+                  <Select
+                    value={selectedFolder}
+                    label="Carpeta (S3)"
+                    onChange={(e) => handleSelectFolder(String(e.target.value))}
+                  >
+                    {folders.map((f) => (
+                      <MenuItem key={f.folderName} value={f.folderName}>
+                        {f.folderName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Opcional: botón para refrescar */}
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                <Button onClick={() => handleSelectFolder(selectedFolder)} disabled={!selectedFolder || loadingFolderImages}>
+                  {loadingFolderImages ? 'Cargando...' : 'Refrescar carpeta'}
+                </Button>
+              </Grid>
 
               <Grid size={{ xs: 12, sm: 8, md: 6 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -751,46 +818,61 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({
                 )}
               </Grid>
 
+              {/* Mostrar imágenes de la carpeta para seleccionar */}
               <Grid size={{ xs: 12 }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-                  {imageUrls.map((url, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        position: 'relative',
-                        width: 150,
-                        height: 150,
-                        border: '1px solid #ddd',
-                        borderRadius: 1,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <Image
-                        src={url}
-                        alt={`Imagen ${index + 1}`}
-                        width={100}
-                        height={100}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      <Button
-                        variant="contained"
-                        color="error"
-                        size="small"
-                        sx={{
-                          position: 'absolute',
-                          top: 5,
-                          right: 5,
-                          minWidth: 'auto',
-                          width: 30,
-                          height: 30,
-                          p: 0,
-                        }}
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        X
-                      </Button>
-                    </Box>
-                  ))}
+                <Box sx={{ mt: 2 }}>
+                  {folderImages.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">Selecciona una carpeta para ver sus imágenes</Typography>
+                  ) : (
+                    <Grid container spacing={2}>
+                      {folderImages.map((img, index) => {
+                        // usa img.url o img.signedUrl según lo que devuelva tu backend
+                        const imageUrl = img.url || img.signedUrl || img.key;
+                        const selected = imageUrls.includes(imageUrl);
+                        return (
+                          <Grid size={{ xs: 6, sm: 4, md: 3 }} key={index}>
+                            <Box
+                              onClick={() => toggleSelectImage(imageUrl)}
+                              sx={{
+                                position: 'relative',
+                                border: selected ? '3px solid #1976d2' : '1px solid #ddd',
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <Image
+                                src={imageUrl}
+                                alt={img.fileName || `img-${index}`}
+                                width={300}
+                                height={200}
+                                style={{ width: '100%', height: 180, objectFit: 'cover' }}
+                              />
+                              {selected && (
+                                <Box sx={{
+                                  position: 'absolute',
+                                  top: 6,
+                                  right: 6,
+                                  backgroundColor: 'rgba(25,118,210,0.9)',
+                                  color: '#fff',
+                                  borderRadius: '50%',
+                                  width: 28,
+                                  height: 28,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: 14
+                                }}>
+                                  ✓
+                                </Box>
+                              )}
+                            </Box>
+                            <Typography variant="caption" noWrap>{img.fileName}</Typography>
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                  )}
                 </Box>
               </Grid>
 
