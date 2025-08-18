@@ -83,7 +83,6 @@ const RightSidePayment = () => {
         script.async = true;
         
         script.onload = () => {
-          console.log('MercadoPago SDK loaded successfully');
           setMpLoaded(true);
           resolve();
         };
@@ -223,12 +222,11 @@ const RightSidePayment = () => {
         orderType:deliveryType === 'pickup' ? 'pickup' :'standard'
       };
 
-      console.log('Creating preference with data:', preferenceData);
+     // console.log('Creating preference with data:', preferenceData);
 
       const response = await OrderService.getPreferenceId(token, preferenceData);
-      console.log("response front",response.data)
       if (response.success) {
-        console.log('Preference created successfully:', response);
+      //  console.log('Preference created successfully:', response);
       //   setOrderId(response.data.orderId);
         return response.data.preferenceId;
       } else {
@@ -261,7 +259,7 @@ const RightSidePayment = () => {
 
     // Crear la preferencia
     const preferenceIdCreated = await createPreference();
-    console.log(" preferenceIdCreated", preferenceIdCreated)
+   // console.log(" preferenceIdCreated", preferenceIdCreated)
     if (!preferenceIdCreated) {
       showError('No se pudo crear la preferencia de pago');
       return;
@@ -274,9 +272,6 @@ const RightSidePayment = () => {
       const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!, {
         locale: 'es-PE',
       });
-
-      console.log("mercadopago",mp)
-      console.log("Opening checkout with preference:", preferenceIdCreated);
 
       // Abrir el checkout directamente
       mp.checkout({
@@ -400,17 +395,6 @@ const RightSidePayment = () => {
               {renderDeliveryInfo()}
             </Box>
 
-            {/* Estado de MercadoPago */}
-            <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="body2">Estado del sistema de pagos:</Typography>
-                <Chip
-                  label={mpLoaded ? 'Listo' : 'Cargando...'}
-                  size="small"
-                  color={mpLoaded ? 'success' : 'warning'}
-                />
-              </Box>
-            </Box>
 
             {/* Información sobre el proceso */}
             <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
