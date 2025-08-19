@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { IProduct } from '@/interfaces/Product';
 import NavbarComponent from '@/components/principal/NavbarComponent';
 import { Box, Grid } from '@mui/material';
-import ProductDetailsEdit from '@/components/product/ProductDetailAndEdit';
 import LeftSideAdmin from '@/components/admin/LeftSideAdmin';
 
 const ProductEditPageSection = () => {
@@ -35,12 +34,7 @@ const ProductEditPageSection = () => {
         <Grid size={{
           xs:12, sm:7, md:9
         }}>
-          <ProductDetailsEdit
-            isEdit={true}
-            productId={productId}
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-          />
+          <ProductForm onSuccess={handleSuccess} onCancel={handleCancel}/>
         </Grid>
       </Grid>
     </>
