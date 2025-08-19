@@ -17,7 +17,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [carrito, setCarrito] = useState<ICartItem[]>([]);
   const [pickUps, setPickUps] = useState<IPickUp[]>([]);
   const [addresses, setAddresses] = useState<IAddress[]>([]);
-  const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | null>(null);
+  const [deliveryType, setDeliveryType] = useState<'pickup' | 'address' | 'courier' | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'yape' | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,7 +30,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [dataLoaded, setDataLoaded] = useState({
     cart: false,
     addresses: false,
-    pickups: false
+    pickups: false,
+    couriers: false
   });
 
   const pathname = usePathname();
@@ -81,6 +82,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       throw error;
     }
   }, [getToken, dataLoaded.addresses]);
+  
 
   // Función para forzar recarga de datos específicos
   const refreshCartItems = useCallback(async () => {

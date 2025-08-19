@@ -36,6 +36,7 @@ const ProductEditPageSection = () => {
           xs:12, sm:7, md:9
         }}>
           <ProductDetailsEdit
+            isEdit={true}
             productId={productId}
             onSuccess={handleSuccess}
             onCancel={handleCancel}

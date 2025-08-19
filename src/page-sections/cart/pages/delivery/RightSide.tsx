@@ -41,7 +41,7 @@ const RightSideDelivery = () => {
 
     const handleChangeEtapa = async()=>{
         try {
-            if (selectedAddress || selectedPickup) {
+            if (selectedAddress || selectedPickup || deliveryType === 'courier') {
                 router.push('/carrito/pagos');
             }else{
                 handleShowSnackbar("Por favor, selecciona una dirección de entrega", 'warning');
@@ -79,7 +79,7 @@ const RightSideDelivery = () => {
     };
 
     // Función para manejar el cambio de tipo de entrega
-    const handleDeliveryTypeChange = (type: 'pickup' | 'address') => {
+    const handleDeliveryTypeChange = (type: 'pickup' | 'address' | 'courier') => {
         setDeliveryType(type);
         
         // Limpiar las selecciones cuando cambias de tipo
@@ -87,6 +87,9 @@ const RightSideDelivery = () => {
             setSelectedAddress(null);
         } else if (type === 'address') {
             setSelectedPickup(null);
+        } else if (type === 'courier') {
+            setSelectedPickup(null);
+            setSelectedAddress(null);
         }
     };
 
@@ -227,6 +230,43 @@ const RightSideDelivery = () => {
                                             </Grid>
                                         )}
                                     </Grid>
+                                    {/* COURIER OPTION */}
+                                    <Grid size={{xs:12, sm:12, md:12}}>
+                                        <Box 
+                                            sx={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                gap: 2, 
+                                                border: deliveryType === 'courier' ? '2px solid #7950f2' : '1px solid #e0e0e0',
+                                                borderRadius: 2,
+                                                p: 2,
+                                                cursor: 'pointer',
+                                                backgroundColor: deliveryType === 'courier' ? '#f8f6ff' : 'white',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onClick={() => handleDeliveryTypeChange('courier')}
+                                        >
+                                            <Radio
+                                                checked={deliveryType === 'courier'}
+                                                onChange={() => handleDeliveryTypeChange('courier')}
+                                                color="primary"
+                                            />
+                                            <LocalShippingIcon sx={{ color: '#7c3aed', fontSize: 32 }} />
+                                            <Typography>
+                                                Recojo en agencia
+                                            </Typography>
+                                        </Box>
+                                        
+                                        {deliveryType === 'courier' && (
+                                            <Grid container spacing={1} sx={{ mt: 1 }}>
+                                                <Grid >
+                                                    <Typography variant="body1">
+                                                        Seleccionaste entrega por mensajería.
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        )}
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>  
@@ -322,10 +362,10 @@ const RightSideDelivery = () => {
                                             fullWidth
                                             sx={{ mt: 3, borderRadius: 2, mb:{xs:4, sm:2, md:0} }}
                                             onClick={handleChangeEtapa}
-                                            disabled={!selectedAddress && !selectedPickup}
+                                            disabled={!selectedAddress && !selectedPickup && !deliveryType}
                                         >
                                             <Typography variant="h7">
-                                                {selectedAddress || selectedPickup ? 'Continuar compra' : 'Selecciona una opción'}
+                                                {selectedAddress || selectedPickup || deliveryType ? 'Continuar compra' : 'Selecciona una opción'}
                                             </Typography>
                                         </Button>
                                         <ProtectionConsumer/>

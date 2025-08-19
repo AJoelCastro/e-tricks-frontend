@@ -7,8 +7,8 @@ export interface CartContextType {
   carrito: ICartItem[];
   setCarrito: React.Dispatch<React.SetStateAction<ICartItem[]>>;
   addresses: IAddress[];
-  deliveryType: 'pickup' | 'address' | null;
-  setDeliveryType: React.Dispatch<React.SetStateAction<'pickup' | 'address' | null>>;
+  deliveryType: 'pickup' | 'address' | 'courier' | null;
+  setDeliveryType: React.Dispatch<React.SetStateAction<'pickup' | 'address' | 'courier' | null>>;
   selectedCardId: string | null;
   setSelectedCardId: React.Dispatch<React.SetStateAction<string | null>>;
   paymentMethod: 'card' | 'yape' | null;
@@ -23,7 +23,7 @@ export interface CartContextType {
   etapa: number;
   setEtapa: React.Dispatch<React.SetStateAction<number>>;
   pickUps: IPickUp[];
-  
+
   // Nuevas funciones para refrescar datos específicos
   refreshCartItems: () => Promise<void>;
   refreshAddresses: () => Promise<void>;

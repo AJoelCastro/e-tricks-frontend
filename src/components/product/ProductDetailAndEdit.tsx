@@ -37,6 +37,7 @@ import { useAuth } from '@clerk/nextjs';
 import { IProduct } from '@/interfaces/Product';
 
 interface ProductDetailsEditProps {
+  isEdit: boolean;
   productId: string;
   onSuccess?: (product: IProduct) => void;
   onCancel?: () => void;
@@ -76,6 +77,7 @@ const brands = ['Nike', 'Adidas', 'Zara', 'H&M', 'Gucci', 'Prada'];
 const seasons = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
 
 const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({ 
+  isEdit,
   productId,
   onSuccess, 
   onCancel,
@@ -366,47 +368,54 @@ const ProductDetailsEdit: React.FC<ProductDetailsEditProps> = ({
               {isEditing ? 'Modifica los datos del producto' : 'Detalles del producto'}
             </Typography>
           </Box>
+          
           <Box sx={{ display: 'flex', gap: 2 }}>
-            {!isEditing && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={<Edit />}
-                  onClick={handleEditToggle}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<Delete />}
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  Eliminar
-                </Button>
-              </>
-            )}
-            {isEditing && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={<Cancel />}
-                  onClick={handleEditToggle}
-                  disabled={loading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<Save />}
-                  onClick={handleSubmit(onSubmit)}
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={20} /> : 'Guardar'}
-                </Button>
-              </>
-            )}
+            {
+              isEdit&&(
+                <>
+                  {!isEditing && (
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Edit />}
+                        onClick={handleEditToggle}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<Delete />}
+                        onClick={handleDelete}
+                        disabled={loading}
+                      >
+                        Eliminar
+                      </Button>
+                    </>
+                  )}
+                  {isEditing && (
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Cancel />}
+                        onClick={handleEditToggle}
+                        disabled={loading}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<Save />}
+                        onClick={handleSubmit(onSubmit)}
+                        disabled={loading}
+                      >
+                        {loading ? <CircularProgress size={20} /> : 'Guardar'}
+                      </Button>
+                    </>
+                  )}
+                </>
+              )
+            }
             {onCancel && (
               <Button variant="outlined" onClick={onCancel}>
                 Volver
