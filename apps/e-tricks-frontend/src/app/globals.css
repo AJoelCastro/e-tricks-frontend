@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@import 'swiper/css';
+@import 'swiper/css/scrollbar';
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Eliminamos la media query para el modo oscuro */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Transiciones suaves */
+.sidebar-enter {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.sidebar-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 300ms ease-out;
+}
+
+.sidebar-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.sidebar-exit-active {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 300ms ease-in;
+}
+
+/* Agregar a tu globals.css o archivo de estilos */
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* Estilos adicionales para mejor UX */
+.mp-checkout-container {
+  max-width: 100% !important;
+}
+
+.mp-checkout-form {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Personalización del componente de MercadoPago */
+.mp-form-row {
+  margin-bottom: 16px !important;
+}
+
+.mp-input {
+  border-radius: 4px !important;
+  border: 1px solid #e0e0e0 !important;
+  padding: 12px !important;
+  font-size: 14px !important;
+}
+
+.mp-input:focus {
+  border-color: #7950f2 !important;
+  box-shadow: 0 0 0 2px rgba(121, 80, 242, 0.2) !important;
+}
+
+.mp-button {
+  background-color: #7950f2 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.mp-button:hover {
+  background-color: #6741d9 !important;
+}
